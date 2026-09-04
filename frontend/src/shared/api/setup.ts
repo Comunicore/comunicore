@@ -6,7 +6,7 @@ const isMocking =
 
 export const apiBaseUrl = isMocking
   ? '/'
-  : (process.env.NEXT_PUBLIC_API_BASE_URL ?? 'https://comunicore.mooo.com');
+  : (process.env.NEXT_PUBLIC_API_URL ?? 'https://comunicore.mooo.com');
 
 client.setConfig({
   baseUrl: apiBaseUrl,
