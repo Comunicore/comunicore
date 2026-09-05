@@ -1,30 +1,57 @@
 'use client';
 
-import { useController, useFormContext } from 'react-hook-form';
+import { useRef } from 'react';
+import { useFormContext } from 'react-hook-form';
 import { LuFileText, LuRedo2, LuUndo2 } from 'react-icons/lu';
 
-import { getTools } from '../../../model/editor/editor.tools';
+import { useEditorTools } from '../../../model/hooks/useEditorTools';
 import { CreateThreadTypes } from '../../../model/schemas/create-thread.schema';
 
 import { ErrorMessage } from '@/shared/ui';
 
 export function MarkdownArea() {
-  const { control } = useFormContext<CreateThreadTypes>();
-
   const {
-    fieldState: { error },
-  } = useController({
-    name: 'description',
-    control,
-  });
+    register,
+    setValue,
+    formState: { errors },
+  } = useFormContext<CreateThreadTypes>();
 
-  const tools = getTools();
+  const { ref: registerRef, ...restRegister } = register('description');
+
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const tools = useEditorTools(textareaRef);
+
+  const undo = () => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    textarea.focus();
+    document.execCommand('undo');
+
+    setValue('description', textarea.value, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+  };
+
+  const redo = () => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    textarea.focus();
+    document.execCommand('redo');
+
+    setValue('description', textarea.value, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+  };
 
   return (
     <div className='grid gap-y-3.75'>
       <h2 className='font-bold text-white'>4. Текст треда</h2>
-      <div className='border-gray-9e/10 before:bg-dark-1b/80 pointer-events-none relative flex flex-col rounded-[0.625rem] border before:absolute before:inset-0 before:z-10 before:content-[""]'>
-        <p className='text-gray-9e absolute inset-0 z-10 flex items-center justify-center text-lg font-light'>
+      <div className='border-gray-9e/10 before:bg-dark-1b/80 relative flex flex-col rounded-[0.625rem] border before:absolute before:inset-0 before:-z-1 before:content-[""]'>
+        <p className='text-gray-9e absolute inset-0 z-10 hidden items-center justify-center text-lg font-light'>
           Раздел в разработке...
         </p>
         <div className='border-b-gray-9e/10 flex items-center border-b'>
@@ -48,6 +75,7 @@ export function MarkdownArea() {
               type='button'
               className='flex items-center'
               aria-label={'Отменить'}
+              onClick={undo}
               title='Отменить'
             >
               <LuUndo2 aria-hidden size={20} className='min-h-5 min-w-5' />
@@ -57,13 +85,22 @@ export function MarkdownArea() {
               title='Повторить'
               aria-label={'Повторить'}
               className='flex items-center'
+              onClick={redo}
             >
               <LuRedo2 aria-hidden size={20} className='min-h-5 min-w-5' />
             </button>
           </div>
         </div>
-        <div className='h-55 w-full p-2.5'>
-          <p className='text-gray-9e'>Напишите ваш тред здесь...</p>
+        <div className='relative z-10'>
+          <textarea
+            {...restRegister}
+            ref={(e) => {
+              registerRef(e);
+              textareaRef.current = e;
+            }}
+            className='h-55 w-full resize-none p-2.5'
+            placeholder='Напишите ваш тред здесь...'
+          />
         </div>
         <div className='text-gray-9e border-t-gray-9e/10 flex items-center gap-x-2.5 border-t p-2.5'>
           <LuFileText aria-hidden size={20} className='min-h-5 min-w-5' />
@@ -72,7 +109,9 @@ export function MarkdownArea() {
           </p>
         </div>
       </div>
-      {error?.message && <ErrorMessage error={error.message} />}
+      {errors.description?.message && (
+        <ErrorMessage error={errors.description.message} />
+      )}
     </div>
   );
 }

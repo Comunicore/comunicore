@@ -4,6 +4,7 @@ import Image from 'next/image';
 
 import { CreateThreadTypes } from '../../../model/schemas/create-thread.schema';
 
+import { md } from '@/shared/lib/markdown/parser';
 import { Tag, Tile } from '@/shared/ui';
 
 export function PostPreview() {
@@ -18,6 +19,8 @@ export function PostPreview() {
   ]);
 
   const fileUrls = baseUrls || ['/preview.jpg'];
+
+  const parsedMarkdown = md.render(description || '');
 
   const removeImage = (url: string) => {
     const updatedFileUrls = fileUrls.filter((fileUrl) => fileUrl !== url);
@@ -43,7 +46,7 @@ export function PostPreview() {
           </ul>
         )}
 
-        <div dangerouslySetInnerHTML={{ __html: description || '' }} />
+        <div dangerouslySetInnerHTML={{ __html: parsedMarkdown }} />
         <div className=''>
           {fileUrls?.map((url) => (
             <div

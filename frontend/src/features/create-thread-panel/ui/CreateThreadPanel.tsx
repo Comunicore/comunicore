@@ -1,10 +1,12 @@
 'use client';
 
+import { useEffect } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { LuEye, LuPencil } from 'react-icons/lu';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 
+import { useDrafts } from '../model/hooks/useDrafts';
 import {
   createThreadSchema,
   CreateThreadTypes,
@@ -25,7 +27,7 @@ const defaultValues = {
     id: '',
     name: '',
   },
-  description: 'prosto text',
+  description: '',
   fileUrl: undefined,
   tags: undefined,
   title: '',
@@ -36,6 +38,10 @@ export function CreateThreadPanel() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+
+  const editorMode = searchParams.get('editor-mode');
+  const isPreview = editorMode === 'preview';
+
   const methods = useForm<CreateThreadTypes>({
     resolver: zodResolver(createThreadSchema),
     defaultValues,
@@ -48,7 +54,14 @@ export function CreateThreadPanel() {
     formState: { errors },
   } = methods;
 
+  const { deleteDraft, loadDraft } = useDrafts(methods, !isPreview);
+
+  useEffect(() => {
+    loadDraft();
+  }, [loadDraft]);
+
   const onSubmit: SubmitHandler<CreateThreadTypes> = (data) => {
+    deleteDraft();
     console.log(data);
   };
 
@@ -66,9 +79,6 @@ export function CreateThreadPanel() {
     }
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
   };
-
-  const editorMode = searchParams.get('editor-mode');
-  const isPreview = editorMode === 'preview';
 
   return (
     <FormProvider {...methods}>
@@ -88,7 +98,20 @@ export function CreateThreadPanel() {
           )}
 
           {/* Buttons */}
-          <div className='border-t-gray-9e/10 flex justify-end gap-x-7.5 border-t p-5'>
+          <div className='border-t-gray-9e/10 grid grid-cols-[1fr_auto_auto] grid-rows-1 justify-end gap-x-7.5 border-t p-5'>
+            <Button
+              type='reset'
+              color='purple'
+              hoverStyle='purple'
+              onClick={() => {
+                methods.reset(defaultValues);
+                deleteDraft();
+              }}
+              size='max-lg'
+              className='justify-self-start'
+            >
+              Очистить
+            </Button>
             <Button
               type='button'
               color='transparent'
