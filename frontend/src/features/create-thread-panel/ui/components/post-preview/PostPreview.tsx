@@ -1,26 +1,21 @@
-import { useFormContext } from 'react-hook-form';
+import { useFormContext, useWatch } from 'react-hook-form';
 import { LuX } from 'react-icons/lu';
 import Image from 'next/image';
 
 import { CreateThreadTypes } from '../../../model/schemas/create-thread.schema';
 
-import { md } from '@/shared/lib/markdown/parser';
 import { Tag, Tile } from '@/shared/ui';
+import { StyledPostHtml } from '@/shared/ui/StyledPostHtml';
 
 export function PostPreview() {
-  const { watch, setValue } = useFormContext<CreateThreadTypes>();
+  const { control, setValue } = useFormContext<CreateThreadTypes>();
 
-  const [title, description, tags, chapter, baseUrls] = watch([
-    'title',
-    'description',
-    'tags',
-    'chapter.name',
-    'fileUrl',
-  ]);
+  const formValues = useWatch({ control });
+  const { chapter, description, fileUrl: baseUrls, tags, title } = formValues;
+
+  const chapterName = chapter?.name || 'Без темы';
 
   const fileUrls = baseUrls || ['/preview.jpg'];
-
-  const parsedMarkdown = md.render(description || '');
 
   const removeImage = (url: string) => {
     const updatedFileUrls = fileUrls.filter((fileUrl) => fileUrl !== url);
@@ -30,7 +25,7 @@ export function PostPreview() {
   return (
     <div className='grid gap-y-5'>
       <p className='text-xl font-bold'>
-        Тема: <span className='text-purple-9d'>{chapter}</span>
+        Тема: <span className='text-purple-9d'>{chapterName}</span>
       </p>
       <h2 className='text-4xl font-bold'>{title}</h2>
       <Tile className='grid gap-y-5'>
@@ -46,7 +41,7 @@ export function PostPreview() {
           </ul>
         )}
 
-        <div dangerouslySetInnerHTML={{ __html: parsedMarkdown }} />
+        <StyledPostHtml markdown={description} />
         <div className=''>
           {fileUrls?.map((url) => (
             <div

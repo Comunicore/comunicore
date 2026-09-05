@@ -1,10 +1,11 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Montserrat } from 'next/font/google';
 
 import Providers from './providers/providers';
 
 import './styles/globals.css';
 import './styles/utils.css';
+import 'highlight.js/styles/base16/solarized-dark.css';
 
 const montserrat = Montserrat({
   variable: '--font-main',
@@ -14,6 +15,12 @@ const montserrat = Montserrat({
 export const metadata: Metadata = {
   title: 'Comunicore',
   description: 'Форум для общения',
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
 };
 
 export default function RootLayout({
