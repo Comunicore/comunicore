@@ -11,7 +11,7 @@ interface TileProps extends PropsWithChildren, HTMLAttributes<HTMLDivElement> {
 }
 
 const sizeStyles: Record<TileSize, string> = {
-  sm: 'p-5 rounded-[1.25rem]',
+  sm: 'p-3.75 rounded-[1.25rem]',
   md: 'p-5 rounded-[1.25rem]',
   lg: 'px-5 py-7.5 rounded-[1.25rem]',
   xl: 'p-7.5 rounded-[1.25rem]',

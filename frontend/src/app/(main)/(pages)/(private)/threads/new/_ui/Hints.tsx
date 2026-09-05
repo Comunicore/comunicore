@@ -1,6 +1,8 @@
 import { LuArrowRight } from 'react-icons/lu';
 import Link from 'next/link';
 
+import { EditorFormTracker } from '@/widgets/editor-form-tracker';
+
 import { AppRouter } from '@/shared/config/app-router';
 import { Tile } from '@/shared/ui';
 
@@ -15,13 +17,18 @@ const communityRulesMap = [
   'Оформляйте код, логи и большие изображения в специальные теги/спойлеры',
 ] as const;
 
-export default function Hints() {
+interface HintsProps {
+  editorModeParam: string;
+  previewMode: string;
+}
+
+export default function Hints({ editorModeParam, previewMode }: HintsProps) {
   return (
     <div className='flex flex-col gap-y-10 **:[h2]:text-lg **:[h2]:font-bold'>
-      <Tile>
-        <h2>Советы по оформлению</h2>
-        <p>hint for writing thread</p>
-      </Tile>
+      <EditorFormTracker
+        editorModeParam={editorModeParam}
+        previewMode={previewMode}
+      />
 
       {/* rules */}
       <Tile className='flex flex-col gap-y-5'>
