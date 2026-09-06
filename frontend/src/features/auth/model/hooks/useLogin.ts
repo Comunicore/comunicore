@@ -20,48 +20,22 @@ export const useLogin = () => {
   const setStatus = useAuthStore((state) => state.actions.setStatus);
 
   const loginMutation = useMutation({
-    ...authLoginMutation().mutationKey,
-    mutationFn: async (loginData: { body: LoginFormTypes }) => {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(loginData.body),
-      });
+    ...authLoginMutation(),
 
-      const contentType = response.headers.get('content-type') ?? '';
-      const responseData = contentType.includes('application/json')
-        ? await response.json().catch(() => null)
-        : await response.text().catch(() => null);
-
-      if (!response.ok) {
-        const rawMessage =
-          typeof responseData === 'string'
-            ? responseData
-            : responseData?.message || responseData?.error;
-
-        const errorMessage =
-          rawMessage === 'Unauthorized'
-            ? 'Неверный логин или пароль'
-            : rawMessage || 'Не удалось войти';
-
-        throw new Error(errorMessage);
-      }
-
-      return responseData;
-    },
     onMutate: () => {
       setStatus('loading');
     },
+
     onSuccess: async () => {
       setStatus('authenticated');
 
       await queryClient.invalidateQueries({
         queryKey: userMeOptions().queryKey,
       });
+
       router.push(`${AppRouter.profile.root}`);
     },
+
     onError: () => {
       setStatus('anonymous');
     },

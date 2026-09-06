@@ -13,10 +13,11 @@ import (
 )
 
 type ForumUser struct {
-	ID       int
-	Name     string
-	Email    string
-	Password string
+	ID        int
+	Name      string
+	Email     string
+	Password  string
+	CreatedAt string
 }
 
 func testUserCreateOk(t *testing.T, baseURL string) ForumUser {
@@ -36,10 +37,11 @@ func testUserCreateOk(t *testing.T, baseURL string) ForumUser {
 			}).
 			Expect().
 			Status(http.StatusCreated).JSON().Object()
-		obj.Keys().ContainsOnly("id", "name", "email", "avatarUrl")
+		obj.Keys().ContainsOnly("id", "name", "email", "avatarUrl", "createdAt")
 		obj.Value("id").Number().Gt(0)
 		obj.Value("name").IsEqual(user.Name)
 		obj.Value("email").IsEqual(user.Email)
+		obj.Value("createdAt").String().NotEmpty()
 
 		user.ID = int(obj.Value("id").Number().Raw())
 	})
@@ -185,11 +187,12 @@ func testUserMeOk(t *testing.T, baseURL string, cookie *http.Cookie) ForumUser {
 			Expect().
 			Status(http.StatusOK).JSON().Object()
 
-		res.Keys().ContainsOnly("id", "name", "email", "avatarUrl")
+		res.Keys().ContainsOnly("id", "name", "email", "avatarUrl", "createdAt")
 
 		user.ID = int(res.Value("id").Number().Raw())
 		user.Name = res.Value("name").String().Raw()
 		user.Email = res.Value("email").String().Raw()
+		user.CreatedAt = res.Value("createdAt").String().Raw()
 	})
 
 	return user
@@ -208,11 +211,12 @@ func testUserGetOk(t *testing.T, baseURL string, cookie *http.Cookie, userID int
 			Expect().
 			Status(http.StatusOK).JSON().Object()
 
-		res.Keys().ContainsOnly("id", "name", "email", "avatarUrl")
+		res.Keys().ContainsOnly("id", "name", "email", "avatarUrl", "createdAt")
 
 		user.ID = int(res.Value("id").Number().Raw())
 		user.Name = res.Value("name").String().Raw()
 		user.Email = res.Value("email").String().Raw()
+		user.CreatedAt = res.Value("createdAt").String().Raw()
 	})
 
 	return user

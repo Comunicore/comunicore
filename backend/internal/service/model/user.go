@@ -3,9 +3,12 @@
 
 package model
 
+import "time"
+
 type User struct {
 	ID        int
 	Name      string
 	Email     string
 	AvatarURL string
+	CreatedAt time.Time
 }
