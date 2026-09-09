@@ -11,7 +11,7 @@ export { Label } from './Label';
 export { Loader } from './Loader';
 export { Pagination } from './Pagination';
 export { PasswordInput } from './PasswordInput';
-export { PreviewImageList } from './PreviewImageList';
+export { PreviewImageList } from './preview-image-list';
 export { ProfileAvatar } from './ProfileAvatar';
 export { ScrollX } from './ScrollX';
 export * from './select';
