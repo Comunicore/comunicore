@@ -1,10 +1,8 @@
 import { useFormContext, useWatch } from 'react-hook-form';
-import { LuX } from 'react-icons/lu';
-import Image from 'next/image';
 
 import { CreateThreadTypes } from '../../../model/schemas/create-thread.schema';
 
-import { Tag, Tile } from '@/shared/ui';
+import { PreviewImageList, Tag, Tile } from '@/shared/ui';
 import { StyledPostHtml } from '@/shared/ui/StyledPostHtml';
 
 export function PostPreview() {
@@ -15,7 +13,7 @@ export function PostPreview() {
 
   const chapterName = chapter?.name || 'Без темы';
 
-  const fileUrls = baseUrls || ['/preview.jpg'];
+  const fileUrls = baseUrls || [];
 
   const removeImage = (url: string) => {
     const updatedFileUrls = fileUrls.filter((fileUrl) => fileUrl !== url);
@@ -42,25 +40,12 @@ export function PostPreview() {
         )}
 
         <StyledPostHtml markdown={description} />
-        <div className=''>
-          {fileUrls?.map((url) => (
-            <div
-              key={url}
-              className='relative size-30 overflow-hidden rounded-xl object-contain'
-            >
-              <Image src={url} alt='preview image' fill />
-              <button
-                type='button'
-                onClick={() => removeImage(url)}
-                title='Remove image'
-                aria-label='Remove image'
-                className='absolute top-2 right-2'
-              >
-                <LuX role='img' size={20} aria-hidden />
-              </button>
-            </div>
-          ))}
-        </div>
+        <PreviewImageList
+          imageClassName='w-full h-50'
+          className='max-h-150 flex-col gap-y-5'
+          urls={fileUrls}
+          onRemove={removeImage}
+        />
       </Tile>
     </div>
   );

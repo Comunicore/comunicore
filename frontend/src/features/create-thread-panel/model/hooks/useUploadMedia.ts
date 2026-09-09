@@ -50,11 +50,15 @@ export const useUploadMedia = <TFieldValues extends FieldValues>({
 
       const results = await Promise.all(uploadPromises);
 
+      const existingArray = Array.isArray(currentUrls) ? [...currentUrls] : [];
+      const existingSet = new Set(existingArray);
+
       const newUrls = results
         .map((res) => res.url)
-        .filter((url): url is string => typeof url === 'string');
-
-      const existingArray = Array.isArray(currentUrls) ? currentUrls : [];
+        .filter(
+          (url): url is string =>
+            typeof url === 'string' && !existingSet.has(url),
+        );
       const updatedValue = [...existingArray, ...newUrls] as PathValue<
         TFieldValues,
         Path<TFieldValues>

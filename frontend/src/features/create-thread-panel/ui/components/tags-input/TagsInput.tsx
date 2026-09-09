@@ -16,9 +16,14 @@ export function TagsInput() {
     if (e.key === 'Enter' || e.key === ',') {
       e.preventDefault();
       const trimmed = inputValue.trim().toLowerCase();
+      const cleanTag = trimmed
+        .split('#')
+        .filter((str) => str !== '#')
+        .join('');
+      const validTag = cleanTag.split(' ').join('');
 
-      if (trimmed && !tags.includes(trimmed)) {
-        const nextTags = [...tags, trimmed];
+      if (validTag && !tags.includes(validTag)) {
+        const nextTags = [...tags, validTag];
         setValue('tags', nextTags, { shouldValidate: true, shouldDirty: true });
         setInputValue('');
       }
@@ -47,6 +52,8 @@ export function TagsInput() {
                 <button
                   type='button'
                   onClick={() => removeTag(tag)}
+                  title='Remove tag'
+                  aria-label='Remove tag'
                   className='text-gray-9e transition-colors hover:text-white'
                 >
                   <LuX size={14} />

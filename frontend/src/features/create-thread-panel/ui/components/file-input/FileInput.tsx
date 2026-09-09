@@ -6,13 +6,22 @@ import { useUploadMedia } from '../../../model/hooks/useUploadMedia';
 import { CreateThreadTypes } from '../../../model/schemas/create-thread.schema';
 
 import { cn } from '@/shared/lib/classNames';
-import { ErrorMessage } from '@/shared/ui';
+import { ErrorMessage, PreviewImageList } from '@/shared/ui';
 
 export function FileInput() {
   const {
+    watch,
     formState: { errors },
+    setValue,
   } = useFormContext<CreateThreadTypes>();
   const [isDragActive, setIsDragActive] = useState(false);
+
+  const fileUrls = watch('fileUrl') || [];
+
+  const removeImage = (url: string) => {
+    const updatedFileUrls = fileUrls.filter((fileUrl) => fileUrl !== url);
+    setValue('fileUrl', updatedFileUrls);
+  };
 
   const { handleFileChange, isUploading, handleDragOver, handleDrop } =
     useUploadMedia<CreateThreadTypes>({ fieldName: 'fileUrl' });
@@ -71,6 +80,7 @@ export function FileInput() {
         <p className='text-gray-9e'>
           Поддерживаемые изображения, код, документы (до 5 мб)
         </p>
+        <PreviewImageList urls={fileUrls} onRemove={removeImage} />
       </div>
     </div>
   );

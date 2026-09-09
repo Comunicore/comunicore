@@ -1,12 +1,17 @@
+export { AlertModal } from './AlertModal';
 export { Button } from './Button';
 export { Checkbox } from './Checkbox';
 export { Container, containerClassName } from './Container';
 export { ErrorMessage } from './ErrorMessage';
+export { FilePlaceholder } from './FilePlaceholder';
 export { FormField } from './FormField';
+export { ImageModal } from './ImageModal';
 export { Input } from './Input';
 export { Label } from './Label';
 export { Loader } from './Loader';
 export { Pagination } from './Pagination';
+export { PasswordInput } from './PasswordInput';
+export { PreviewImageList } from './PreviewImageList';
 export { ProfileAvatar } from './ProfileAvatar';
 export { ScrollX } from './ScrollX';
 export * from './select';

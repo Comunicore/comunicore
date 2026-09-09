@@ -5,37 +5,50 @@ import { UseFormReturn } from 'react-hook-form';
 
 import { CreateThreadTypes } from '../schemas/create-thread.schema';
 
-const SAVE_INTERVAL = 1000 * 10; // 10 seconds
 const DRAFT_KEY = 'communicore_thread_draft';
+const DEBOUNCE_DELAY = 800;
 
 export const useDrafts = (
   methods: UseFormReturn<CreateThreadTypes>,
   isActive: boolean = true,
 ) => {
-  const {
-    getValues,
-    reset,
-    formState: { isDirty },
-  } = methods;
+  const { getValues, reset, watch } = methods;
   const isAutoSaveActive = useRef(isActive);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const clearAutoSaveTimer = useCallback(() => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+  }, []);
+
+  const hasFormContent = (values: Partial<CreateThreadTypes>) =>
+    Object.values(values).some((val) => Boolean(val));
 
   const saveDraft = useCallback(() => {
-    if (!isAutoSaveActive.current || !isDirty || typeof window === 'undefined')
-      return;
+    if (!isAutoSaveActive.current || typeof window === 'undefined') return;
+
     const values = getValues();
-    const hasContent = Object.values(values).some((val) => Boolean(val));
-    if (hasContent) {
+    if (hasFormContent(values)) {
       localStorage.setItem(DRAFT_KEY, JSON.stringify(values));
     }
-  }, [getValues, isDirty]);
+  }, [getValues]);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      saveDraft();
-    }, SAVE_INTERVAL);
+    const subscription = watch(() => {
+      clearAutoSaveTimer();
 
-    return () => clearInterval(interval);
-  }, [saveDraft]);
+      timerRef.current = setTimeout(() => {
+        saveDraft();
+      }, DEBOUNCE_DELAY);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+      clearAutoSaveTimer();
+    };
+  }, [watch, saveDraft, clearAutoSaveTimer]);
 
   const loadDraft = useCallback(() => {
     if (typeof window === 'undefined') return;
@@ -47,6 +60,7 @@ export const useDrafts = (
         reset(parsedDraft);
       } catch (e) {
         console.error('Ошибка парсинга черновика:', e);
+        localStorage.removeItem(DRAFT_KEY);
       }
     }
   }, [reset]);
@@ -59,6 +73,7 @@ export const useDrafts = (
   }, []);
 
   return {
+    saveDraft,
     deleteDraft,
     loadDraft,
   };
