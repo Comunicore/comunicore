@@ -4,7 +4,7 @@ import { type Client, formDataBodySerializer, type Options as Options2, type TDa
 import { client } from './client.gen';
 import type { AnalyticsMetricsGetData, AnalyticsMetricsGetErrors, AnalyticsMetricsGetResponses, AnalyticsVisitBatchSubmitData, AnalyticsVisitBatchSubmitErrors, AnalyticsVisitBatchSubmitResponses, AuthLoginData, AuthLoginErrors, AuthLoginResponses, AuthLogoutData, AuthLogoutResponses, MediaGetData, MediaGetErrors, MediaGetResponses, MediaUploadData, MediaUploadErrors, MediaUploadResponses, ThreadAddPostData, ThreadAddPostErrors, ThreadAddPostResponses, ThreadCreateData, ThreadCreateErrors, ThreadCreateResponses, ThreadGetData, ThreadGetErrors, ThreadGetResponses, ThreadsListData, ThreadsListErrors, ThreadsListResponses, UserCreateData, UserCreateErrors, UserCreateResponses, UserDeleteData, UserDeleteResponses, UserGetData, UserGetErrors, UserGetResponses, UserMeData, UserMeErrors, UserMeResponses, UserUpdateData, UserUpdateResponses } from './types.gen';
 
-export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
+export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
      * You can provide a client instance returned by `createClient()` instead of
      * individual options. This might be also useful if you want to implement a

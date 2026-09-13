@@ -1,8 +1,10 @@
-import { format } from 'date-fns';
-
 import { User } from '../../model/types/user.types';
 
 import { cn } from '@/shared/lib/classNames';
+import {
+  DATE_FALLBACK,
+  safeFormatDate,
+} from '@/shared/lib/helpers/safeFormatDate';
 import { Tile } from '@/shared/ui';
 
 type ProfileUserInfoProps = Pick<
@@ -30,21 +32,29 @@ export function ProfileUserInfo({
     >
       <h3 className='text-lg font-bold'>Инфо</h3>
 
-      <div>
-        <h4>Роль</h4>
-        <p>{role}</p>
-      </div>
+      {role && (
+        <div>
+          <h4>Роль</h4>
+          <p>{role}</p>
+        </div>
+      )}
 
       <div>
         <h4>На форуме с </h4>
-        <time dateTime={createdAt}>{format(createdAt, 'dd.MM.yyyy')}</time>
+        {createdAt ? (
+          <time dateTime={createdAt}>{safeFormatDate(createdAt)}</time>
+        ) : (
+          <p>{DATE_FALLBACK}</p>
+        )}
       </div>
 
       <div>
         <h4>Последняя активность</h4>
-        <time dateTime={lastActivity}>
-          {format(lastActivity, 'dd.MM.yyyy')}
-        </time>
+        {lastActivity ? (
+          <time dateTime={lastActivity}>{safeFormatDate(lastActivity)}</time>
+        ) : (
+          <p>{DATE_FALLBACK}</p>
+        )}
       </div>
 
       {webSite && (
