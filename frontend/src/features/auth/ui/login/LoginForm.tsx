@@ -86,7 +86,7 @@ export function LoginForm() {
       {serverError && (
         <ErrorMessage
           className='text-center'
-          error={getErrorMessage(serverError.message)}
+          error={getErrorMessage(serverError)}
         />
       )}
 
