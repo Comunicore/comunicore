@@ -1,21 +1,30 @@
 'use client';
 
-import { AuthMeResponse } from '../types/authMe.types';
-import { User } from '../types/user.types';
+import { useMemo } from 'react';
+
+import { mapApiUserToUser } from '../mappers/mapApiUserToUser';
+import type { ApiUser, ApiUserEnvelope } from '../types/apiUser.types';
+import type { AuthMeResponse } from '../types/authMe.types';
 
 import { useAuthMeQuery } from './useAuthMeQuery';
+
+type AuthMePayload = ApiUser | ApiUserEnvelope;
+
+const isEnvelope = (data: AuthMePayload): data is ApiUserEnvelope =>
+  'user' in data && typeof data.user === 'object' && data.user !== null;
+
+const toAuthMeResponse = (data: AuthMePayload): AuthMeResponse =>
+  isEnvelope(data)
+    ? {
+        accessToken: data.accessToken ?? '',
+        user: mapApiUserToUser(data.user),
+      }
+    : { accessToken: '', user: mapApiUserToUser(data) };
 
 export const useUser = (options?: { enabled?: boolean }) => {
   const { data, ...query } = useAuthMeQuery(options);
 
-  const user = data
-    ? 'user' in data
-      ? (data as unknown as AuthMeResponse)
-      : ({
-          accessToken: '',
-          user: data as unknown as User,
-        } satisfies AuthMeResponse)
-    : null;
+  const user = useMemo(() => (data ? toAuthMeResponse(data) : null), [data]);
 
   return {
     user,

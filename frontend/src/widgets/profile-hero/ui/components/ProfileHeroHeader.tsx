@@ -1,8 +1,10 @@
-import { format } from 'date-fns';
-
 import { User } from '@/entities/user';
 
 import { cn } from '@/shared/lib/classNames';
+import {
+  DATE_FALLBACK,
+  safeFormatDate,
+} from '@/shared/lib/helpers/safeFormatDate';
 import { Tag } from '@/shared/ui';
 
 type ProfileHeaderProps = Pick<User, 'createdAt' | 'name' | 'role' | 'userTag'>;
@@ -29,7 +31,7 @@ export function ProfileHeroHeader(props: ProfileHeaderProps) {
         >
           {name}
         </h1>
-        <Tag className='whitespace-nowrap'>{role}</Tag>
+        {role && <Tag className='whitespace-nowrap'>{role}</Tag>}
       </header>
 
       <div
@@ -43,7 +45,11 @@ export function ProfileHeroHeader(props: ProfileHeaderProps) {
         <span>{userTag}</span>
         <span>
           На форуме с{' '}
-          <time dateTime={createdAt}>{format(createdAt, 'dd.MM.yyyy')}</time>
+          {createdAt ? (
+            <time dateTime={createdAt}>{safeFormatDate(createdAt)}</time>
+          ) : (
+            DATE_FALLBACK
+          )}
         </span>
       </div>
     </div>
