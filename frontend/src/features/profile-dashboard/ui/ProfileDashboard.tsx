@@ -37,7 +37,7 @@ export function ProfileDashboard(_: { userId: User['id'] }) {
         items={dashboardItems.lastComments}
       />
       <DashboardCard
-        href={AppRouter.profile.bookmarks}
+        href={AppRouter.profile.favorites}
         title='Закладки'
         items={dashboardItems.bookmarks}
       />

@@ -7,7 +7,7 @@ import { User } from '@/entities/user';
 
 import { AppRouter } from '@/shared/config/app-router';
 import { isApiUrl } from '@/shared/guards/isApiUrl.guard';
-import { Button, ProfileAvatar } from '@/shared/ui';
+import { ProfileAvatar } from '@/shared/ui';
 
 export function ProfileHero(props: { user: User }) {
   const {
@@ -85,15 +85,8 @@ export function ProfileHero(props: { user: User }) {
             </p>
 
             <div className='flex flex-col gap-y-2 *:w-full max-lg:justify-center sm:flex-row sm:gap-x-2.5 sm:*:w-fit'>
-              <Button
-                href={AppRouter.profile.edit}
-                color='purple'
-                className='whitespace-nowrap'
-              >
-                Редактировать профиль
-              </Button>
               <Link
-                href={AppRouter.settings}
+                href={AppRouter.profile.settings}
                 className='border-purple-86 hover:text-purple-86 hover:border-purple-86/50 rounded-[0.3125rem] border-2 px-4 py-3.25 text-center duration-200'
               >
                 Настройки

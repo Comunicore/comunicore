@@ -29,15 +29,15 @@ export const profileChapters = [
     href: AppRouter.profile.messages,
   },
   {
-    id: 'bookmarks',
+    id: 'favorites',
     icon: LuBookmark,
     label: 'Закладки',
-    href: AppRouter.profile.bookmarks,
+    href: AppRouter.profile.favorites,
   },
   {
     id: 'notifications',
     icon: LuBell,
     label: 'Уведомления',
-    href: AppRouter.notification,
+    href: AppRouter.profile.notifications,
   },
 ] as const satisfies ListItemLinkWithIcon[];

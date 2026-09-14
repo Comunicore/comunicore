@@ -21,23 +21,23 @@ const navigations = [
   {
     name: 'Notifications',
     Icon: IoNotificationsSharp,
-    href: AppRouter.notification,
+    href: AppRouter.profile.notifications,
   },
   {
     name: 'Messages',
     Icon: IoChatboxSharp,
-    href: AppRouter.faq,
+    href: AppRouter.profile.messages,
   },
   {
     name: 'Favorites',
     Icon: IoBookmarkSharp,
-    href: AppRouter.favorites,
+    href: AppRouter.profile.favorites,
   },
 
   {
     name: 'Settings',
     Icon: IoSettingsSharp,
-    href: AppRouter.main,
+    href: AppRouter.profile.settings,
   },
 ] satisfies NavigationItem[];
 
@@ -74,6 +74,7 @@ export function ProfileActions({ className }: Props) {
       </div>
       <div className='hidden gap-x-6 xl:flex'>
         {navigations
+          // фильтр на десктопе убирает лишние кнопки
           .filter(({ name }) =>
             ['messages', 'notifications'].includes(name.toLowerCase()),
           )
