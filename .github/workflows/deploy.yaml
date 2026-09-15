@@ -9,6 +9,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # Required to delete branch deploy
     # build frontend
     steps:
       - name: Checkout code
@@ -70,3 +72,7 @@ jobs:
           ssh -i ./deploy_key -o StrictHostKeychecking=no comunicore@comunicore.mooo.com cat < ./comunicore.tar.xz
         env:
           DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+
+      - name: delete deploy branch
+        run: |
+          git push origin --delete deploy
