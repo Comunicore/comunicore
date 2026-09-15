@@ -1,11 +1,7 @@
-export { useAuthMeQuery } from './model/hooks/useAuthMeQuery';
-export { useUser } from './model/hooks/useUser';
-export { mapApiUserToUser } from './model/mappers/mapApiUserToUser';
-export type { ApiUser, ApiUserEnvelope } from './model/types/apiUser.types';
-export type {
-  User,
-  UserAchievement,
-  UserLocation,
-} from './model/types/user.types';
-export { ProfileUserInfo } from './ui/profile-user-info/ProfileUserInfo';
-export { ProfileAchivements } from './ui/profile-achievements/ProfileAchivements';
+export type { ApiUser, ApiUserEnvelope } from './model/apiUser.types';
+export { mapApiUserToUser } from './model/mapApiUserToUser';
+export { useAuthMeQuery } from './model/useAuthMeQuery';
+export type { User, UserAchievement, UserLocation } from './model/user.types';
+export { useUser } from './model/useUser';
+export { ProfileAchivements } from './ui/ProfileAchivements';
+export { ProfileUserInfo } from './ui/ProfileUserInfo';

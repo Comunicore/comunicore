@@ -8,7 +8,7 @@ import {
 } from 'react-icons/io5';
 import Link from 'next/link';
 
-import { NavigationItem } from '../model/types/navigation-item.types';
+import { NavigationItem } from '../model/navigation-item.types';
 
 import { selectIsAuthenticated, useAuthStore } from '@/entities/session';
 import { useUser } from '@/entities/user';

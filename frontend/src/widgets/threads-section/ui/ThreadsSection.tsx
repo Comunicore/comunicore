@@ -1,6 +1,6 @@
-import { NotFoundResp } from './components/not-found-resp/NotFoundRespl';
-import { ThreadsHeader } from './components/threads-header/ThreadsHeader';
-import { ThreadsList } from './components/threads-list/ThreadsList';
+import { NotFoundResp } from './NotFoundRespl';
+import { ThreadsHeader } from './ThreadsHeader';
+import { ThreadsList } from './ThreadsList';
 
 import { FilterByTag } from '@/features/filter-by-tag';
 import { ThreadsFiltration } from '@/features/threads-filtration';

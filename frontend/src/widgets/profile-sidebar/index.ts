@@ -1,2 +1,2 @@
-export { ProfileChapterList } from './ui/components/profile-chapter-list/ProfileChapterList';
+export { ProfileChapterList } from './ui/ProfileChapterList';
 export { ProfileSidebar } from './ui/ProfileSidebar';

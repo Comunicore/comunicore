@@ -1,7 +1,7 @@
-import { useDashboardItems } from '../model/hooks/useDashboardItems';
+import { useDashboardItems } from '../model/useDashboardItems';
 
-import { DashboardCard } from './components/dashboard-card/DashboardCard';
-import { DashboardSkeleton } from './components/dashboard-skeleton/DashboardSkeleton';
+import { DashboardCard } from './DashboardCard';
+import { DashboardSkeleton } from './DashboardSkeleton';
 
 import { User } from '@/entities/user';
 

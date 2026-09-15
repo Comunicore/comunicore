@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { ProfileHeroHeader } from './components/ProfileHeroHeader';
+import { ProfileHeroHeader } from './ProfileHeroHeader';
 
 import { User } from '@/entities/user';
 

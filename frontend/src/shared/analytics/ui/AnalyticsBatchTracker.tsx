@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 
-import { apiBaseUrl } from '../../../shared/api/setup';
+import { apiBaseUrl } from '../../api/setup';
 
 type AnalyticsBatchPayload = {
   clientBatchId: string;
