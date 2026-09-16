@@ -44,6 +44,7 @@ func (u *UserHandler) userGetById(ctx context.Context, userId int) (*api.UserCre
 		Name:      user.Name,
 		Email:     user.Email,
 		AvatarUrl: *avatarUrl,
+		CreatedAt: api.NewOptDateTime(user.CreatedAt),
 	}, nil
 }
 func (u *UserHandler) UserMe(ctx context.Context) (api.UserMeRes, error) {
@@ -66,6 +67,7 @@ func (u *UserHandler) UserCreate(ctx context.Context, req *api.UserCreateRequest
 			Name:      user.Name,
 			Email:     user.Email,
 			AvatarUrl: *avatarUrl,
+			CreatedAt: api.NewOptDateTime(user.CreatedAt),
 		}, nil
 	}
 	var nonUniqueFields []string

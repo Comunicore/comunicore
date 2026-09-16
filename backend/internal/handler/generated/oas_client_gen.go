@@ -4,6 +4,7 @@ package api
 
 import (
 	"context"
+	"io"
 	"net/url"
 	"strings"
 
@@ -29,8 +30,8 @@ type Invoker interface {
 	AnalyticsMetricsGet(ctx context.Context, params AnalyticsMetricsGetParams) (AnalyticsMetricsGetRes, error)
 	// AnalyticsVisitBatchSubmit invokes analyticsVisitBatchSubmit operation.
 	//
-	// Public endpoint; when the `sid` cookie is present, the batch is linked to the user.
-	// Idempotent per `clientBatchId`.
+	// Public endpoint; when the `sid` cookie is present, the batch is linked to the user. Idempotent per
+	// `clientBatchId`.
 	//
 	// POST /api/analytics/visit-batch
 	AnalyticsVisitBatchSubmit(ctx context.Context, request *AnalyticsVisitBatchRequest) (AnalyticsVisitBatchSubmitRes, error)
@@ -81,41 +82,37 @@ type Invoker interface {
 	// Получить список веток с пагинацией. Можно
 	// использовать либо постраничную пагинацию (page + limit),
 	// либо курсорную пагинацию (after или before). Нужно
-	// использовать только один параметр.
-	// after, before или page с номером страницы. Если ни один не
-	// указан - выводятся самые свежие сообщения.
-	// limit - количество сообщений на страницу, по умолчанию 20.
-	// С разделением на страницы есть неприятная
-	// особенность. При удалении или добавлении новых
-	// сообщений,
-	// страницы могут "прыгать". Т.е. у нас есть список
-	// (сообщений) и в него могут добавляться и удаляться
-	// элементы
-	// в любом месте списка. Если мы находится на странице 3 и
-	// хотим 7-ю, то в ней могут быть совсем другие элементы,
-	// чем на момент запроса страницы 3. Поэтому для более
-	// стабильной пагинации можно использовать курсорную
-	// пагинацию.
+	// использовать только один параметр. after, before или page с
+	// номером страницы. Если ни один не указан - выводятся
+	// самые свежие сообщения. limit - количество сообщений на
+	// страницу, по умолчанию 20. С разделением на страницы
+	// есть неприятная особенность. При удалении или
+	// добавлении новых сообщений, страницы могут "прыгать".
+	// Т.е. у нас есть список (сообщений) и в него могут
+	// добавляться и удаляться элементы в любом месте списка.
+	// Если мы находится на странице 3 и хотим 7-ю, то в ней
+	// могут быть совсем другие элементы, чем на момент
+	// запроса страницы 3. Поэтому для более стабильной
+	// пагинации можно использовать курсорную пагинацию.
+	//
 	// Навигация по номеру страницы выберает все сообщения
-	// на момент запроса и отдает нужную страницу.
-	// Добавление
+	// на момент запроса и отдает нужную страницу. Добавление
 	// или удаление сообщений сбивает это разделение.
+	//
 	// Курсорная пагинация позволяет двигаться вперед и
-	// назад по списку, учитывая изменеия в нем.
-	// Но для нее нужно указывать минимальный или
-	// максимальный id сообщения на странице, чтобы понять
-	// откуда двигаться
+	// назад по списку, учитывая изменеия в нем. Но для нее
+	// нужно указывать минимальный или максимальный id
+	// сообщения на странице, чтобы понять откуда двигаться
 	// дальше. И она не позволяет прыгать на конкретную
-	// страницу, а только двигаться вперед и назад.
-	// При этом before и after не включаются в результат, т.е. если
-	// указать before=10, то в результат не попадет
-	// сообщение с id 10, а только с id меньше 10. И аналогично для
-	// after. В них указываются id сообщения, но
-	// before - для получения более старых сообщений, а after - для
-	// получения более новых сообщений по времени.
-	// Более старым сообщениям (before) соответствует меньший id
-	// (более старые сообщения),
-	// а более новым (after) - больший id. И при этом не важно,
+	// страницу, а только двигаться вперед и назад. При этом
+	// before и after не включаются в результат, т.е. если указать
+	// before=10, то в результат не попадет сообщение с id 10, а
+	// только с id меньше 10. И аналогично для after. В них
+	// указываются id сообщения, но before - для получения более
+	// старых сообщений, а after - для получения более новых
+	// сообщений по времени. Более старым сообщениям (before)
+	// соответствует меньший id (более старые сообщения), а
+	// более новым (after) - больший id. И при этом не важно,
 	// удалены эти сообщения или нет.
 	//
 	// GET /api/threads
@@ -290,7 +287,13 @@ func (c *Client) sendAnalyticsMetricsGet(ctx context.Context, params AnalyticsMe
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	result, err := decodeAnalyticsMetricsGetResponse(resp)
 	if err != nil {
@@ -302,8 +305,8 @@ func (c *Client) sendAnalyticsMetricsGet(ctx context.Context, params AnalyticsMe
 
 // AnalyticsVisitBatchSubmit invokes analyticsVisitBatchSubmit operation.
 //
-// Public endpoint; when the `sid` cookie is present, the batch is linked to the user.
-// Idempotent per `clientBatchId`.
+// Public endpoint; when the `sid` cookie is present, the batch is linked to the user. Idempotent per
+// `clientBatchId`.
 //
 // POST /api/analytics/visit-batch
 func (c *Client) AnalyticsVisitBatchSubmit(ctx context.Context, request *AnalyticsVisitBatchRequest) (AnalyticsVisitBatchSubmitRes, error) {
@@ -331,7 +334,13 @@ func (c *Client) sendAnalyticsVisitBatchSubmit(ctx context.Context, request *Ana
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	result, err := decodeAnalyticsVisitBatchSubmitResponse(resp)
 	if err != nil {
@@ -371,7 +380,13 @@ func (c *Client) sendAuthLogin(ctx context.Context, request *AuthLoginRequest) (
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	result, err := decodeAuthLoginResponse(resp)
 	if err != nil {
@@ -441,7 +456,13 @@ func (c *Client) sendAuthLogout(ctx context.Context) (res *AuthLogoutNoContent, 
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	result, err := decodeAuthLogoutResponse(resp)
 	if err != nil {
@@ -496,7 +517,13 @@ func (c *Client) sendMediaGet(ctx context.Context, params MediaGetParams) (res M
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	result, err := decodeMediaGetResponse(resp)
 	if err != nil {
@@ -569,7 +596,13 @@ func (c *Client) sendMediaUpload(ctx context.Context, request *MediaUploadReques
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	result, err := decodeMediaUploadResponse(resp)
 	if err != nil {
@@ -661,7 +694,13 @@ func (c *Client) sendThreadAddPost(ctx context.Context, request *ThreadCreatePos
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	result, err := decodeThreadAddPostResponse(resp)
 	if err != nil {
@@ -734,7 +773,13 @@ func (c *Client) sendThreadCreate(ctx context.Context, request *ThreadCreateRequ
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	result, err := decodeThreadCreateResponse(resp)
 	if err != nil {
@@ -822,7 +867,13 @@ func (c *Client) sendThreadGet(ctx context.Context, params ThreadGetParams) (res
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	result, err := decodeThreadGetResponse(resp)
 	if err != nil {
@@ -837,41 +888,37 @@ func (c *Client) sendThreadGet(ctx context.Context, params ThreadGetParams) (res
 // Получить список веток с пагинацией. Можно
 // использовать либо постраничную пагинацию (page + limit),
 // либо курсорную пагинацию (after или before). Нужно
-// использовать только один параметр.
-// after, before или page с номером страницы. Если ни один не
-// указан - выводятся самые свежие сообщения.
-// limit - количество сообщений на страницу, по умолчанию 20.
-// С разделением на страницы есть неприятная
-// особенность. При удалении или добавлении новых
-// сообщений,
-// страницы могут "прыгать". Т.е. у нас есть список
-// (сообщений) и в него могут добавляться и удаляться
-// элементы
-// в любом месте списка. Если мы находится на странице 3 и
-// хотим 7-ю, то в ней могут быть совсем другие элементы,
-// чем на момент запроса страницы 3. Поэтому для более
-// стабильной пагинации можно использовать курсорную
-// пагинацию.
+// использовать только один параметр. after, before или page с
+// номером страницы. Если ни один не указан - выводятся
+// самые свежие сообщения. limit - количество сообщений на
+// страницу, по умолчанию 20. С разделением на страницы
+// есть неприятная особенность. При удалении или
+// добавлении новых сообщений, страницы могут "прыгать".
+// Т.е. у нас есть список (сообщений) и в него могут
+// добавляться и удаляться элементы в любом месте списка.
+// Если мы находится на странице 3 и хотим 7-ю, то в ней
+// могут быть совсем другие элементы, чем на момент
+// запроса страницы 3. Поэтому для более стабильной
+// пагинации можно использовать курсорную пагинацию.
+//
 // Навигация по номеру страницы выберает все сообщения
-// на момент запроса и отдает нужную страницу.
-// Добавление
+// на момент запроса и отдает нужную страницу. Добавление
 // или удаление сообщений сбивает это разделение.
+//
 // Курсорная пагинация позволяет двигаться вперед и
-// назад по списку, учитывая изменеия в нем.
-// Но для нее нужно указывать минимальный или
-// максимальный id сообщения на странице, чтобы понять
-// откуда двигаться
+// назад по списку, учитывая изменеия в нем. Но для нее
+// нужно указывать минимальный или максимальный id
+// сообщения на странице, чтобы понять откуда двигаться
 // дальше. И она не позволяет прыгать на конкретную
-// страницу, а только двигаться вперед и назад.
-// При этом before и after не включаются в результат, т.е. если
-// указать before=10, то в результат не попадет
-// сообщение с id 10, а только с id меньше 10. И аналогично для
-// after. В них указываются id сообщения, но
-// before - для получения более старых сообщений, а after - для
-// получения более новых сообщений по времени.
-// Более старым сообщениям (before) соответствует меньший id
-// (более старые сообщения),
-// а более новым (after) - больший id. И при этом не важно,
+// страницу, а только двигаться вперед и назад. При этом
+// before и after не включаются в результат, т.е. если указать
+// before=10, то в результат не попадет сообщение с id 10, а
+// только с id меньше 10. И аналогично для after. В них
+// указываются id сообщения, но before - для получения более
+// старых сообщений, а after - для получения более новых
+// сообщений по времени. Более старым сообщениям (before)
+// соответствует меньший id (более старые сообщения), а
+// более новым (after) - больший id. И при этом не важно,
 // удалены эти сообщения или нет.
 //
 // GET /api/threads
@@ -968,7 +1015,13 @@ func (c *Client) sendThreadsList(ctx context.Context, params ThreadsListParams) 
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	result, err := decodeThreadsListResponse(resp)
 	if err != nil {
@@ -1008,7 +1061,13 @@ func (c *Client) sendUserCreate(ctx context.Context, request *UserCreateRequest)
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	result, err := decodeUserCreateResponse(resp)
 	if err != nil {
@@ -1096,7 +1155,13 @@ func (c *Client) sendUserDelete(ctx context.Context, params UserDeleteParams) (r
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	result, err := decodeUserDeleteResponse(resp)
 	if err != nil {
@@ -1184,7 +1249,13 @@ func (c *Client) sendUserGet(ctx context.Context, params UserGetParams) (res Use
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	result, err := decodeUserGetResponse(resp)
 	if err != nil {
@@ -1254,7 +1325,13 @@ func (c *Client) sendUserMe(ctx context.Context) (res UserMeRes, err error) {
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	result, err := decodeUserMeResponse(resp)
 	if err != nil {
@@ -1345,7 +1422,13 @@ func (c *Client) sendUserUpdate(ctx context.Context, request *UserUpdateRequest,
 		return res, errors.Wrap(err, "do request")
 	}
 	body := resp.Body
-	defer body.Close()
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
 
 	result, err := decodeUserUpdateResponse(resp)
 	if err != nil {

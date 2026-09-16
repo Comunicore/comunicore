@@ -1,15 +1,28 @@
 -- name: UserGet :one
-SELECT id, name, email, avatar_url FROM users WHERE id = $1;
+SELECT id, name, email, avatar_url, created_at
+FROM users
+WHERE id = $1;
+
 -- name: UserGetByNameOrEmail :many
-SELECT name, email FROM users WHERE name = $1 OR email = $2;
+SELECT name, email
+FROM users
+WHERE name = $1 OR email = $2;
+
 -- name: UserGetNameById :one
-SELECT name FROM users WHERE id = $1;
+SELECT name
+FROM users
+WHERE id = $1;
+
 -- name: UserCreate :one
-INSERT INTO users (name, email) VALUES ($1, $2) RETURNING id, name, email, avatar_url;
+INSERT INTO users (name, email)
+VALUES ($1, $2)
+RETURNING id, name, email, avatar_url, created_at;
+
 -- name: UserUpdate :one
 UPDATE users
 SET name = $1, email = $2
-WHERE id = $3 RETURNING id, name, email, avatar_url;
+WHERE id = $3
+RETURNING id, name, email, avatar_url, created_at;
 
 -- name: AuthCreate :exec
 INSERT INTO auth_passwords (user_id, login, password_hash) VALUES ($1, $2, $3);
