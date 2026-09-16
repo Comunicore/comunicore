@@ -34,6 +34,7 @@ export const FormField = forwardRef<HTMLInputElement, FormFieldProps>(
     <div className={cn('flex flex-col gap-y-2', className)}>
       {label && <Label htmlFor={id}>{label}</Label>}
       <Input
+        inputColor='ghost'
         ref={ref}
         id={id}
         icon={icon}

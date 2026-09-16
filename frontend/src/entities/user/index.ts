@@ -7,5 +7,5 @@ export type {
   UserAchievement,
   UserLocation,
 } from './model/types/user.types';
-export { ProfileUserInfo } from './ui/profile-user-info/ProfileUserInfo';
 export { ProfileAchivements } from './ui/profile-achievements/ProfileAchivements';
+export { ProfileUserInfo } from './ui/profile-user-info/ProfileUserInfo';

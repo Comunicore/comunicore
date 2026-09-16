@@ -5,6 +5,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import { filterTags } from '../../../model/data/tags-data';
 
+import { AppRouter } from '@/shared/config/app-router';
 import { Button } from '@/shared/ui';
 
 const CHAPTER_QUERY_KEY = 'chapter';
@@ -42,6 +43,7 @@ export function ThreadsHeader() {
         <Button
           size='lg'
           color='purple'
+          href={AppRouter.threads.new}
           className='w-full max-w-120 whitespace-nowrap xl:w-fit'
         >
           Создать новый тред

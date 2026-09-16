@@ -1,22 +1,20 @@
 import { z } from 'zod';
 
-export const loginFormSchema = z.object({
-  login: z
-    .string()
-    .trim()
-    .min(1, 'Заполните поле')
-    .max(255, 'Слишком длинное значение')
-    .refine(
-      (value) => {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const emailSchema = z.email('Введите корректный email').toLowerCase();
 
-        return emailRegex.test(value) || value.length >= 3;
-      },
-      {
-        message: 'Введите имя пользователя или корректный email',
-      },
-    )
-    .transform((value) => value.toLowerCase()),
+const usernameSchema = z
+  .string()
+  .trim()
+  .min(3, 'Имя пользователя должно быть от 3 символов')
+  .max(255, 'Слишком длинное значение')
+  .toLowerCase();
+
+export const loginFormSchema = z.object({
+  login: z.union([emailSchema, usernameSchema], {
+    error: () => ({
+      message: 'Введите имя пользователя или корректный email',
+    }),
+  }),
   password: z.string().trim().min(1, 'Введите пароль'),
 });
 

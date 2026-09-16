@@ -1,15 +1,8 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import {
-  LuCalendar,
-  LuCircleUser,
-  LuEye,
-  LuEyeOff,
-  LuLockKeyhole,
-  LuMail,
-} from 'react-icons/lu';
+import { LuCalendar, LuMail, LuUser } from 'react-icons/lu';
 import Link from 'next/link';
 import { zodResolver } from '@hookform/resolvers/zod';
 
@@ -21,7 +14,14 @@ import {
 
 import { AppRouter } from '@/shared/config/app-router';
 import { getErrorMessage } from '@/shared/lib/helpers/getErrorMessage';
-import { Button, Checkbox, ErrorMessage, FormField, Label } from '@/shared/ui';
+import {
+  Button,
+  Checkbox,
+  ErrorMessage,
+  FormField,
+  Label,
+  PasswordInput,
+} from '@/shared/ui';
 
 const defaultValues = {
   name: '',
@@ -33,9 +33,6 @@ const defaultValues = {
 };
 
 export function RegistrationForm() {
-  // Стейты для переключения видимости паролей
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const {
     register,
     handleSubmit,
@@ -74,7 +71,7 @@ export function RegistrationForm() {
           label='Имя пользователя'
           placeholder='Введите имя пользователя'
           helperText='От 3 до 40 символов. Только буквы, цифры и подчёркивания'
-          icon={<LuCircleUser />}
+          icon={<LuUser />}
           {...register('name')}
           error={errors.name}
         />
@@ -82,32 +79,27 @@ export function RegistrationForm() {
           id='user-email'
           label='Email'
           type='email'
+          autoComplete='email'
           placeholder='Введите ваш email'
           icon={<LuMail />}
           {...register('email')}
           error={errors.email}
         />
-        <FormField
+        <PasswordInput
           id='user-password'
           label='Пароль'
-          type={showPassword ? 'text' : 'password'}
+          autoComplete='new-password'
+          {...register('password')}
           placeholder='Введите ваш пароль'
           helperText='Минимум 8 символов, большие буквы и цифры'
-          icon={<LuLockKeyhole />}
-          actionIcon={showPassword ? <LuEyeOff /> : <LuEye />}
-          onActionIconClick={() => setShowPassword((prev) => !prev)}
-          {...register('password')}
           error={errors.password}
         />
-        <FormField
+        <PasswordInput
           id='user-password-again'
           label='Повторите пароль'
-          type={showConfirmPassword ? 'text' : 'password'}
-          placeholder='Повторите ваш пароль'
-          icon={<LuLockKeyhole />}
-          actionIcon={showConfirmPassword ? <LuEyeOff /> : <LuEye />}
-          onActionIconClick={() => setShowConfirmPassword((prev) => !prev)}
+          autoComplete='new-password'
           {...register('confirmPassword')}
+          placeholder='Введите ваш пароль'
           error={errors.confirmPassword}
         />
         <FormField

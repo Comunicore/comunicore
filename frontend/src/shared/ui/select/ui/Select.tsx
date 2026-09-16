@@ -135,7 +135,7 @@ export const SelectItem = <T extends string | number>({
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       onChange(itemValue);
-      setIsOpen(false);
+      setTimeout(() => setIsOpen(false), 0);
     }
   };
 
@@ -152,7 +152,7 @@ export const SelectItem = <T extends string | number>({
       onKeyDown={handleKeyDown}
       onClick={() => {
         onChange(itemValue);
-        setIsOpen(false);
+        setTimeout(() => setIsOpen(false), 0);
       }}
       {...props}
     >

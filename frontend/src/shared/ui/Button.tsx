@@ -9,8 +9,9 @@ import Link from 'next/link';
 
 import { cn } from '../lib/classNames';
 
+type HoverStyle = 'purple' | 'pink' | 'bordered' | 'transparent' | 'ghost';
+type ButtonSize = 'min-sm' | 'sm' | 'md' | 'max-lg' | 'lg' | 'xl' | 'square';
 type ButtonColor = 'purple' | 'ghost' | 'bordered' | 'transparent' | 'red';
-type ButtonSize = 'min-sm' | 'sm' | 'md' | 'lg' | 'xl' | 'square';
 
 type ButtonProps = Partial<
   AnchorHTMLAttributes<HTMLAnchorElement> &
@@ -21,6 +22,7 @@ type ButtonProps = Partial<
   className?: string;
   color?: ButtonColor;
   size?: ButtonSize;
+  hoverStyle?: HoverStyle;
 };
 
 const colorStyles: Record<ButtonColor, string> = {
@@ -34,6 +36,14 @@ const colorStyles: Record<ButtonColor, string> = {
     'bg-transparent border border-gray-9e/10 hover:bg-dark-1b hover:border-gray-9e/30',
 };
 
+const hoverStyles: Record<HoverStyle, string> = {
+  purple: 'hover:bg-transparent hover:text-purple-67',
+  pink: 'hover:bg-pink-86 duration-200 hover:text-white hover:border-pink-86',
+  ghost: 'hover:border-gray-9e',
+  bordered: 'hover:bg-transparent hover:border-gray-9e/30',
+  transparent: 'hover:bg-dark-1b hover:border-gray-9e/30',
+};
+
 const sizeStyles: Record<ButtonSize, string> = {
   square: 'size-10 text-2xl font-normal',
   'min-sm':
@@ -41,6 +51,7 @@ const sizeStyles: Record<ButtonSize, string> = {
   sm: 'px-[20px] py-[10px] text-[14px]',
   md: 'px-[20px] py-[14px] text-[16px]',
   lg: 'px-[15px] py-[15px] text-[18px]',
+  'max-lg': 'px-[53px] py-[20px] text-[18px] rounded-[5px]',
   xl: 'w-full p-[20px] text-[18px] rounded-[10px]',
 };
 
@@ -54,6 +65,7 @@ export const Button = forwardRef<
     className,
     color = 'purple',
     size = 'md',
+    hoverStyle = 'transparent',
     ...restProps
   } = props;
 
@@ -62,6 +74,7 @@ export const Button = forwardRef<
     'rounded-[5px] duration-200 text-center font-bold text-white',
     colorStyles[color],
     sizeStyles[size],
+    hoverStyles[hoverStyle],
     className,
   );
 

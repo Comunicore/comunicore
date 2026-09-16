@@ -2,6 +2,7 @@ import { HTMLAttributes } from 'react';
 import Image from 'next/image';
 
 import notfoundresp from '@/shared/assets/images/not-found-resp.png';
+import { AppRouter } from '@/shared/config/app-router';
 import { cn } from '@/shared/lib/classNames';
 import { Button } from '@/shared/ui';
 
@@ -24,7 +25,11 @@ export function NotFoundResp(props: HTMLAttributes<HTMLDivElement>) {
       <p className='text-gray-9e'>
         Задайте свой пвопрос сообществу прямо сейчас
       </p>
-      <Button size='lg' href='#' className='w-full 2xl:ml-auto 2xl:w-fit'>
+      <Button
+        size='lg'
+        href={AppRouter.threads.new}
+        className='w-full 2xl:ml-auto 2xl:w-fit'
+      >
         Создать новый тред
       </Button>
     </div>

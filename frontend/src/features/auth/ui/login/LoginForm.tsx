@@ -1,7 +1,7 @@
 'use client';
 
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { LuAtSign, LuLock } from 'react-icons/lu';
+import { LuUser } from 'react-icons/lu';
 import Link from 'next/link';
 import { zodResolver } from '@hookform/resolvers/zod';
 
@@ -13,7 +13,14 @@ import {
 
 import { AppRouter } from '@/shared/config/app-router';
 import { getErrorMessage } from '@/shared/lib/helpers/getErrorMessage';
-import { Button, Checkbox, ErrorMessage, FormField, Label } from '@/shared/ui';
+import {
+  Button,
+  Checkbox,
+  ErrorMessage,
+  FormField,
+  Label,
+  PasswordInput,
+} from '@/shared/ui';
 
 const defaultValues = {
   login: '',
@@ -51,19 +58,17 @@ export function LoginForm() {
       <section className='flex flex-col gap-y-5'>
         <FormField
           id='user-login-email'
-          label='Имя пользователя или почта'
-          placeholder='Введите имя/email'
-          icon={<LuAtSign size={20} />}
+          label='Email или имя пользователя'
+          placeholder='Введите имя пользователя'
+          icon={<LuUser size={20} />}
           {...register('login')}
           error={errors.login}
           disabled={isPending}
         />
-        <FormField
+        <PasswordInput
           id='user-login-password'
           label='Пароль'
-          type='password'
           placeholder='Введите ваш пароль'
-          icon={<LuLock size={20} />}
           {...register('password')}
           error={errors.password}
           disabled={isPending}
@@ -93,6 +98,8 @@ export function LoginForm() {
       <Button type='submit' disabled={isPending} className='w-full'>
         {isPending ? 'Загрузка...' : 'Войти'}
       </Button>
+
+      {serverError && <ErrorMessage error={getErrorMessage(serverError)} />}
     </form>
   );
 }

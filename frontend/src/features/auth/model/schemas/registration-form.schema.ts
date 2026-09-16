@@ -9,12 +9,7 @@ export const registrationFormSchema = z
       .trim()
       .min(1, { message: 'Введите имя' })
       .max(50, { message: 'Имя слишком длинное' }),
-    email: z
-      .string()
-      .trim()
-      .toLowerCase()
-      .min(1, { message: 'Введите почту' })
-      .email({ message: 'Неверный формат почты' }),
+    email: z.email({ message: 'Неверный формат почты' }),
     password: passwordSchema,
     confirmPassword: z.string().min(1, { message: 'Подтвердите пароль' }),
     birthDate: z.string().optional().or(z.literal('')),

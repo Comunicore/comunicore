@@ -13,7 +13,7 @@ import { AppRouter } from '@/shared/config/app-router';
 import { Button, Container, Input, Label } from '@/shared/ui';
 
 const navigationLinks = [
-  { label: 'Форум', href: AppRouter.threads },
+  { label: 'Форум', href: AppRouter.threads.root },
   { label: 'Участники', href: AppRouter.main },
   { label: 'Блог', href: AppRouter.main },
   { label: 'Правила', href: AppRouter.rules.root },
@@ -109,7 +109,7 @@ export function Footer() {
             </p>
 
             <form className='mt-7.5 flex flex-col gap-3 md:flex-row'>
-              <Label htmlFor='footer-email' className='visually-hidden'>
+              <Label htmlFor='footer-email' className='sr-only'>
                 Email
               </Label>
               <Input

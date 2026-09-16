@@ -137,7 +137,7 @@ export function BurgerMenu({ menuRef }: BurgerMenuProps) {
       )}
 
       <nav className='flex flex-col gap-y-2.5'>
-        {navLinks.map(({ label, href, Icon }) => {
+        {navLinks.map(({ label, href }) => {
           const isActive = isLinkActive(href);
 
           return (
@@ -160,10 +160,10 @@ export function BurgerMenu({ menuRef }: BurgerMenuProps) {
                 isActive && 'bg-purple-67 text-white',
               )}
             >
-              <Icon
+              {/* <Icon
                 className='size-5 shrink-0 text-current'
                 aria-hidden='true'
-              />
+              /> */}
               {label}
             </Button>
           );
