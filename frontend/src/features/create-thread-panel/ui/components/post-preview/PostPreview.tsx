@@ -41,8 +41,7 @@ export function PostPreview() {
 
         <StyledPostHtml markdown={description} />
         <PreviewImageList
-          imageClassName='w-full h-50'
-          className='max-h-150 flex-col gap-y-5'
+          imageClassName='size-50'
           urls={fileUrls}
           onRemove={removeImage}
         />
