@@ -4,13 +4,11 @@ permissions:
 
 on:
   push:
-    branches: [ deploy ]
+    branches: [ "main", "deploy" ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write # Required to delete branch deploy
     # build frontend
     steps:
       - name: Checkout code
@@ -19,13 +17,23 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: '22'
+          node-version: '24'
           cache: 'npm'
           cache-dependency-path: ./frontend/package-lock.json
 
       - name: Install dependencies
         working-directory: ./frontend
         run: npm ci
+
+      - name: ESLint
+        working-directory: ./frontend
+        run: npm run lint
+        continue-on-error: true
+
+      - name: Stylelint
+        working-directory: ./frontend
+        run: npx stylelint "**/*.{css,scss}"
+        continue-on-error: true
 
       - name: Build Production
         working-directory: ./frontend
@@ -72,7 +80,3 @@ jobs:
           ssh -i ./deploy_key -o StrictHostKeychecking=no comunicore@comunicore.mooo.com cat < ./comunicore.tar.xz
         env:
           DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
-
-      - name: delete deploy branch
-        run: |
-          git push origin --delete deploy
