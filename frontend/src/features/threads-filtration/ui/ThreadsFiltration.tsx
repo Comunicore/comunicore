@@ -9,17 +9,17 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import {
   threadsFiltrationSchema,
   ThreadsFiltrationTypes,
-} from '../model/schemas/filtration.schema';
+} from '../model/filtration.schema';
 import {
   sortPeriodLabels,
   threadsPeriodSortEnum,
   ThreadsPeriodSortTypes,
-} from '../model/schemas/period-sort.enum';
+} from '../model/period-sort.enum';
 import {
   sortLabels,
   threadsSortEnum,
   type ThreadsSortTypes,
-} from '../model/schemas/sort.enum';
+} from '../model/sort.enum';
 
 import { useModal } from '@/shared/hooks/useModal';
 import { useWindowResize } from '@/shared/hooks/useWindowResize';

@@ -26,17 +26,20 @@ export const AppRouter = {
   participants: '/participants',
   profile: {
     root: '/profile',
-    get edit() {
-      return `${this.root}/edit`;
-    },
-    get threads() {
-      return `${this.root}/threads`;
+    get notifications() {
+      return `${this.root}/notifications`;
     },
     get messages() {
       return `${this.root}/messages`;
     },
-    get bookmarks() {
-      return `${this.root}/bookmarks`;
+    get settings() {
+      return `${this.root}/settings`;
+    },
+    get favorites() {
+      return `${this.root}/favorites`;
+    },
+    get threads() {
+      return `${this.root}/threads`;
     },
   },
   achivements: {

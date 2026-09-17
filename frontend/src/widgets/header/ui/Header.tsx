@@ -8,8 +8,8 @@ import { usePathname } from 'next/navigation';
 
 import { navLinks } from '../model/navLinks';
 
-import { AuthButtons } from './auth-buttons';
-import { Burger } from './burger';
+import { AuthButtons } from './AuthButtons';
+import { Burger } from './Burger';
 
 import { ProfileActions } from '@/features/profile-actions';
 

@@ -1,3 +1,3 @@
-export { Burger } from './ui/burger/Burger';
-export { BurgerMenu } from './ui/burger-menu/BurgerMenu';
+export { Burger } from './ui/Burger';
+export { BurgerMenu } from './ui/BurgerMenu';
 export { Header } from './ui/Header';

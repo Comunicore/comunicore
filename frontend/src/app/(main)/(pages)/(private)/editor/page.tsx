@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 
-import { CreateThreadEditor } from '@/widgets/create-thread-editor/ui';
+import { CreateThreadEditor } from '@/widgets/create-thread-editor';
 
 import {
   selectIsAuthenticated,

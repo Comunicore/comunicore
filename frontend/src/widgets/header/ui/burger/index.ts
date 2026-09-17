@@ -1,1 +1,0 @@
-export { Burger } from './Burger';
