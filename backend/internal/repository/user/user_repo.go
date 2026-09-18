@@ -36,6 +36,7 @@ func (r *UserRepo) Get(ctx context.Context, userId int) (model.User, error) {
 		Name:      row.Name,
 		Email:     row.Email,
 		AvatarURL: row.AvatarUrl.String,
+		CreatedAt: row.CreatedAt.Time,
 	}, err
 }
 func (r *UserRepo) GetNameById(ctx context.Context, userId int) (string, error) {
@@ -51,6 +52,7 @@ func (r *UserRepo) Create(ctx context.Context, name, email string) (model.User, 
 			Name:      row.Name,
 			Email:     row.Email,
 			AvatarURL: row.AvatarUrl.String,
+			CreatedAt: row.CreatedAt.Time,
 		}, err
 	}
 	// some db error, probubly unique constraint violation on name or email,
@@ -102,5 +104,6 @@ func (r *UserRepo) Update(ctx context.Context, userId int, name, email string) (
 		Name:      row.Name,
 		Email:     row.Email,
 		AvatarURL: row.AvatarUrl.String,
+		CreatedAt: row.CreatedAt.Time,
 	}, err
 }

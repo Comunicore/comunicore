@@ -3,9 +3,9 @@
 import { useMemo } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
-import { mockTags } from '../model/data/mock-tags';
+import { mockTags } from '../model/mock-tags';
 
-import { ViewAllButton } from './components/ViewAllButton';
+import { ViewAllButton } from './ViewAllButton';
 
 import { cn } from '@/shared/lib/classNames';
 import { Tag } from '@/shared/ui';

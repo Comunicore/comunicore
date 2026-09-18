@@ -1,9 +1,11 @@
-export const formatInt = (views: number): string => {
-  if (views >= 1000000) {
-    return (views / 1000000).toFixed(1) + 'м';
+export const formatInt = (views: number | null | undefined): string => {
+  const value = typeof views === 'number' && Number.isFinite(views) ? views : 0;
+
+  if (value >= 1000000) {
+    return (value / 1000000).toFixed(1) + 'м';
   }
-  if (views >= 1000) {
-    return (views / 1000).toFixed(1) + 'к';
+  if (value >= 1000) {
+    return (value / 1000).toFixed(1) + 'к';
   }
-  return views.toString();
+  return value.toString();
 };

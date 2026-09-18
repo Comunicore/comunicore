@@ -1,4 +1,4 @@
-import { ProfileChapterList } from './components/profile-chapter-list/ProfileChapterList';
+import { ProfileChapterList } from './ProfileChapterList';
 
 import {
   ProfileAchivements,

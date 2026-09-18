@@ -659,8 +659,8 @@ func (s *ErrorNotUniqueCode) UnmarshalText(data []byte) error {
 	}
 }
 
-// Error with just string message, without code or other data. For simple errors,
-// when we don't need to send any additional data, just a message for log.
+// Error with just string message, without code or other data. For simple errors, when we don't need to
+// send any additional data, just a message for log.
 // Ref: #/components/schemas/ErrorStringMessage
 type ErrorStringMessage struct {
 	Code    ErrorStringMessageCode `json:"code"`
@@ -937,6 +937,52 @@ func (o OptBool) Get() (v bool, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptBool) Or(d bool) bool {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptDateTime returns new OptDateTime with value set to v.
+func NewOptDateTime(v time.Time) OptDateTime {
+	return OptDateTime{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptDateTime is optional time.Time.
+type OptDateTime struct {
+	Value time.Time
+	Set   bool
+}
+
+// IsSet returns true if OptDateTime was set.
+func (o OptDateTime) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptDateTime) Reset() {
+	var v time.Time
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptDateTime) SetTo(v time.Time) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptDateTime) Get() (v time.Time, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptDateTime) Or(d time.Time) time.Time {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -1392,7 +1438,8 @@ func (*ThreadWithPostsListResponse) threadGetRes() {}
 
 // UserCreateBadRequest represents sum type.
 type UserCreateBadRequest struct {
-	Type               UserCreateBadRequestType // switch on this field
+	// Type selects the active sum variant, switch on this field.
+	Type               UserCreateBadRequestType
 	ErrorNotUnique     ErrorNotUnique
 	ErrorStringMessage ErrorStringMessage
 }
@@ -1499,10 +1546,11 @@ func (s *UserCreateRequest) SetPassword(val string) {
 
 // Ref: #/components/schemas/UserCreateResponse
 type UserCreateResponse struct {
-	ID        int     `json:"id"`
-	Name      string  `json:"name"`
-	Email     string  `json:"email"`
-	AvatarUrl url.URL `json:"avatarUrl"`
+	ID        int         `json:"id"`
+	Name      string      `json:"name"`
+	Email     string      `json:"email"`
+	AvatarUrl url.URL     `json:"avatarUrl"`
+	CreatedAt OptDateTime `json:"createdAt"`
 }
 
 // GetID returns the value of ID.
@@ -1525,6 +1573,11 @@ func (s *UserCreateResponse) GetAvatarUrl() url.URL {
 	return s.AvatarUrl
 }
 
+// GetCreatedAt returns the value of CreatedAt.
+func (s *UserCreateResponse) GetCreatedAt() OptDateTime {
+	return s.CreatedAt
+}
+
 // SetID sets the value of ID.
 func (s *UserCreateResponse) SetID(val int) {
 	s.ID = val
@@ -1543,6 +1596,11 @@ func (s *UserCreateResponse) SetEmail(val string) {
 // SetAvatarUrl sets the value of AvatarUrl.
 func (s *UserCreateResponse) SetAvatarUrl(val url.URL) {
 	s.AvatarUrl = val
+}
+
+// SetCreatedAt sets the value of CreatedAt.
+func (s *UserCreateResponse) SetCreatedAt(val OptDateTime) {
+	s.CreatedAt = val
 }
 
 func (*UserCreateResponse) authLoginRes()  {}

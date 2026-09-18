@@ -21,6 +21,7 @@ export type UserCreateResponse = {
     name: string;
     email: string;
     avatarUrl: string;
+    createdAt?: string;
 };
 
 export type UserUpdateRequest = {
