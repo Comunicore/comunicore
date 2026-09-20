@@ -19,7 +19,7 @@ import {
 } from 'react-icons/lu';
 import textFieldEdit from 'text-field-edit';
 
-import { CreateThreadTypes } from '../schemas/create-thread.schema';
+import { CreateThreadTypes } from './create-thread.schema';
 
 interface Tool {
   name: string;

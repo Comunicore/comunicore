@@ -4,8 +4,8 @@ import { useRef } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { LuFileText, LuRedo2, LuUndo2 } from 'react-icons/lu';
 
-import { useEditorTools } from '../../../model/hooks/useEditorTools';
-import { CreateThreadTypes } from '../../../model/schemas/create-thread.schema';
+import { CreateThreadTypes } from '../../model/create-thread.schema';
+import { useEditorTools } from '../../model/useEditorTools';
 
 import { ErrorMessage } from '@/shared/ui';
 

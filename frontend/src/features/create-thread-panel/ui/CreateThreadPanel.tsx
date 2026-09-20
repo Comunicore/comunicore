@@ -5,16 +5,18 @@ import { SubmitHandler, useFormContext } from 'react-hook-form';
 import { LuEye, LuPencil } from 'react-icons/lu';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
-import { useDrafts } from '../model/hooks/useDrafts';
-import { CreateThreadTypes } from '../model/schemas/create-thread.schema';
+import { CreateThreadTypes } from '../model/create-thread.schema';
+import { useDrafts } from '../model/useDrafts';
 
-import { FileInput } from './components/file-input/FileInput';
-import { MarkdownArea } from './components/markdown-area/MarkdownArea';
-import { PostPreview } from './components/post-preview/PostPreview';
-import { SelectCategory } from './components/select-category/SelectCategory';
-import { TagsInput } from './components/tags-input/TagsInput';
-import { ThreadType } from './components/thread-type/ThreadType';
-import { TitleInput } from './components/title-input/TitleInput';
+import { FileInput } from './file-input/FileInput';
+import { MarkdownArea } from './markdown-area/MarkdownArea';
+import { PostPreview } from './post-preview/PostPreview';
+import { SelectCategory } from './select-category/SelectCategory';
+import { TagsInput } from './tags-input/TagsInput';
+import { ThreadType } from './thread-type/ThreadType';
+import { TitleInput } from './title-input/TitleInput';
+
+import { selectIsAuthenticated, useAuthStore } from '@/entities/session';
 
 import { AppRouter } from '@/shared/config/app-router';
 import { Button, Tile } from '@/shared/ui';
@@ -31,6 +33,7 @@ export function CreateThreadPanel(props: CreateThreadPanelProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const methods = useFormContext<CreateThreadTypes>();
+  const isAuth = useAuthStore(selectIsAuthenticated);
 
   const editorMode = searchParams.get(editorModeParam);
   const isPreview = editorMode === previewMode;
@@ -48,10 +51,13 @@ export function CreateThreadPanel(props: CreateThreadPanelProps) {
   }, [loadDraft]);
 
   const onSubmit: SubmitHandler<CreateThreadTypes> = (data) => {
+    if (!isAuth) {
+      router.push(AppRouter.auth.registration);
+    }
     deleteDraft();
-    methods.reset(formDefaultValues);
     console.log(data);
     router.push(AppRouter.threads.root);
+    methods.reset(formDefaultValues);
   };
 
   const toggleMode = async () => {

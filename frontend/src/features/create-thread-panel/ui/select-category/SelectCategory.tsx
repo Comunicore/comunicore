@@ -1,7 +1,7 @@
 import { Controller, useFormContext } from 'react-hook-form';
 
-import { mockChapters } from '../../../model/data/mock-chapters';
-import { CreateThreadTypes } from '../../../model/schemas/create-thread.schema';
+import { CreateThreadTypes } from '../../model/create-thread.schema';
+import { mockChapters } from '../../model/mock-chapters';
 
 import {
   ErrorMessage,

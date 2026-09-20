@@ -1,6 +1,6 @@
 import { useFormContext, useWatch } from 'react-hook-form';
 
-import { CreateThreadTypes } from '../../../model/schemas/create-thread.schema';
+import { CreateThreadTypes } from '../../model/create-thread.schema';
 
 import { PreviewImageList, Tag, Tile } from '@/shared/ui';
 import { StyledPostHtml } from '@/shared/ui/StyledPostHtml';

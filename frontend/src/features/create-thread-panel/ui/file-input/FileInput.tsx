@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { LuUpload } from 'react-icons/lu';
 
-import { useUploadMedia } from '../../../model/hooks/useUploadMedia';
-import { CreateThreadTypes } from '../../../model/schemas/create-thread.schema';
+import { CreateThreadTypes } from '../../model/create-thread.schema';
+import { useUploadMedia } from '../../model/useUploadMedia';
 
 import { cn } from '@/shared/lib/classNames';
 import { ErrorMessage, PreviewImageList } from '@/shared/ui';

@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 
-import { CreateThreadTypes } from '../schemas/create-thread.schema';
+import { CreateThreadTypes } from './create-thread.schema';
 
 const DRAFT_KEY = 'communicore_thread_draft';
 const DEBOUNCE_DELAY = 800;

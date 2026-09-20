@@ -1,5 +1,5 @@
 export {
   createThreadSchema,
   type CreateThreadTypes,
-} from './model/schemas/create-thread.schema';
+} from './model/create-thread.schema';
 export { CreateThreadPanel } from './ui/CreateThreadPanel';

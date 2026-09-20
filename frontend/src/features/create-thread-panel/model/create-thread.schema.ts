@@ -22,8 +22,8 @@ export const createThreadSchema = z.object({
   description: z
     .string()
     .trim()
-    // .min(5, { message: 'Описание должно содержать минимум 5 символов' })
-    // .max(5000, { message: 'Описание не должно превышать 5000 символов' })
+    .min(5, { message: 'Описание должно содержать минимум 5 символов' })
+    .max(5000, { message: 'Описание не должно превышать 5000 символов' })
     .optional(),
 
   tags: z.array(z.string().trim()).optional(),

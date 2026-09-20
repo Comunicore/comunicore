@@ -2,7 +2,7 @@ import { KeyboardEvent, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { LuX } from 'react-icons/lu';
 
-import { CreateThreadTypes } from '../../../model/schemas/create-thread.schema';
+import { CreateThreadTypes } from '../../model/create-thread.schema';
 
 import { Input, Tag } from '@/shared/ui';
 

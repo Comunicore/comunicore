@@ -6,7 +6,7 @@ import { LuFileText, LuMessageCircle } from 'react-icons/lu';
 import {
   CreateThreadTypes,
   ThreadTypeOption,
-} from '../../../model/schemas/create-thread.schema';
+} from '../../model/create-thread.schema';
 
 import { cn } from '@/shared/lib/classNames';
 import { Label } from '@/shared/ui';

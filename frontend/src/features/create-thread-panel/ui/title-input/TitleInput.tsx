@@ -1,6 +1,6 @@
 import { useFormContext } from 'react-hook-form';
 
-import { CreateThreadTypes } from '../../../model/schemas/create-thread.schema';
+import { CreateThreadTypes } from '../../model/create-thread.schema';
 
 import { TitleCounter } from './TitleCounter';
 
