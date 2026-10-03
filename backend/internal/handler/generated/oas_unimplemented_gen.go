@@ -68,9 +68,20 @@ func (UnimplementedHandler) MediaUpload(ctx context.Context, req *MediaUploadReq
 	return r, ht.ErrNotImplemented
 }
 
+// ThreadAddComment implements threadAddComment operation.
+//
+// Add a new comment to thread.
+//
+// POST /api/threads/{threadId}/comments
+func (UnimplementedHandler) ThreadAddComment(ctx context.Context, req *ThreadCreateCommentRequest, params ThreadAddCommentParams) (r ThreadAddCommentRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // ThreadAddPost implements threadAddPost operation.
 //
 // Add a new post to thread.
+//
+// Deprecated: schema marks this operation as deprecated.
 //
 // POST /api/threads/{threadId}/posts
 func (UnimplementedHandler) ThreadAddPost(ctx context.Context, req *ThreadCreatePostRequest, params ThreadAddPostParams) (r ThreadAddPostRes, _ error) {

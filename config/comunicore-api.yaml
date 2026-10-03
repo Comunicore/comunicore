@@ -272,6 +272,7 @@ paths:
   /api/threads/{threadId}/posts:
     post:
       operationId: threadAddPost
+      deprecated: true
       summary: Add a new post to thread
       parameters:
         - name: threadId
@@ -293,6 +294,34 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ThreadPostItem'
+        "400":
+          $ref: '#/components/responses/ErrorStringDescription'
+        "500":
+          $ref: '#/components/responses/ErrorStringDescription'
+  /api/threads/{threadId}/comments:
+    post:
+      operationId: threadAddComment
+      summary: Add a new comment to thread
+      parameters:
+        - name: threadId
+          in: path
+          description: Thread id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ThreadCreateCommentRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ThreadCommentItem'
         "400":
           $ref: '#/components/responses/ErrorStringDescription'
         "500":
@@ -595,8 +624,12 @@ components:
         content:
           type: string
         postsCount:
+          deprecated: true
           type: integer
           description: Number of reply posts (rows in posts). The opening message lives in title/content only and is not counted.
+        commentsCount:
+          type: integer
+          description: Number of comments (rows in comments). The opening message lives in title/content only and is not counted.
         createdAt:
           type: string
           format: date-time
@@ -608,6 +641,7 @@ components:
         - title
         - content
         - postsCount
+        - commentsCount
         - createdAt
       example:
         id: 1
@@ -617,6 +651,7 @@ components:
         authorName: "Petr Semenov"
         authorAvatarUrl: "https://comunicore.mooo.com/storage/media/avatar1.png"
         postsCount: 5
+        commentsCount: 5
         createdAt: "2024-01-01T12:00:00Z"
     ThreadWithPostsListResponse:
       type: object
@@ -635,8 +670,12 @@ components:
         content:
           type: string
         postsCount:
+          deprecated: true
           type: integer
           description: Number of reply posts (rows in posts). The opening message is not included.
+        commentsCount:
+          type: integer
+          description: Number of comments (rows in comments). The opening message is not included.
         createdAt:
           type: string
           format: date-time
@@ -652,6 +691,7 @@ components:
         - title
         - content
         - postsCount
+        - commentsCount
         - createdAt
         - posts
       example:
@@ -677,6 +717,7 @@ components:
             authorAvatarUrl: "https://comunicore.mooo.com/storage/media/avatar2.png"
             createdAt: "2024-01-02T15:30:00Z"
     ThreadPostItem:
+      deprecated: true
       type: object
       properties:
         id:
@@ -707,6 +748,38 @@ components:
         authorName: "Petr Semenov"
         authorAvatarUrl: "https://comunicore.mooo.com/storage/media/avatar1.png"
         postsCount: 5
+        commentsCount: 3
+        createdAt: "2024-01-01T12:00:00Z"
+    ThreadCommentItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        authorId:
+          type: integer
+        authorName:
+          type: string
+        authorAvatarUrl:
+          type: string
+          format: uri
+        content:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - authorId
+        - authorName
+        - authorAvatarUrl
+        - content
+        - createdAt
+      example:
+        id: 1
+        content: "Первый ответ в ветке."
+        authorId: 42
+        authorName: "Petr Semenov"
+        authorAvatarUrl: "https://comunicore.mooo.com/storage/media/avatar1.png"
         createdAt: "2024-01-01T12:00:00Z"
     ThreadCreateRequest:
       type: object
@@ -727,6 +800,16 @@ components:
         title: "How to learn Go?"
         content: "I want to learn Go, but I don't know where to start. Any advice?"
     ThreadCreatePostRequest:
+      deprecated: true
+      type: object
+      properties:
+        content:
+          type: string
+      required:
+        - content
+      example:
+        content: "I want to learn Go, but I don't know where to start. Any advice?"
+    ThreadCreateCommentRequest:
       type: object
       properties:
         content:

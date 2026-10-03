@@ -21,6 +21,10 @@ type MediaUploadRes interface {
 	mediaUploadRes()
 }
 
+type ThreadAddCommentRes interface {
+	threadAddCommentRes()
+}
+
 type ThreadAddPostRes interface {
 	threadAddPostRes()
 }

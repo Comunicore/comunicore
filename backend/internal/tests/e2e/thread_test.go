@@ -53,7 +53,8 @@ func testThreadCreateOk(t *testing.T, baseURL string, cookie *http.Cookie) Threa
 			Expect().
 			Status(http.StatusCreated).JSON().Object()
 
-		res.Keys().ContainsOnly("id", "authorId", "authorName", "authorAvatarUrl", "title", "content", "postsCount", "createdAt")
+		res.Keys().ContainsOnly("id", "authorId", "authorName", "authorAvatarUrl", "title",
+			"content", "postsCount", "commentsCount", "createdAt")
 		res.Value("id").Number().Gt(0)
 		res.Value("authorId").Number().Gt(0)
 		res.Value("authorName").String().NotEmpty()
@@ -62,6 +63,7 @@ func testThreadCreateOk(t *testing.T, baseURL string, cookie *http.Cookie) Threa
 		res.Value("content").String().HasPrefix("This is a test thread content ")
 		// posts_count is replies-only (table posts); opening message is not counted.
 		res.Value("postsCount").Number().IsEqual(0)
+		res.Value("commentsCount").Number().IsEqual(0)
 		res.Value("createdAt").String().NotEmpty()
 
 		res.Decode(&thread)
@@ -134,7 +136,8 @@ func testThreadGet(t *testing.T, baseURL string,
 			Status(http.StatusOK).JSON().Object()
 
 		res.Keys().ContainsOnly(
-			"id", "authorId", "authorName", "authorAvatarUrl", "title", "content", "postsCount", "createdAt", "posts")
+			"id", "authorId", "authorName", "authorAvatarUrl", "title", "content",
+			"postsCount", "commentsCount", "createdAt", "posts")
 		res.Value("id").Number().IsEqual(expectedThread.ID)
 		res.Value("authorId").Number().IsEqual(expectedThread.AuthorID)
 		res.Value("authorName").String().IsEqual(expectedThread.AuthorName)
@@ -143,6 +146,7 @@ func testThreadGet(t *testing.T, baseURL string,
 		res.Value("content").String().IsEqual(expectedThread.Content)
 		// One reply row exists in posts after threadPostCreateOk.
 		res.Value("postsCount").Number().IsEqual(1)
+		res.Value("commentsCount").Number().IsEqual(1)
 		res.Value("createdAt").String().NotEmpty()
 
 		posts := res.Value("posts").Array()

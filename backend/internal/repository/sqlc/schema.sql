@@ -22,11 +22,11 @@ CREATE TABLE IF NOT EXISTS threads (
     title TEXT NOT NULL,
     content TEXT NOT NULL,
     user_id INTEGER NOT NULL,
-    posts_count INTEGER NOT NULL DEFAULT 0,
+    comments_count INTEGER NOT NULL DEFAULT 0,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NULL
 );
-CREATE TABLE IF NOT EXISTS posts (
+CREATE TABLE IF NOT EXISTS comments (
     id SERIAL PRIMARY KEY,
     thread_id INTEGER NOT NULL,
     user_id INTEGER NOT NULL,
@@ -56,16 +56,16 @@ CREATE TABLE IF NOT EXISTS analytics_visit_batches (
 CREATE INDEX IF NOT EXISTS analytics_visit_batches_start_at_idx ON analytics_visit_batches (batch_start_at);
 CREATE INDEX IF NOT EXISTS analytics_visit_batches_user_id_idx ON analytics_visit_batches (user_id);
 
-CREATE OR REPLACE FUNCTION threads_bump_posts_count()
+CREATE OR REPLACE FUNCTION threads_bump_comments_count()
 RETURNS TRIGGER AS $$
 BEGIN
-    UPDATE threads SET posts_count = posts_count + 1 WHERE id = NEW.thread_id;
+    UPDATE threads SET comments_count = comments_count + 1 WHERE id = NEW.thread_id;
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
-DROP TRIGGER IF EXISTS trg_posts_bump_thread_count ON posts;
-CREATE TRIGGER trg_posts_bump_thread_count
-AFTER INSERT ON posts
+DROP TRIGGER IF EXISTS trg_comments_bump_thread_count ON comments;
+CREATE TRIGGER trg_comments_bump_thread_count
+AFTER INSERT ON comments
 FOR EACH ROW
-EXECUTE FUNCTION threads_bump_posts_count();
+EXECUTE FUNCTION threads_bump_comments_count();

@@ -59,9 +59,17 @@ type Invoker interface {
 	//
 	// POST /api/media
 	MediaUpload(ctx context.Context, request *MediaUploadRequestMultipart) (MediaUploadRes, error)
+	// ThreadAddComment invokes threadAddComment operation.
+	//
+	// Add a new comment to thread.
+	//
+	// POST /api/threads/{threadId}/comments
+	ThreadAddComment(ctx context.Context, request *ThreadCreateCommentRequest, params ThreadAddCommentParams) (ThreadAddCommentRes, error)
 	// ThreadAddPost invokes threadAddPost operation.
 	//
 	// Add a new post to thread.
+	//
+	// Deprecated: schema marks this operation as deprecated.
 	//
 	// POST /api/threads/{threadId}/posts
 	ThreadAddPost(ctx context.Context, request *ThreadCreatePostRequest, params ThreadAddPostParams) (ThreadAddPostRes, error)
@@ -612,9 +620,109 @@ func (c *Client) sendMediaUpload(ctx context.Context, request *MediaUploadReques
 	return result, nil
 }
 
+// ThreadAddComment invokes threadAddComment operation.
+//
+// Add a new comment to thread.
+//
+// POST /api/threads/{threadId}/comments
+func (c *Client) ThreadAddComment(ctx context.Context, request *ThreadCreateCommentRequest, params ThreadAddCommentParams) (ThreadAddCommentRes, error) {
+	res, err := c.sendThreadAddComment(ctx, request, params)
+	return res, err
+}
+
+func (c *Client) sendThreadAddComment(ctx context.Context, request *ThreadCreateCommentRequest, params ThreadAddCommentParams) (res ThreadAddCommentRes, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/api/threads/"
+	{
+		// Encode "threadId" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "threadId",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.IntToString(params.ThreadId))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/comments"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	r, err := ht.NewRequest(ctx, "POST", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+	if err := encodeThreadAddCommentRequest(request, r); err != nil {
+		return res, errors.Wrap(err, "encode request")
+	}
+
+	{
+		type bitset = [1]uint8
+		var satisfied bitset
+		{
+
+			switch err := c.securityCookieAuth(ctx, ThreadAddCommentOperation, r); {
+			case err == nil: // if NO error
+				satisfied[0] |= 1 << 0
+			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
+				// Skip this security.
+			default:
+				return res, errors.Wrap(err, "security \"CookieAuth\"")
+			}
+		}
+
+		if ok := func() bool {
+		nextRequirement:
+			for _, requirement := range []bitset{
+				{0b00000001},
+			} {
+				for i, mask := range requirement {
+					if satisfied[i]&mask != mask {
+						continue nextRequirement
+					}
+				}
+				return true
+			}
+			return false
+		}(); !ok {
+			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
+		}
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	body := resp.Body
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
+
+	result, err := decodeThreadAddCommentResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
 // ThreadAddPost invokes threadAddPost operation.
 //
 // Add a new post to thread.
+//
+// Deprecated: schema marks this operation as deprecated.
 //
 // POST /api/threads/{threadId}/posts
 func (c *Client) ThreadAddPost(ctx context.Context, request *ThreadCreatePostRequest, params ThreadAddPostParams) (ThreadAddPostRes, error) {
