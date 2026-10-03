@@ -22,15 +22,15 @@ import (
 	urlencode "github.com/hetagdarchiev/comunicore/backend/internal/lib/urlEncode"
 	"github.com/ogen-go/ogen/ogenerrors"
 
-	authRepo "github.com/hetagdarchiev/comunicore/backend/internal/repository/auth"
 	analyticsRepo "github.com/hetagdarchiev/comunicore/backend/internal/repository/analytics"
+	authRepo "github.com/hetagdarchiev/comunicore/backend/internal/repository/auth"
+	commentsRepo "github.com/hetagdarchiev/comunicore/backend/internal/repository/comments"
 	mediaRepo "github.com/hetagdarchiev/comunicore/backend/internal/repository/media"
-	postsRepo "github.com/hetagdarchiev/comunicore/backend/internal/repository/posts"
 	threadsRepo "github.com/hetagdarchiev/comunicore/backend/internal/repository/threads"
 	userRepo "github.com/hetagdarchiev/comunicore/backend/internal/repository/user"
 
-	authService "github.com/hetagdarchiev/comunicore/backend/internal/service/auth"
 	analyticsService "github.com/hetagdarchiev/comunicore/backend/internal/service/analytics"
+	authService "github.com/hetagdarchiev/comunicore/backend/internal/service/auth"
 	mediaService "github.com/hetagdarchiev/comunicore/backend/internal/service/media"
 	threadsService "github.com/hetagdarchiev/comunicore/backend/internal/service/threads"
 	userService "github.com/hetagdarchiev/comunicore/backend/internal/service/user"
@@ -202,7 +202,7 @@ func RegisterOgenRoutes(mux *http.ServeMux, cfg *config.AppConfig) {
 		fmt.Printf("Failed to create storage: %v\n", err)
 		return
 	}
-	postR, err := postsRepo.NewPostsRepo(cfg.Database.DSN())
+	commentR, err := commentsRepo.NewCommentsRepo(cfg.Database.DSN())
 	if err != nil {
 		panic(err)
 	}
@@ -219,7 +219,7 @@ func RegisterOgenRoutes(mux *http.ServeMux, cfg *config.AppConfig) {
 	userS := userService.NewUserService(userR, authR)
 	mediaS := mediaService.NewMediaService(cfg.Server.BaseURL, mediaR)
 
-	threadsS := threadsService.NewThreadsService(threadR, postR, userR)
+	threadsS := threadsService.NewThreadsService(threadR, commentR, userR)
 	analyticsS := analyticsService.NewAnalyticsService(analyticsR)
 
 	secure, sameSite := config.SessionCookieOpts(cfg.Server.BaseURL)
@@ -254,9 +254,12 @@ func RegisterOgenRoutes(mux *http.ServeMux, cfg *config.AppConfig) {
 }
 
 // Thread handlers
-
+// deprecated: use ThreadsAddComments instead
 func (h *OgenHandler) ThreadAddPost(ctx context.Context, req *api.ThreadCreatePostRequest, params api.ThreadAddPostParams) (api.ThreadAddPostRes, error) {
 	return h.threadsHandler.ThreadAddPost(ctx, req, params)
+}
+func (h *OgenHandler) ThreadAddComment(ctx context.Context, req *api.ThreadCreateCommentRequest, params api.ThreadAddCommentParams) (api.ThreadAddCommentRes, error) {
+	return h.threadsHandler.ThreadAddComment(ctx, req, params)
 }
 
 func (h *OgenHandler) ThreadCreate(ctx context.Context, req *api.ThreadCreateRequest) (api.ThreadCreateRes, error) {

@@ -21,6 +21,7 @@ func NewThreadsHandler(threadsService *threadsService.ThreadsService) *ThreadsHa
 	return &ThreadsHandler{threadsService: threadsService}
 }
 
+// deprecated: use ThreadAddComment instead
 func (h *ThreadsHandler) ThreadAddPost(
 	ctx context.Context,
 	req *api.ThreadCreatePostRequest,
@@ -50,6 +51,35 @@ func (h *ThreadsHandler) ThreadAddPost(
 		CreatedAt:  post.CreatedAt,
 	}, nil
 }
+func (h *ThreadsHandler) ThreadAddComment(
+	ctx context.Context,
+	req *api.ThreadCreateCommentRequest,
+	params api.ThreadAddCommentParams) (api.ThreadAddCommentRes, error) {
+
+	globalCtx := GlobalContextFromContext(ctx)
+	if globalCtx == nil || globalCtx.UserIDIsSet == false {
+		res := api.ThreadAddCommentInternalServerError("in handler.ThreadAddComment() user ID is not set")
+		return &res, apperror.NewAuthenticationError("handler.ThreadAddComment()", nil, "user ID is not set")
+	}
+	postCreate := model.PostCreate{
+		ThreadID: params.ThreadId,
+		UserID:   globalCtx.UserID,
+		Content:  req.Content,
+	}
+
+	post, err := h.threadsService.AddComment(ctx, postCreate)
+	if err != nil {
+		return nil, err
+	}
+
+	return &api.ThreadCommentItem{
+		ID:         post.ID,
+		AuthorId:   post.UserID,
+		AuthorName: post.UserName,
+		Content:    post.Content,
+		CreatedAt:  post.CreatedAt,
+	}, nil
+}
 
 func (h *ThreadsHandler) ThreadCreate(
 	ctx context.Context, req *api.ThreadCreateRequest) (api.ThreadCreateRes, error) {
@@ -71,19 +101,19 @@ func (h *ThreadsHandler) ThreadCreate(
 		return nil, err
 	}
 	return &api.ThreadListItem{
-		ID:         thread.ID,
-		Title:      thread.Title,
-		Content:    thread.Content,
-		AuthorId:   thread.UserID,
-		AuthorName: thread.UserName,
-		PostsCount: thread.PostsCount,
-		CreatedAt:  thread.CreatedAt,
+		ID:            thread.ID,
+		Title:         thread.Title,
+		Content:       thread.Content,
+		AuthorId:      thread.UserID,
+		AuthorName:    thread.UserName,
+		CommentsCount: thread.CommentsCount,
+		CreatedAt:     thread.CreatedAt,
 	}, nil
 }
 
 // get thread with all posts
 func (h *ThreadsHandler) ThreadGet(ctx context.Context, params api.ThreadGetParams) (api.ThreadGetRes, error) {
-	threadWithPosts, err := h.threadsService.GetThreadWithPosts(ctx, params.ThreadId)
+	threadWithPosts, err := h.threadsService.GetThreadWithComments(ctx, params.ThreadId)
 	if err != nil {
 		return nil, err
 	}
@@ -103,14 +133,15 @@ func (h *ThreadsHandler) ThreadGet(ctx context.Context, params api.ThreadGetPara
 		})
 	}
 	return &api.ThreadWithPostsListResponse{
-		ID:         threadWithPosts.ID,
-		AuthorId:   threadWithPosts.AuthorID,
-		AuthorName: threadWithPosts.AuthorName,
-		Title:      threadWithPosts.Title,
-		Content:    threadWithPosts.Content,
-		PostsCount: threadWithPosts.PostsCount,
-		CreatedAt:  threadWithPosts.CreatedAt,
-		Posts:      posts,
+		ID:            threadWithPosts.ID,
+		AuthorId:      threadWithPosts.AuthorID,
+		AuthorName:    threadWithPosts.AuthorName,
+		Title:         threadWithPosts.Title,
+		Content:       threadWithPosts.Content,
+		PostsCount:    threadWithPosts.CommentsCount,
+		CommentsCount: threadWithPosts.CommentsCount,
+		CreatedAt:     threadWithPosts.CreatedAt,
+		Posts:         posts,
 	}, nil
 }
 
@@ -154,13 +185,14 @@ GOT_THREAD_ID:
 	resThreads := make([]api.ThreadListItem, len(threadList.Threads))
 	for i, thread := range threadList.Threads {
 		resThreads[i] = api.ThreadListItem{
-			ID:         thread.ID,
-			Title:      thread.Title,
-			Content:    thread.Content,
-			AuthorId:   thread.AuthorID,
-			AuthorName: thread.AuthorName,
-			PostsCount: thread.PostsCount,
-			CreatedAt:  thread.CreatedAt,
+			ID:            thread.ID,
+			Title:         thread.Title,
+			Content:       thread.Content,
+			AuthorId:      thread.AuthorID,
+			AuthorName:    thread.AuthorName,
+			PostsCount:    thread.CommentsCount,
+			CommentsCount: thread.CommentsCount,
+			CreatedAt:     thread.CreatedAt,
 		}
 	}
 	return &api.ThreadListResponse{

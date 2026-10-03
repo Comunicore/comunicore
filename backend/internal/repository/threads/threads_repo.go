@@ -34,12 +34,12 @@ func (r *ThreadsRepo) Create(ctx context.Context, thread model.ThreadCreate) (mo
 		UserID:  int32(thread.UserID),
 	})
 	return model.ThreadRepoInfo{
-		ID:         int(row.ID),
-		UserID:     int(row.UserID),
-		Title:      row.Title,
-		Content:    row.Content,
-		PostsCount: int(row.PostsCount),
-		CreatedAt:  row.CreatedAt.Time,
+		ID:            int(row.ID),
+		UserID:        int(row.UserID),
+		Title:         row.Title,
+		Content:       row.Content,
+		CommentsCount: int(row.CommentsCount),
+		CreatedAt:     row.CreatedAt.Time,
 	}, err
 }
 
@@ -77,12 +77,12 @@ func (r *ThreadsRepo) PageByPageID(ctx context.Context, page, limit int) (model.
 	threads := make([]model.ThreadRepoInfo, 0, limit)
 	for _, row := range rows {
 		threads = append(threads, model.ThreadRepoInfo{
-			ID:         int(row.ID),
-			UserID:     int(row.UserID),
-			Title:      row.Title,
-			Content:    row.Content,
-			PostsCount: int(row.PostsCount),
-			CreatedAt:  row.CreatedAt.Time,
+			ID:            int(row.ID),
+			UserID:        int(row.UserID),
+			Title:         row.Title,
+			Content:       row.Content,
+			CommentsCount: int(row.CommentsCount),
+			CreatedAt:     row.CreatedAt.Time,
 		})
 	}
 	if len(threads) == 0 {
@@ -114,12 +114,12 @@ func (r *ThreadsRepo) PageByOffset(ctx context.Context, threadId, limit int, bef
 		}
 		for _, row := range rows {
 			threads = append(threads, model.ThreadRepoInfo{
-				ID:         int(row.ID),
-				UserID:     int(row.UserID),
-				Title:      row.Title,
-				Content:    row.Content,
-				PostsCount: int(row.PostsCount),
-				CreatedAt:  row.CreatedAt.Time,
+				ID:            int(row.ID),
+				UserID:        int(row.UserID),
+				Title:         row.Title,
+				Content:       row.Content,
+				CommentsCount: int(row.CommentsCount),
+				CreatedAt:     row.CreatedAt.Time,
 			})
 		}
 	} else {
@@ -132,12 +132,12 @@ func (r *ThreadsRepo) PageByOffset(ctx context.Context, threadId, limit int, bef
 		}
 		for _, row := range rows {
 			threads = append(threads, model.ThreadRepoInfo{
-				ID:         int(row.ID),
-				UserID:     int(row.UserID),
-				Title:      row.Title,
-				Content:    row.Content,
-				PostsCount: int(row.PostsCount),
-				CreatedAt:  row.CreatedAt.Time,
+				ID:            int(row.ID),
+				UserID:        int(row.UserID),
+				Title:         row.Title,
+				Content:       row.Content,
+				CommentsCount: int(row.CommentsCount),
+				CreatedAt:     row.CreatedAt.Time,
 			})
 		}
 	}
@@ -194,11 +194,11 @@ func (r *ThreadsRepo) threadListInfo(ctx context.Context, minId, maxId int) (mod
 func (r *ThreadsRepo) Get(ctx context.Context, threadId int) (*model.ThreadRepoInfo, error) {
 	row, err := r.queries.ThreadGetById(ctx, int32(threadId))
 	return &model.ThreadRepoInfo{
-		ID:         int(row.ID),
-		UserID:     int(row.UserID),
-		Title:      row.Title,
-		Content:    row.Content,
-		PostsCount: int(row.PostsCount),
-		CreatedAt:  row.CreatedAt.Time,
+		ID:            int(row.ID),
+		UserID:        int(row.UserID),
+		Title:         row.Title,
+		Content:       row.Content,
+		CommentsCount: int(row.CommentsCount),
+		CreatedAt:     row.CreatedAt.Time,
 	}, err
 }

@@ -28,7 +28,7 @@ type AuthPassword struct {
 	PasswordHash string
 }
 
-type Post struct {
+type Comment struct {
 	ID        int32
 	ThreadID  int32
 	UserID    int32
@@ -43,13 +43,13 @@ type Session struct {
 }
 
 type Thread struct {
-	ID         int32
-	Title      string
-	Content    string
-	UserID     int32
-	PostsCount int32
-	CreatedAt  pgtype.Timestamptz
-	UpdatedAt  pgtype.Timestamptz
+	ID            int32
+	Title         string
+	Content       string
+	UserID        int32
+	CommentsCount int32
+	CreatedAt     pgtype.Timestamptz
+	UpdatedAt     pgtype.Timestamptz
 }
 
 type ThreadTag struct {

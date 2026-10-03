@@ -1,34 +1,34 @@
 // SPDX-License-Identifier: MIT
 // Copyright 2026 Alex Syrnikov <alex19srv@gmail.com>
 
-package posts
+package comments
 
 import (
 	"context"
 
 	"github.com/hetagdarchiev/comunicore/backend/internal/repository"
-	postsDb "github.com/hetagdarchiev/comunicore/backend/internal/repository/sqlc/db"
+	commentsDb "github.com/hetagdarchiev/comunicore/backend/internal/repository/sqlc/db"
 	"github.com/hetagdarchiev/comunicore/backend/internal/service/model"
 )
 
-type PostsRepo struct {
-	queries *postsDb.Queries
+type CommentsRepo struct {
+	queries *commentsDb.Queries
 }
 
-func NewPostsRepo(dsn string) (*PostsRepo, error) {
+func NewCommentsRepo(dsn string) (*CommentsRepo, error) {
 	pool, err := repository.PgPool(dsn)
 	if err != nil {
 		return nil, err
 	}
-	return &PostsRepo{queries: postsDb.New(pool)}, nil
+	return &CommentsRepo{queries: commentsDb.New(pool)}, nil
 }
 
-// create post in thread
-func (r *PostsRepo) Create(ctx context.Context, post model.PostCreate) (model.Post, error) {
-	row, err := r.queries.PostCreate(ctx, postsDb.PostCreateParams{
-		ThreadID: int32(post.ThreadID),
-		UserID:   int32(post.UserID),
-		Content:  post.Content,
+// create comment in thread
+func (r *CommentsRepo) Create(ctx context.Context, comment model.PostCreate) (model.Post, error) {
+	row, err := r.queries.CommentCreate(ctx, commentsDb.CommentCreateParams{
+		ThreadID: int32(comment.ThreadID),
+		UserID:   int32(comment.UserID),
+		Content:  comment.Content,
 	})
 	return model.Post{
 		ID:        int(row.ID),
@@ -39,9 +39,9 @@ func (r *PostsRepo) Create(ctx context.Context, post model.PostCreate) (model.Po
 	}, err
 }
 
-// list posts by thread id
-func (r *PostsRepo) List(ctx context.Context, threadId int) ([]model.Post, error) {
-	rows, err := r.queries.PostListByThreadId(ctx, int32(threadId))
+// list comments by thread id
+func (r *CommentsRepo) List(ctx context.Context, threadId int) ([]model.Post, error) {
+	rows, err := r.queries.CommentListByThreadId(ctx, int32(threadId))
 
 	var posts []model.Post
 	for _, data := range rows {

@@ -157,7 +157,7 @@ func (r *AnalyticsRepo) GetMetrics(ctx context.Context, dropoffN, dropoffInactiv
 		}
 	}
 
-	topUsersByPosts, err := r.queries.AnalyticsTopUsersByPosts(ctx)
+	topUsersByPosts, err := r.queries.AnalyticsTopUsersByComments(ctx)
 	if err != nil {
 		return out, err
 	}
@@ -166,7 +166,7 @@ func (r *AnalyticsRepo) GetMetrics(ctx context.Context, dropoffN, dropoffInactiv
 		out.TopUsersByPosts = append(out.TopUsersByPosts, model.AnalyticsUserCount{
 			UserID: int(row.ID),
 			Name:   row.Name,
-			Count:  row.PostCount,
+			Count:  row.CommentCount,
 		})
 	}
 
@@ -182,7 +182,7 @@ func (r *AnalyticsRepo) GetMetrics(ctx context.Context, dropoffN, dropoffInactiv
 		})
 	}
 
-	postsByDay, err := r.queries.AnalyticsPostsActivityByDay(ctx)
+	postsByDay, err := r.queries.AnalyticsCommentsActivityByDay(ctx)
 	if err != nil {
 		return out, err
 	}
@@ -190,7 +190,7 @@ func (r *AnalyticsRepo) GetMetrics(ctx context.Context, dropoffN, dropoffInactiv
 	for _, row := range postsByDay {
 		out.PostsActivityByDay = append(out.PostsActivityByDay, model.AnalyticsDayPosts{
 			Day:        row.Day.Time,
-			PostsCount: row.PostsCount,
+			PostsCount: row.CommentsCount,
 		})
 	}
 
@@ -207,7 +207,7 @@ func (r *AnalyticsRepo) GetMetrics(ctx context.Context, dropoffN, dropoffInactiv
 		})
 	}
 
-	postOnlyUsers, err := r.queries.AnalyticsUsersWithPostsButNoThreads(ctx)
+	postOnlyUsers, err := r.queries.AnalyticsUsersWithCommentsButNoThreads(ctx)
 	if err != nil {
 		return out, err
 	}
@@ -216,7 +216,7 @@ func (r *AnalyticsRepo) GetMetrics(ctx context.Context, dropoffN, dropoffInactiv
 		out.PostOnlyUsers = append(out.PostOnlyUsers, model.AnalyticsUserCount{
 			UserID: int(row.ID),
 			Name:   row.Name,
-			Count:  row.PostCount,
+			Count:  row.CommentCount,
 		})
 	}
 

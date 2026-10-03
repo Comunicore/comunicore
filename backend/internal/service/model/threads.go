@@ -5,14 +5,14 @@ package model
 
 import "time"
 
-type ThreadWithPosts struct {
+type ThreadWithComments struct {
 	ID              int
 	AuthorID        int
 	AuthorName      string
 	AuthorAvatarUrl string
 	Title           string
 	Content         string
-	PostsCount      int
+	CommentsCount   int
 	CreatedAt       time.Time
 	Posts           []PostListItem
 }
@@ -24,12 +24,12 @@ type ThreadCreate struct {
 	Tags    []string
 }
 type ThreadRepoInfo struct {
-	ID         int
-	Title      string
-	Content    string
-	UserID     int
-	PostsCount int
-	CreatedAt  time.Time
+	ID            int
+	Title         string
+	Content       string
+	UserID        int
+	CommentsCount int
+	CreatedAt     time.Time
 }
 type ThreadListRepo struct {
 	Threads []ThreadRepoInfo
@@ -45,7 +45,7 @@ type ThreadInfoResponse struct {
 	AuthorID        int
 	AuthorName      string
 	AuthorAvatarUrl string
-	PostsCount      int
+	CommentsCount   int
 	CreatedAt       time.Time
 }
 
@@ -58,16 +58,11 @@ type ThreadListResponse struct {
 }
 
 type ThreadInfo struct {
-	ID         int
-	Title      string
-	Content    string
-	UserID     int
-	UserName   string
-	PostsCount int
-	CreatedAt  time.Time
+	ID            int
+	Title         string
+	Content       string
+	UserID        int
+	UserName      string
+	CommentsCount int
+	CreatedAt     time.Time
 }
-
-// type ThreadListItem struct {
-// 	ID   int
-// 	Name string
-// }

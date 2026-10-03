@@ -262,6 +262,49 @@ func encodeMediaUploadResponse(response MediaUploadRes, w http.ResponseWriter) e
 	}
 }
 
+func encodeThreadAddCommentResponse(response ThreadAddCommentRes, w http.ResponseWriter) error {
+	switch response := response.(type) {
+	case *ThreadCommentItem:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(201)
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *ThreadAddCommentBadRequest:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(400)
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *ThreadAddCommentInternalServerError:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(500)
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	default:
+		return errors.Errorf("unexpected response type: %T", response)
+	}
+}
+
 func encodeThreadAddPostResponse(response ThreadAddPostRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
 	case *ThreadPostItem:

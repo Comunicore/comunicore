@@ -45,9 +45,17 @@ type Handler interface {
 	//
 	// POST /api/media
 	MediaUpload(ctx context.Context, req *MediaUploadRequestMultipart) (MediaUploadRes, error)
+	// ThreadAddComment implements threadAddComment operation.
+	//
+	// Add a new comment to thread.
+	//
+	// POST /api/threads/{threadId}/comments
+	ThreadAddComment(ctx context.Context, req *ThreadCreateCommentRequest, params ThreadAddCommentParams) (ThreadAddCommentRes, error)
 	// ThreadAddPost implements threadAddPost operation.
 	//
 	// Add a new post to thread.
+	//
+	// Deprecated: schema marks this operation as deprecated.
 	//
 	// POST /api/threads/{threadId}/posts
 	ThreadAddPost(ctx context.Context, req *ThreadCreatePostRequest, params ThreadAddPostParams) (ThreadAddPostRes, error)

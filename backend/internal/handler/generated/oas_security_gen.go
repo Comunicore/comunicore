@@ -37,6 +37,7 @@ var operationRolesCookieAuth = map[string][]string{
 	AnalyticsMetricsGetOperation: []string{},
 	AuthLogoutOperation:          []string{},
 	MediaUploadOperation:         []string{},
+	ThreadAddCommentOperation:    []string{},
 	ThreadAddPostOperation:       []string{},
 	ThreadCreateOperation:        []string{},
 	ThreadGetOperation:           []string{},

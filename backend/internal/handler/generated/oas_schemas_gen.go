@@ -1035,6 +1035,14 @@ func (o OptInt) Or(d int) int {
 	return d
 }
 
+type ThreadAddCommentBadRequest AnalyticsMetricsGetInternalServerErrorApplicationJSON
+
+func (*ThreadAddCommentBadRequest) threadAddCommentRes() {}
+
+type ThreadAddCommentInternalServerError AnalyticsMetricsGetInternalServerErrorApplicationJSON
+
+func (*ThreadAddCommentInternalServerError) threadAddCommentRes() {}
+
 type ThreadAddPostBadRequest AnalyticsMetricsGetInternalServerErrorApplicationJSON
 
 func (*ThreadAddPostBadRequest) threadAddPostRes() {}
@@ -1043,10 +1051,98 @@ type ThreadAddPostInternalServerError AnalyticsMetricsGetInternalServerErrorAppl
 
 func (*ThreadAddPostInternalServerError) threadAddPostRes() {}
 
+// Ref: #/components/schemas/ThreadCommentItem
+type ThreadCommentItem struct {
+	ID              int       `json:"id"`
+	AuthorId        int       `json:"authorId"`
+	AuthorName      string    `json:"authorName"`
+	AuthorAvatarUrl url.URL   `json:"authorAvatarUrl"`
+	Content         string    `json:"content"`
+	CreatedAt       time.Time `json:"createdAt"`
+}
+
+// GetID returns the value of ID.
+func (s *ThreadCommentItem) GetID() int {
+	return s.ID
+}
+
+// GetAuthorId returns the value of AuthorId.
+func (s *ThreadCommentItem) GetAuthorId() int {
+	return s.AuthorId
+}
+
+// GetAuthorName returns the value of AuthorName.
+func (s *ThreadCommentItem) GetAuthorName() string {
+	return s.AuthorName
+}
+
+// GetAuthorAvatarUrl returns the value of AuthorAvatarUrl.
+func (s *ThreadCommentItem) GetAuthorAvatarUrl() url.URL {
+	return s.AuthorAvatarUrl
+}
+
+// GetContent returns the value of Content.
+func (s *ThreadCommentItem) GetContent() string {
+	return s.Content
+}
+
+// GetCreatedAt returns the value of CreatedAt.
+func (s *ThreadCommentItem) GetCreatedAt() time.Time {
+	return s.CreatedAt
+}
+
+// SetID sets the value of ID.
+func (s *ThreadCommentItem) SetID(val int) {
+	s.ID = val
+}
+
+// SetAuthorId sets the value of AuthorId.
+func (s *ThreadCommentItem) SetAuthorId(val int) {
+	s.AuthorId = val
+}
+
+// SetAuthorName sets the value of AuthorName.
+func (s *ThreadCommentItem) SetAuthorName(val string) {
+	s.AuthorName = val
+}
+
+// SetAuthorAvatarUrl sets the value of AuthorAvatarUrl.
+func (s *ThreadCommentItem) SetAuthorAvatarUrl(val url.URL) {
+	s.AuthorAvatarUrl = val
+}
+
+// SetContent sets the value of Content.
+func (s *ThreadCommentItem) SetContent(val string) {
+	s.Content = val
+}
+
+// SetCreatedAt sets the value of CreatedAt.
+func (s *ThreadCommentItem) SetCreatedAt(val time.Time) {
+	s.CreatedAt = val
+}
+
+func (*ThreadCommentItem) threadAddCommentRes() {}
+
+// Ref: #/components/schemas/ThreadCreateCommentRequest
+type ThreadCreateCommentRequest struct {
+	Content string `json:"content"`
+}
+
+// GetContent returns the value of Content.
+func (s *ThreadCreateCommentRequest) GetContent() string {
+	return s.Content
+}
+
+// SetContent sets the value of Content.
+func (s *ThreadCreateCommentRequest) SetContent(val string) {
+	s.Content = val
+}
+
 type ThreadCreateInternalServerError AnalyticsMetricsGetInternalServerErrorApplicationJSON
 
 func (*ThreadCreateInternalServerError) threadCreateRes() {}
 
+// Deprecated: schema marks this type as deprecated.
 // Ref: #/components/schemas/ThreadCreatePostRequest
 type ThreadCreatePostRequest struct {
 	Content string `json:"content"`
@@ -1122,8 +1218,13 @@ type ThreadListItem struct {
 	Content         string  `json:"content"`
 	// Number of reply posts (rows in posts). The opening message lives in title/content only and is not
 	// counted.
-	PostsCount int       `json:"postsCount"`
-	CreatedAt  time.Time `json:"createdAt"`
+	//
+	// Deprecated: schema marks this property as deprecated.
+	PostsCount int `json:"postsCount"`
+	// Number of comments (rows in comments). The opening message lives in title/content only and is not
+	// counted.
+	CommentsCount int       `json:"commentsCount"`
+	CreatedAt     time.Time `json:"createdAt"`
 }
 
 // GetID returns the value of ID.
@@ -1159,6 +1260,11 @@ func (s *ThreadListItem) GetContent() string {
 // GetPostsCount returns the value of PostsCount.
 func (s *ThreadListItem) GetPostsCount() int {
 	return s.PostsCount
+}
+
+// GetCommentsCount returns the value of CommentsCount.
+func (s *ThreadListItem) GetCommentsCount() int {
+	return s.CommentsCount
 }
 
 // GetCreatedAt returns the value of CreatedAt.
@@ -1199,6 +1305,11 @@ func (s *ThreadListItem) SetContent(val string) {
 // SetPostsCount sets the value of PostsCount.
 func (s *ThreadListItem) SetPostsCount(val int) {
 	s.PostsCount = val
+}
+
+// SetCommentsCount sets the value of CommentsCount.
+func (s *ThreadListItem) SetCommentsCount(val int) {
+	s.CommentsCount = val
 }
 
 // SetCreatedAt sets the value of CreatedAt.
@@ -1258,6 +1369,7 @@ func (s *ThreadListResponse) SetHaveNext(val bool) {
 
 func (*ThreadListResponse) threadsListRes() {}
 
+// Deprecated: schema marks this type as deprecated.
 // Ref: #/components/schemas/ThreadPostItem
 type ThreadPostItem struct {
 	ID              int       `json:"id"`
@@ -1339,9 +1451,13 @@ type ThreadWithPostsListResponse struct {
 	Title           string  `json:"title"`
 	Content         string  `json:"content"`
 	// Number of reply posts (rows in posts). The opening message is not included.
-	PostsCount int              `json:"postsCount"`
-	CreatedAt  time.Time        `json:"createdAt"`
-	Posts      []ThreadPostItem `json:"posts"`
+	//
+	// Deprecated: schema marks this property as deprecated.
+	PostsCount int `json:"postsCount"`
+	// Number of comments (rows in comments). The opening message is not included.
+	CommentsCount int              `json:"commentsCount"`
+	CreatedAt     time.Time        `json:"createdAt"`
+	Posts         []ThreadPostItem `json:"posts"`
 }
 
 // GetID returns the value of ID.
@@ -1377,6 +1493,11 @@ func (s *ThreadWithPostsListResponse) GetContent() string {
 // GetPostsCount returns the value of PostsCount.
 func (s *ThreadWithPostsListResponse) GetPostsCount() int {
 	return s.PostsCount
+}
+
+// GetCommentsCount returns the value of CommentsCount.
+func (s *ThreadWithPostsListResponse) GetCommentsCount() int {
+	return s.CommentsCount
 }
 
 // GetCreatedAt returns the value of CreatedAt.
@@ -1422,6 +1543,11 @@ func (s *ThreadWithPostsListResponse) SetContent(val string) {
 // SetPostsCount sets the value of PostsCount.
 func (s *ThreadWithPostsListResponse) SetPostsCount(val int) {
 	s.PostsCount = val
+}
+
+// SetCommentsCount sets the value of CommentsCount.
+func (s *ThreadWithPostsListResponse) SetCommentsCount(val int) {
+	s.CommentsCount = val
 }
 
 // SetCreatedAt sets the value of CreatedAt.

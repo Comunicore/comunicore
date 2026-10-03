@@ -16,8 +16,8 @@ type ThreadsRepo interface {
 	PageByOffset(ctx context.Context, threadId, limit int, before bool) (model.ThreadListRepo, error)
 	InsertThreadTags(ctx context.Context, threadID int, tags []string) error
 }
-type PostsRepo interface {
-	Create(ctx context.Context, post model.PostCreate) (model.Post, error)
+type CommentsRepo interface {
+	Create(ctx context.Context, comment model.PostCreate) (model.Post, error)
 	List(ctx context.Context, threadId int) ([]model.Post, error)
 }
 type UserRepo interface {
@@ -26,17 +26,18 @@ type UserRepo interface {
 }
 
 type ThreadsService struct {
-	threadsRepo ThreadsRepo
-	postsRepo   PostsRepo
-	userRepo    UserRepo
+	threadsRepo  ThreadsRepo
+	commentsRepo CommentsRepo
+	userRepo     UserRepo
 }
 
-func NewThreadsService(threadsRepo ThreadsRepo, postsRepo PostsRepo, userRepo UserRepo) *ThreadsService {
-	return &ThreadsService{threadsRepo: threadsRepo, postsRepo: postsRepo, userRepo: userRepo}
+func NewThreadsService(threadsRepo ThreadsRepo, commentsRepo CommentsRepo, userRepo UserRepo) *ThreadsService {
+	return &ThreadsService{threadsRepo: threadsRepo, commentsRepo: commentsRepo, userRepo: userRepo}
 }
 
+// deprecated: use AddComment instead
 func (s *ThreadsService) AddPost(ctx context.Context, post model.PostCreate) (model.PostInfo, error) {
-	createdPost, err := s.postsRepo.Create(ctx, post)
+	createdPost, err := s.commentsRepo.Create(ctx, post)
 	if err != nil {
 		return model.PostInfo{}, err
 	}
@@ -51,6 +52,24 @@ func (s *ThreadsService) AddPost(ctx context.Context, post model.PostCreate) (mo
 		UserName:  userName,
 		Content:   createdPost.Content,
 		CreatedAt: createdPost.CreatedAt,
+	}, nil
+}
+func (s *ThreadsService) AddComment(ctx context.Context, comment model.PostCreate) (model.PostInfo, error) {
+	createdComment, err := s.commentsRepo.Create(ctx, comment)
+	if err != nil {
+		return model.PostInfo{}, err
+	}
+	userName, err := s.userRepo.GetNameById(ctx, createdComment.UserID)
+	if err != nil {
+		return model.PostInfo{}, err
+	}
+	return model.PostInfo{
+		ID:        createdComment.ID,
+		ThreadID:  createdComment.ThreadID,
+		UserID:    createdComment.UserID,
+		UserName:  userName,
+		Content:   createdComment.Content,
+		CreatedAt: createdComment.CreatedAt,
 	}, nil
 }
 func (s *ThreadsService) Create(ctx context.Context, thread model.ThreadCreate) (model.ThreadInfo, error) {
@@ -68,54 +87,54 @@ func (s *ThreadsService) Create(ctx context.Context, thread model.ThreadCreate) 
 		return model.ThreadInfo{}, err
 	}
 	return model.ThreadInfo{
-		ID:         createdThread.ID,
-		Title:      createdThread.Title,
-		Content:    createdThread.Content,
-		UserID:     createdThread.UserID,
-		UserName:   userName,
-		PostsCount: createdThread.PostsCount,
-		CreatedAt:  createdThread.CreatedAt,
+		ID:            createdThread.ID,
+		Title:         createdThread.Title,
+		Content:       createdThread.Content,
+		UserID:        createdThread.UserID,
+		UserName:      userName,
+		CommentsCount: createdThread.CommentsCount,
+		CreatedAt:     createdThread.CreatedAt,
 	}, nil
 }
 
-func (s *ThreadsService) GetThreadWithPosts(ctx context.Context, threadId int) (model.ThreadWithPosts, error) {
+func (s *ThreadsService) GetThreadWithComments(ctx context.Context, threadId int) (model.ThreadWithComments, error) {
 	threadInfo, err := s.threadsRepo.Get(ctx, threadId)
 	if err != nil {
-		return model.ThreadWithPosts{}, err
+		return model.ThreadWithComments{}, err
 	}
-	posts, err := s.postsRepo.List(ctx, threadId)
+	comments, err := s.commentsRepo.List(ctx, threadId)
 	if err != nil {
-		return model.ThreadWithPosts{}, err
+		return model.ThreadWithComments{}, err
 	}
-	var postListItems []model.PostListItem
-	for _, post := range posts {
-		userInfo, err := s.userRepo.Get(ctx, post.UserID)
+	var commentListItems []model.PostListItem
+	for _, comment := range comments {
+		userInfo, err := s.userRepo.Get(ctx, comment.UserID)
 		if err != nil {
-			return model.ThreadWithPosts{}, err
+			return model.ThreadWithComments{}, err
 		}
-		postListItems = append(postListItems, model.PostListItem{
-			ID:              post.ID,
-			UserID:          post.UserID,
+		commentListItems = append(commentListItems, model.PostListItem{
+			ID:              comment.ID,
+			UserID:          comment.UserID,
 			UserName:        userInfo.Name,
 			AuthorAvatarUrl: userInfo.AvatarURL,
-			Content:         post.Content,
-			CreatedAt:       post.CreatedAt,
+			Content:         comment.Content,
+			CreatedAt:       comment.CreatedAt,
 		})
 	}
 	userInfo, err := s.userRepo.Get(ctx, threadInfo.UserID)
 	if err != nil {
-		return model.ThreadWithPosts{}, err
+		return model.ThreadWithComments{}, err
 	}
-	return model.ThreadWithPosts{
+	return model.ThreadWithComments{
 		ID:              threadInfo.ID,
 		AuthorID:        threadInfo.UserID,
 		AuthorName:      userInfo.Name,
 		AuthorAvatarUrl: userInfo.AvatarURL,
 		Title:           threadInfo.Title,
 		Content:         threadInfo.Content,
-		PostsCount:      threadInfo.PostsCount,
+		CommentsCount:   threadInfo.CommentsCount,
 		CreatedAt:       threadInfo.CreatedAt,
-		Posts:           postListItems,
+		Posts:           commentListItems,
 	}, nil
 }
 func (s *ThreadsService) GetThreadListByPage(ctx context.Context, page, limit int) (model.ThreadListResponse, error) {
@@ -148,7 +167,7 @@ func (s *ThreadsService) convertThreadListRepoToResponse(
 			AuthorID:        thread.UserID,
 			AuthorName:      userInfo.Name,
 			AuthorAvatarUrl: userInfo.AvatarURL,
-			PostsCount:      thread.PostsCount,
+			CommentsCount:   thread.CommentsCount,
 			CreatedAt:       thread.CreatedAt,
 		})
 	}
