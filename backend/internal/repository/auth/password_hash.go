@@ -10,9 +10,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/hetagdarchiev/comunicore/backend/internal/lib/utils"
+	"github.com/comunicore/comunicore/backend/internal/lib/utils"
 
-	"github.com/hetagdarchiev/comunicore/backend/internal/apperror"
+	"github.com/comunicore/comunicore/backend/internal/apperror"
 	"golang.org/x/crypto/argon2"
 )
 

@@ -7,10 +7,10 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/comunicore/comunicore/backend/internal/apperror"
+	"github.com/comunicore/comunicore/backend/internal/repository"
+	authDb "github.com/comunicore/comunicore/backend/internal/repository/sqlc/db"
 	"github.com/google/uuid"
-	"github.com/hetagdarchiev/comunicore/backend/internal/apperror"
-	"github.com/hetagdarchiev/comunicore/backend/internal/repository"
-	authDb "github.com/hetagdarchiev/comunicore/backend/internal/repository/sqlc/db"
 	"github.com/jackc/pgx/v5/pgtype"
 )
 

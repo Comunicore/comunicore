@@ -6,9 +6,9 @@ package comments
 import (
 	"context"
 
-	"github.com/hetagdarchiev/comunicore/backend/internal/repository"
-	commentsDb "github.com/hetagdarchiev/comunicore/backend/internal/repository/sqlc/db"
-	"github.com/hetagdarchiev/comunicore/backend/internal/service/model"
+	"github.com/comunicore/comunicore/backend/internal/repository"
+	commentsDb "github.com/comunicore/comunicore/backend/internal/repository/sqlc/db"
+	"github.com/comunicore/comunicore/backend/internal/service/model"
 )
 
 type CommentsRepo struct {

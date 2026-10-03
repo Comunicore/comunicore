@@ -6,8 +6,8 @@ package handler
 import (
 	"context"
 
-	api "github.com/hetagdarchiev/comunicore/backend/internal/handler/generated"
-	mediaService "github.com/hetagdarchiev/comunicore/backend/internal/service/media"
+	api "github.com/comunicore/comunicore/backend/internal/handler/generated"
+	mediaService "github.com/comunicore/comunicore/backend/internal/service/media"
 )
 
 type MediaHandler struct {

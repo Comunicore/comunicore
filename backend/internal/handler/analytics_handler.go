@@ -3,9 +3,9 @@ package handler
 import (
 	"context"
 
-	api "github.com/hetagdarchiev/comunicore/backend/internal/handler/generated"
-	"github.com/hetagdarchiev/comunicore/backend/internal/service/model"
-	analyticsService "github.com/hetagdarchiev/comunicore/backend/internal/service/analytics"
+	api "github.com/comunicore/comunicore/backend/internal/handler/generated"
+	analyticsService "github.com/comunicore/comunicore/backend/internal/service/analytics"
+	"github.com/comunicore/comunicore/backend/internal/service/model"
 )
 
 type AnalyticsHandler struct {
@@ -34,15 +34,15 @@ func (h *AnalyticsHandler) AnalyticsVisitBatchSubmit(ctx context.Context, req *a
 	}
 
 	if err := h.svc.RecordVisitBatch(ctx, model.AnalyticsVisitBatchInsert{
-		UserID:              uid,
-		ClientBatchID:       req.ClientBatchId,
-		ActiveDurationMs:    req.ActiveDurationMs,
-		VisibleDurationMs:   req.VisibleDurationMs,
-		IsMobile:            req.IsMobile,
-		HadComposeActivity:  compose,
-		HadReadActivity:     read,
-		BatchStartAt:        req.BatchStartAt,
-		BatchEndAt:          req.BatchEndAt,
+		UserID:             uid,
+		ClientBatchID:      req.ClientBatchId,
+		ActiveDurationMs:   req.ActiveDurationMs,
+		VisibleDurationMs:  req.VisibleDurationMs,
+		IsMobile:           req.IsMobile,
+		HadComposeActivity: compose,
+		HadReadActivity:    read,
+		BatchStartAt:       req.BatchStartAt,
+		BatchEndAt:         req.BatchEndAt,
 	}); err != nil {
 		return nil, err
 	}

@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/comunicore/comunicore/backend/internal/tests"
 	"github.com/gavv/httpexpect/v2"
-	"github.com/hetagdarchiev/comunicore/backend/internal/tests"
 )
 
 func TestThreadCreate(t *testing.T) {

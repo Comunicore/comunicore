@@ -14,8 +14,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/hetagdarchiev/comunicore/backend/internal/handler"
-	"github.com/hetagdarchiev/comunicore/backend/internal/lib/config"
+	"github.com/comunicore/comunicore/backend/internal/handler"
+	"github.com/comunicore/comunicore/backend/internal/lib/config"
 )
 
 func main() {

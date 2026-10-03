@@ -6,7 +6,7 @@ package threads
 import (
 	"context"
 
-	"github.com/hetagdarchiev/comunicore/backend/internal/service/model"
+	"github.com/comunicore/comunicore/backend/internal/service/model"
 )
 
 type ThreadsRepo interface {

@@ -7,10 +7,10 @@ import (
 	"context"
 	"net/url"
 
-	"github.com/hetagdarchiev/comunicore/backend/internal/apperror"
-	api "github.com/hetagdarchiev/comunicore/backend/internal/handler/generated"
-	"github.com/hetagdarchiev/comunicore/backend/internal/service/model"
-	threadsService "github.com/hetagdarchiev/comunicore/backend/internal/service/threads"
+	"github.com/comunicore/comunicore/backend/internal/apperror"
+	api "github.com/comunicore/comunicore/backend/internal/handler/generated"
+	"github.com/comunicore/comunicore/backend/internal/service/model"
+	threadsService "github.com/comunicore/comunicore/backend/internal/service/threads"
 )
 
 type ThreadsHandler struct {
