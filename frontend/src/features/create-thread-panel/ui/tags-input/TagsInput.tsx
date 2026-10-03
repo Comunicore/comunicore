@@ -67,10 +67,10 @@ export function TagsInput() {
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={handleKeyDown}
-          color='ghost'
+          inputColor='ghost'
           placeholder='Нажмите Enter или запятую для добавления тега'
         />
-        <p className='text-gray-9e'>
+        <p className='text-gray-9e max-sm:text-sm'>
           Например: react, typescript, помощь, новичок <br /> Теги помогают
           другим пользователям найти ваш тред
         </p>

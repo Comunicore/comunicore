@@ -17,8 +17,8 @@ export default function Header(props: HTMLAttributes<HTMLHeadElement>) {
         Перейти на форум
       </Link>
       <div className='flex flex-col gap-y-2.5'>
-        <h1 className='text-5xl'>Создать новый тред</h1>
-        <p className='text-gray-9e'>
+        <h1 className='text-3xl md:text-5xl'>Создать новый тред</h1>
+        <p className='text-gray-9e max-sm:text-sm'>
           Поделитесь своей идеей, задайте вопрос или начните обсуждение.
         </p>
       </div>

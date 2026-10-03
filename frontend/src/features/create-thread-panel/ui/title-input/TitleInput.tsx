@@ -26,13 +26,16 @@ export function TitleInput() {
             maxLength={TITLE_MAX_LENGHT}
             minLength={TITLE_MIN_LENGHT}
             {...register('title')}
-            className='w-full pr-30'
-            placeholder='Введите заголовок вашего треда'
+            className='w-full pr-20 sm:pr-30'
+            placeholder='Введите заголовок'
           />
-          <TitleCounter titleMaxLenght={TITLE_MAX_LENGHT} />
+          <TitleCounter
+            titleMaxLenght={TITLE_MAX_LENGHT}
+            className='max-sm:text-sm'
+          />
         </div>
         {errors.title?.message && <ErrorMessage error={errors.title.message} />}
-        <p className='text-gray-9e'>
+        <p className='text-gray-9e max-sm:text-sm'>
           Короткий, но понятный заголовок может привлечь внимание.
         </p>
       </div>

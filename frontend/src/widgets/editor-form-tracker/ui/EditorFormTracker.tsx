@@ -7,16 +7,19 @@ import { useSearchParams } from 'next/navigation';
 
 import { CreateThreadTypes } from '@/features/create-thread-panel';
 
+import { cn } from '@/shared/lib/classNames';
 import { Tile } from '@/shared/ui/Tile';
 
 interface EditorFormTrackerProps {
   editorModeParam: string;
   previewMode: string;
+  className?: string;
 }
 
 export function EditorFormTracker({
   editorModeParam,
   previewMode,
+  className,
 }: EditorFormTrackerProps) {
   const searchParams = useSearchParams();
   const formValues = useWatch<CreateThreadTypes>();
@@ -66,7 +69,7 @@ export function EditorFormTracker({
   ];
 
   return (
-    <Tile size='sm' className='grid gap-y-5'>
+    <Tile size='sm' color='bordered' className={cn('grid gap-y-5', className)}>
       <h2>Советы по оформлению</h2>
       <ul className='flex flex-col gap-y-3.75'>
         {rules.map((rule) => (
@@ -86,7 +89,7 @@ export function EditorFormTracker({
                 className='text-red-ff min-h-5 min-w-5'
               />
             )}
-            <p className='text-gray-9e text-base leading-4 whitespace-nowrap'>
+            <p className='text-gray-9e text-base leading-4 sm:whitespace-nowrap'>
               {rule.label}
             </p>
           </li>

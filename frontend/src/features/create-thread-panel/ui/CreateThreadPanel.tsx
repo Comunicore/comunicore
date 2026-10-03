@@ -19,6 +19,7 @@ import { TitleInput } from './title-input/TitleInput';
 import { selectIsAuthenticated, useAuthStore } from '@/entities/session';
 
 import { AppRouter } from '@/shared/config/app-router';
+import { cn } from '@/shared/lib/classNames';
 import { Button, Tile } from '@/shared/ui';
 
 interface CreateThreadPanelProps {
@@ -53,6 +54,7 @@ export function CreateThreadPanel(props: CreateThreadPanelProps) {
   const onSubmit: SubmitHandler<CreateThreadTypes> = (data) => {
     if (!isAuth) {
       router.push(AppRouter.auth.registration);
+      return;
     }
     deleteDraft();
     console.log(data);
@@ -76,8 +78,12 @@ export function CreateThreadPanel(props: CreateThreadPanelProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <Tile className='flex flex-col gap-y-13.5' size='xl' color='ghost'>
+    <form onSubmit={handleSubmit(onSubmit)} className='max-2xl:order-last'>
+      <Tile
+        className='flex flex-col gap-y-13.5 max-md:p-5'
+        size='xl'
+        color='ghost'
+      >
         {isPreview ? (
           <PostPreview />
         ) : (
@@ -92,7 +98,14 @@ export function CreateThreadPanel(props: CreateThreadPanelProps) {
         )}
 
         {/* Buttons */}
-        <div className='border-t-gray-9e/10 grid grid-cols-[1fr_auto_auto] grid-rows-1 justify-end gap-x-7.5 border-t p-5'>
+        <div
+          className={cn(
+            'border-t-gray-9e/10 grid gap-7.5 border-t p-5',
+            'md:grid-cols-[auto_1fr]',
+            'md:justify-items-end',
+            'lg:grid-cols-[1fr_auto_auto] lg:justify-items-start',
+          )}
+        >
           <Button
             type='button'
             color='purple'
@@ -110,14 +123,14 @@ export function CreateThreadPanel(props: CreateThreadPanelProps) {
               }
             }}
             size='max-lg'
-            className='justify-self-start'
+            className='justify-self-start max-md:w-full'
           >
             Очистить
           </Button>
           <Button
             type='button'
             color='transparent'
-            className='flex gap-x-2.5'
+            className='flex gap-x-2.5 max-md:w-full'
             onClick={toggleMode}
           >
             {isPreview ? (
@@ -137,6 +150,7 @@ export function CreateThreadPanel(props: CreateThreadPanelProps) {
             color='purple'
             hoverStyle='purple'
             size='max-lg'
+            className='max-md:w-full'
           >
             Опубликовать тред
           </Button>

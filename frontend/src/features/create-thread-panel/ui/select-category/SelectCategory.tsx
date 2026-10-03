@@ -49,7 +49,7 @@ export function SelectCategory() {
                   }
                 }}
               >
-                <SelectTrigger className='*:last:text-purple-86 text-white'>
+                <SelectTrigger className='*:last:text-purple-86 text-white max-sm:text-sm'>
                   <SelectValue />
                 </SelectTrigger>
 
@@ -71,7 +71,7 @@ export function SelectCategory() {
           />
         )}
 
-        <p className='text-gray-9e'>
+        <p className='text-gray-9e max-sm:text-sm'>
           Поделитесь своей идеей, задайте вопрос или начните обсуждение.
         </p>
       </div>

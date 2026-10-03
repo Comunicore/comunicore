@@ -50,12 +50,12 @@ export function ThreadType() {
   return (
     <fieldset>
       <legend className='mb-3.75 font-bold text-white'>2. Тип треда</legend>
-      <div className='flex items-center gap-x-5'>
+      <div className='flex flex-col gap-5 sm:flex-row'>
         {optionsType.map(({ icon: Icon, description, id, title }) => {
           const isChecked = selectedType === id;
 
           return (
-            <Label key={id}>
+            <Label key={id} className='max-md:w-full'>
               <input
                 type='radio'
                 className='peer sr-only'
@@ -65,25 +65,35 @@ export function ThreadType() {
               />
               <div
                 className={cn(
-                  'border-gray-9e/10 bg-dark-1b/50 flex items-start gap-x-5 rounded-[0.625rem] border px-5 py-7.5 duration-200',
+                  'border-gray-9e/10 bg-dark-1b/50 grid h-full grid-cols-1 gap-3 rounded-[0.625rem] border px-3 py-4 duration-200',
                   'peer-focus-visible:ring-offset-dark-1b peer-focus-visible:ring-2 peer-focus-visible:ring-white peer-focus-visible:ring-offset-2',
+                  'md:grid-cols-[auto_1fr] md:gap-5 md:px-5 md:py-7.5',
                   isChecked && 'border-purple-86 bg-purple-67/10 border',
                 )}
               >
                 <div
                   className={cn(
-                    'bg-gray-9e/10 rounded-[0.625rem] p-2.5',
+                    'bg-gray-9e/10 row-span-2 h-fit w-fit rounded-[0.625rem] p-2.5',
                     isChecked && 'bg-purple-86/10 text-purple-86',
                   )}
                 >
                   <Icon aria-hidden size={30} className='min-w-7.5' />
                 </div>
-                <div className='flex flex-col gap-y-2.5 text-lg leading-5.5'>
-                  <span
-                    className={cn(isChecked ? 'text-pink-d5' : 'text-white')}
-                  >
-                    {title}
-                  </span>
+                <span
+                  className={cn(
+                    isChecked ? 'text-pink-d5' : 'text-white',
+                    'max-sm:text-sm',
+                  )}
+                >
+                  {title}
+                </span>
+                <div
+                  className={cn(
+                    'hidden text-lg leading-5.5',
+                    'md:block',
+                    'max-2xl:col-span-2',
+                  )}
+                >
                   <span>{description}</span>
                 </div>
               </div>

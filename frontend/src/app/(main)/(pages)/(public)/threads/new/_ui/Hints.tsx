@@ -1,3 +1,6 @@
+'use client';
+
+import { useEffect, useState } from 'react';
 import { LuArrowRight } from 'react-icons/lu';
 import Link from 'next/link';
 
@@ -23,15 +26,32 @@ interface HintsProps {
 }
 
 export default function Hints({ editorModeParam, previewMode }: HintsProps) {
+  const [rules, setRules] = useState(() => communityRulesMap.slice(0, 3));
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setRules(communityRulesMap.slice(0, 3));
+      } else {
+        setRules([...communityRulesMap]);
+      }
+    };
+
+    handleResize(); // Pierwsze przeliczenie po zamontowaniu w przeglądarce
+    window.addEventListener('resize', handleResize);
+
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   return (
     <div className='flex flex-col gap-y-10 **:[h2]:text-lg **:[h2]:font-bold'>
       <EditorFormTracker
+        className='max-md:hidden'
         editorModeParam={editorModeParam}
         previewMode={previewMode}
       />
 
       {/* rules */}
-      <Tile className='flex flex-col gap-y-5'>
+      <Tile className='flex flex-col gap-y-5' color='bordered'>
         <h2>Правила сообщества</h2>
 
         <p className='text-gray-9e'>
@@ -42,7 +62,7 @@ export default function Hints({ editorModeParam, previewMode }: HintsProps) {
         </p>
 
         <ul className='flex list-disc flex-col gap-y-3 pl-5'>
-          {communityRulesMap.map((rule) => (
+          {rules.map((rule) => (
             <li key={rule}>{rule}</li>
           ))}
         </ul>

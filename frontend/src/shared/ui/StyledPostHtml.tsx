@@ -5,7 +5,7 @@ import { md } from '../lib/markdown/parser';
 import { sanitize } from '../lib/markdown/sanitize';
 
 const defaultPreviewStyles = cn(
-  'max-w-none prose prose-invert',
+  'max-w-none prose prose-invert break-words break-all',
   // Headings
   '**:[h1]:text-4xl mb-5',
   '**:[h2]:text-3xl mb-4',
@@ -27,9 +27,10 @@ const defaultPreviewStyles = cn(
 
 interface StyledPostHtmlProps {
   markdown?: string;
+  className?: string;
 }
 
-export function StyledPostHtml({ markdown }: StyledPostHtmlProps) {
+export function StyledPostHtml({ markdown, className }: StyledPostHtmlProps) {
   const parsedMarkdown = useMemo(
     () => sanitize(md.render(markdown || '')),
     [markdown],
@@ -37,7 +38,7 @@ export function StyledPostHtml({ markdown }: StyledPostHtmlProps) {
 
   return (
     <div
-      className={defaultPreviewStyles}
+      className={cn(defaultPreviewStyles, className)}
       dangerouslySetInnerHTML={{ __html: parsedMarkdown }}
     />
   );

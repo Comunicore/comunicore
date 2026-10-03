@@ -22,10 +22,10 @@ export function PostPreview() {
 
   return (
     <div className='grid gap-y-5'>
-      <p className='text-xl font-bold'>
+      <p className='text-lg font-bold lg:text-xl'>
         Тема: <span className='text-purple-9d'>{chapterName}</span>
       </p>
-      <h2 className='text-4xl font-bold'>{title}</h2>
+      <h2 className='text-xl font-bold break-all lg:text-4xl'>{title}</h2>
       <Tile className='grid gap-y-5'>
         {tags && (
           <ul className='flex flex-wrap gap-x-2.5'>

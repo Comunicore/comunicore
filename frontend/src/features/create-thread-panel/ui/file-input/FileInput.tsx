@@ -60,9 +60,10 @@ export function FileInput() {
 
           <div
             className={cn(
-              'border-gray-9e/20 bg-dark-1b/5 flex h-30 w-full items-center justify-center gap-x-2.5 rounded-[0.625rem] border border-dashed px-5 transition-all select-none',
+              'border-gray-9e/20 bg-dark-1b/5 flex h-30 w-full items-center justify-center gap-x-2.5 rounded-[0.625rem] border border-dashed transition-all select-none',
               'hover:border-gray-9e/40 hover:bg-white/5',
               'peer-focus-visible:ring-offset-dark-1b peer-focus-visible:ring-2 peer-focus-visible:ring-white peer-focus-visible:ring-offset-2',
+              'sm:px-5',
               isDragActive && 'bg-white/10 ring-2 ring-white',
             )}
           >
@@ -77,7 +78,7 @@ export function FileInput() {
           <ErrorMessage error={errors.fileUrl.message} />
         )}
 
-        <p className='text-gray-9e'>
+        <p className='text-gray-9e max-sm:text-sm'>
           Поддерживаемые изображения, код, документы (до 5 мб)
         </p>
         <PreviewImageList urls={fileUrls} onRemove={removeImage} />

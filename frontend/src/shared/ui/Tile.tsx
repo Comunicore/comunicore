@@ -3,7 +3,7 @@ import { HTMLAttributes, PropsWithChildren } from 'react';
 import { cn } from '../lib/classNames';
 
 type TileSize = 'sm' | 'md' | 'lg' | 'xl';
-type TIleColor = 'gray' | 'ghost';
+type TIleColor = 'gray' | 'ghost' | 'bordered';
 
 interface TileProps extends PropsWithChildren, HTMLAttributes<HTMLDivElement> {
   color?: TIleColor;
@@ -20,6 +20,7 @@ const sizeStyles: Record<TileSize, string> = {
 const colorStyles: Record<TIleColor, string> = {
   gray: 'bg-dark-1b border border-gray-9e/10',
   ghost: 'bg-dark-1b/50',
+  bordered: 'bg-dark-1b/50 border border-gray-9e/10',
 };
 
 export function Tile(props: TileProps) {
