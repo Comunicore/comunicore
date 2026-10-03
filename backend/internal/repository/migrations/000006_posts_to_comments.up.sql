@@ -1,9 +1,8 @@
 DROP TRIGGER IF EXISTS trg_posts_bump_thread_count ON posts;
-DROP FUNCTION IF EXISTS threads_bump_posts_count();
+DROP FUNCTION IF EXISTS threads_bump_posts_count;
 
 ALTER TABLE posts RENAME TO comments;
-
-ALTER TABLE threads ALTER COLUMN posts_count RENAME TO comments_count;
+ALTER TABLE threads RENAME COLUMN posts_count TO comments_count;
 
 CREATE OR REPLACE FUNCTION threads_bump_comments_count()
 RETURNS TRIGGER AS $$

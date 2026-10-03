@@ -3,7 +3,7 @@ DROP FUNCTION IF EXISTS threads_bump_comments_count();
 
 ALTER TABLE comments RENAME TO posts;
 
-ALTER TABLE threads ALTER COLUMN comments_count RENAME TO posts_count;
+ALTER TABLE threads RENAME COLUMN comments_count TO posts_count;
 
 CREATE OR REPLACE FUNCTION threads_bump_posts_count()
 RETURNS TRIGGER AS $$
