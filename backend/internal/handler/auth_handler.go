@@ -8,10 +8,10 @@ import (
 	"net/http"
 	"time"
 
+	api "github.com/comunicore/comunicore/backend/internal/handler/generated"
+	urlencode "github.com/comunicore/comunicore/backend/internal/lib/urlEncode"
+	authService "github.com/comunicore/comunicore/backend/internal/service/auth"
 	"github.com/google/uuid"
-	api "github.com/hetagdarchiev/comunicore/backend/internal/handler/generated"
-	urlencode "github.com/hetagdarchiev/comunicore/backend/internal/lib/urlEncode"
-	authService "github.com/hetagdarchiev/comunicore/backend/internal/service/auth"
 )
 
 type AuthHandler struct {

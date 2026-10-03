@@ -6,8 +6,8 @@ package auth
 import (
 	"context"
 
+	"github.com/comunicore/comunicore/backend/internal/service/model"
 	"github.com/google/uuid"
-	"github.com/hetagdarchiev/comunicore/backend/internal/service/model"
 )
 
 type AuthRepo interface {

@@ -10,9 +10,9 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"github.com/hetagdarchiev/comunicore/backend/internal/repository"
-	analyticsDb "github.com/hetagdarchiev/comunicore/backend/internal/repository/sqlc/db"
-	"github.com/hetagdarchiev/comunicore/backend/internal/service/model"
+	"github.com/comunicore/comunicore/backend/internal/repository"
+	analyticsDb "github.com/comunicore/comunicore/backend/internal/repository/sqlc/db"
+	"github.com/comunicore/comunicore/backend/internal/service/model"
 )
 
 type AnalyticsRepo struct {

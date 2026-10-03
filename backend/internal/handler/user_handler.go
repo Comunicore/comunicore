@@ -10,9 +10,9 @@ import (
 	"log"
 	"net/url"
 
-	"github.com/hetagdarchiev/comunicore/backend/internal/apperror"
-	api "github.com/hetagdarchiev/comunicore/backend/internal/handler/generated"
-	userService "github.com/hetagdarchiev/comunicore/backend/internal/service/user"
+	"github.com/comunicore/comunicore/backend/internal/apperror"
+	api "github.com/comunicore/comunicore/backend/internal/handler/generated"
+	userService "github.com/comunicore/comunicore/backend/internal/service/user"
 )
 
 type UserHandler struct {

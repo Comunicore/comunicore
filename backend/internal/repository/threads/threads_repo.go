@@ -7,9 +7,9 @@ import (
 	"context"
 	"strings"
 
-	"github.com/hetagdarchiev/comunicore/backend/internal/repository"
-	threadDb "github.com/hetagdarchiev/comunicore/backend/internal/repository/sqlc/db"
-	"github.com/hetagdarchiev/comunicore/backend/internal/service/model"
+	"github.com/comunicore/comunicore/backend/internal/repository"
+	threadDb "github.com/comunicore/comunicore/backend/internal/repository/sqlc/db"
+	"github.com/comunicore/comunicore/backend/internal/service/model"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 

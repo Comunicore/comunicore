@@ -12,7 +12,7 @@ import (
 	"os"
 	"path"
 
-	"github.com/hetagdarchiev/comunicore/backend/internal/lib/filetype"
+	"github.com/comunicore/comunicore/backend/internal/lib/filetype"
 )
 
 type MediaRepo struct {

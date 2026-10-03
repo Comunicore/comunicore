@@ -8,10 +8,6 @@ import (
 	"testing"
 
 	"github.com/gavv/httpexpect/v2"
-	// "time"
-	// "github.com/gavv/httpexpect/v2"
-	// jwtService "github.com/hetagdarchiev/comunicore/backend/internal/service/jwt"
-	// "github.com/stretchr/testify/require"
 )
 
 func TestMediaUpload(t *testing.T) {

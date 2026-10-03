@@ -8,10 +8,10 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/hetagdarchiev/comunicore/backend/internal/apperror"
-	"github.com/hetagdarchiev/comunicore/backend/internal/repository"
-	userDb "github.com/hetagdarchiev/comunicore/backend/internal/repository/sqlc/db"
-	"github.com/hetagdarchiev/comunicore/backend/internal/service/model"
+	"github.com/comunicore/comunicore/backend/internal/apperror"
+	"github.com/comunicore/comunicore/backend/internal/repository"
+	userDb "github.com/comunicore/comunicore/backend/internal/repository/sqlc/db"
+	"github.com/comunicore/comunicore/backend/internal/service/model"
 )
 
 type UserRepo struct {

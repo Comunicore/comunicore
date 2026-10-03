@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"testing"
 
+	"github.com/comunicore/comunicore/backend/internal/tests"
 	"github.com/gavv/httpexpect/v2"
-	"github.com/hetagdarchiev/comunicore/backend/internal/tests"
 )
 
 type ForumUser struct {

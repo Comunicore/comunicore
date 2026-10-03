@@ -14,8 +14,8 @@ import (
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 
-	"github.com/hetagdarchiev/comunicore/backend/internal/handler"
-	"github.com/hetagdarchiev/comunicore/backend/internal/lib/config"
+	"github.com/comunicore/comunicore/backend/internal/handler"
+	"github.com/comunicore/comunicore/backend/internal/lib/config"
 )
 
 func postgresStart(ctx context.Context) (stop func()) {

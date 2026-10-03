@@ -9,8 +9,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/comunicore/comunicore/backend/internal/lib/config"
 	"github.com/golang-migrate/migrate/v4"
-	"github.com/hetagdarchiev/comunicore/backend/internal/lib/config"
 
 	_ "github.com/golang-migrate/migrate/v4/database/pgx/v5"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
