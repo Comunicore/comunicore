@@ -4,8 +4,8 @@ import { Suspense } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod/dist/zod.js';
 
-import Header from './_ui/Header';
-import Hints from './_ui/Hints';
+import Header from './ui/Header';
+import Hints from './ui/Hints';
 
 import { EditorFormTracker } from '@/widgets/editor-form-tracker';
 
