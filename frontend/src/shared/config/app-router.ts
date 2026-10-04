@@ -7,7 +7,12 @@ export const AppRouter = {
   verification: '/verification',
   settings: '/settings',
   questions: '/questions',
-  threads: '/threads',
+  threads: {
+    root: '/threads',
+    get new() {
+      return `${this.root}/new`;
+    },
+  },
   tags: {
     root: '/tags',
     get template() {

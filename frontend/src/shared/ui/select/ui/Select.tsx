@@ -57,8 +57,9 @@ export const Select = <T extends string | number>({
 export const SelectTrigger = ({
   children,
   className = '',
+  chevronOff = false,
   ...props
-}: ButtonHTMLAttributes<HTMLButtonElement>) => {
+}: ButtonHTMLAttributes<HTMLButtonElement> & { chevronOff?: boolean }) => {
   const { isOpen, setIsOpen } = useSelect();
 
   return (
@@ -74,13 +75,15 @@ export const SelectTrigger = ({
       {...props}
     >
       {children}
-      <LuChevronDown
-        size={16}
-        className={cn(
-          'min-w-4 transition-transform duration-200',
-          isOpen ? 'rotate-180' : '',
-        )}
-      />
+      {!chevronOff && (
+        <LuChevronDown
+          size={16}
+          className={cn(
+            'min-w-4 transition-transform duration-200',
+            isOpen ? 'rotate-180' : '',
+          )}
+        />
+      )}
     </button>
   );
 };
@@ -135,7 +138,7 @@ export const SelectItem = <T extends string | number>({
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       onChange(itemValue);
-      setIsOpen(false);
+      setTimeout(() => setIsOpen(false), 0);
     }
   };
 
@@ -152,7 +155,7 @@ export const SelectItem = <T extends string | number>({
       onKeyDown={handleKeyDown}
       onClick={() => {
         onChange(itemValue);
-        setIsOpen(false);
+        setTimeout(() => setIsOpen(false), 0);
       }}
       {...props}
     >
