@@ -1,7 +1,7 @@
 import { HTMLAttributes } from 'react';
 import Link from 'next/link';
 
-import { Post } from '../model/post.types';
+import { Comment } from '../model/comment.types';
 
 import { AppRouter } from '@/shared/config/app-router';
 import { cn } from '@/shared/lib/classNames';
@@ -9,11 +9,11 @@ import { formatInt } from '@/shared/lib/helpers/formatInt';
 import { formatTimeAgo } from '@/shared/lib/helpers/formatTimeAgo';
 import { ProfileAvatar, Tag } from '@/shared/ui';
 
-interface PostCardProps extends HTMLAttributes<HTMLElement> {
-  post: Post;
+interface CommentCardProps extends HTMLAttributes<HTMLElement> {
+  post: Comment;
 }
 
-export const PostCard = ({
+export const CommentCard = ({
   className,
   post: {
     avatarUrl,
@@ -26,7 +26,7 @@ export const PostCard = ({
     createdAt,
   },
   ...restAttrs
-}: PostCardProps) => (
+}: CommentCardProps) => (
   <article className={cn(className)} {...restAttrs}>
     <header className='flex gap-x-5 lg:items-center'>
       <ProfileAvatar
@@ -39,7 +39,7 @@ export const PostCard = ({
       <div className='grid gap-y-2.25'>
         <h2 className='line-clamp-2 max-w-65 text-start text-lg leading-5.5 2xl:max-w-80'>
           <Link
-            href={AppRouter.post.getRoute(String(id))}
+            href={AppRouter.comment.getRoute(String(id))}
             className='focus:outline-none'
           >
             {title}

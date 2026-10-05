@@ -98,8 +98,8 @@ export const AppRouter = {
     },
   },
 
-  post: {
-    root: `/posts/${idTemplate}`,
+  comment: {
+    root: `/comments/${idTemplate}`,
     getRoute(id: string) {
       return replaceRouteId(this.root, id);
     },

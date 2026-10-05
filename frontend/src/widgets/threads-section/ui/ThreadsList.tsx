@@ -1,6 +1,6 @@
 import { threadsList } from '../model/mock-posts';
 
-import { PostCard } from '@/entities/post';
+import { CommentCard } from '@/entities/comment';
 
 import { cn } from '@/shared/lib/classNames';
 import { Pagination } from '@/shared/ui';
@@ -37,7 +37,7 @@ export function ThreadsList() {
                 'focus-within:ring-offset focus-within:ring focus-within:ring-white',
               )}
             >
-              <PostCard className={tableGridClassName} post={thread} />
+              <CommentCard className={tableGridClassName} post={thread} />
             </li>
           ))}
         </ul>

@@ -1,4 +1,4 @@
-export interface Post {
+export interface Comment {
   id: string | number;
   avatarUrl: string;
   title: string;

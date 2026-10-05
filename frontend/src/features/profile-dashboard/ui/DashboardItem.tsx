@@ -43,7 +43,7 @@ export const DashboardItem = memo(
           {hasMessage && (
             <p className='max-lg:hidden'>
               <Link
-                href={`${AppRouter.post.getRoute(id)}?message=${messageId}`}
+                href={`${AppRouter.comment.getRoute(id)}?message=${messageId}`}
               >
                 Message: {message}
               </Link>

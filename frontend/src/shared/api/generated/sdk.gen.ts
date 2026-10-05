@@ -2,24 +2,20 @@
 
 import { type Client, formDataBodySerializer, type Options as Options2, type TDataShape } from './client';
 import { client } from './client.gen';
-import type { AnalyticsMetricsGetData, AnalyticsMetricsGetErrors, AnalyticsMetricsGetResponses, AnalyticsVisitBatchSubmitData, AnalyticsVisitBatchSubmitErrors, AnalyticsVisitBatchSubmitResponses, AuthLoginData, AuthLoginErrors, AuthLoginResponses, AuthLogoutData, AuthLogoutResponses, MediaGetData, MediaGetErrors, MediaGetResponses, MediaUploadData, MediaUploadErrors, MediaUploadResponses, ThreadAddPostData, ThreadAddPostErrors, ThreadAddPostResponses, ThreadCreateData, ThreadCreateErrors, ThreadCreateResponses, ThreadGetData, ThreadGetErrors, ThreadGetResponses, ThreadsListData, ThreadsListErrors, ThreadsListResponses, UserCreateData, UserCreateErrors, UserCreateResponses, UserDeleteData, UserDeleteResponses, UserGetData, UserGetErrors, UserGetResponses, UserMeData, UserMeErrors, UserMeResponses, UserUpdateData, UserUpdateResponses } from './types.gen';
+import type { AnalyticsMetricsGetData, AnalyticsMetricsGetErrors, AnalyticsMetricsGetResponses, AnalyticsVisitBatchSubmitData, AnalyticsVisitBatchSubmitErrors, AnalyticsVisitBatchSubmitResponses, AuthLoginData, AuthLoginErrors, AuthLoginResponses, AuthLogoutData, AuthLogoutResponses, MediaGetData, MediaGetErrors, MediaGetResponses, MediaUploadData, MediaUploadErrors, MediaUploadResponses, ThreadAddCommentData, ThreadAddCommentErrors, ThreadAddCommentResponses, ThreadAddPostData, ThreadAddPostErrors, ThreadAddPostResponses, ThreadCreateData, ThreadCreateErrors, ThreadCreateResponses, ThreadGetData, ThreadGetErrors, ThreadGetResponses, ThreadsListData, ThreadsListErrors, ThreadsListResponses, UserCreateData, UserCreateErrors, UserCreateResponses, UserDeleteData, UserDeleteResponses, UserGetData, UserGetErrors, UserGetResponses, UserMeData, UserMeErrors, UserMeResponses, UserUpdateData, UserUpdateResponses } from './types.gen';
 
-export type Options<
-  TData extends TDataShape = TDataShape,
-  ThrowOnError extends boolean = boolean,
-  TResponse = unknown,
-> = Options2<TData, ThrowOnError, TResponse> & {
-  /**
-   * You can provide a client instance returned by `createClient()` instead of
-   * individual options. This might be also useful if you want to implement a
-   * custom client.
-   */
-  client?: Client;
-  /**
-   * You can pass arbitrary values through the `meta` object. This can be
-   * used to access values that aren't defined as part of the SDK function.
-   */
-  meta?: Record<string, unknown>;
+export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
+    /**
+     * You can provide a client instance returned by `createClient()` instead of
+     * individual options. This might be also useful if you want to implement a
+     * custom client.
+     */
+    client?: Client;
+    /**
+     * You can pass arbitrary values through the `meta` object. This can be
+     * used to access values that aren't defined as part of the SDK function.
+     */
+    meta?: Record<string, unknown>;
 };
 
 /**
@@ -177,6 +173,8 @@ export const threadGet = <ThrowOnError extends boolean = false>(options: Options
 
 /**
  * Add a new post to thread
+ *
+ * @deprecated
  */
 export const threadAddPost = <ThrowOnError extends boolean = false>(options: Options<ThreadAddPostData, ThrowOnError>) => (options.client ?? client).post<ThreadAddPostResponses, ThreadAddPostErrors, ThrowOnError>({
     security: [{
@@ -185,6 +183,23 @@ export const threadAddPost = <ThrowOnError extends boolean = false>(options: Opt
             type: 'apiKey'
         }],
     url: '/api/threads/{threadId}/posts',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Add a new comment to thread
+ */
+export const threadAddComment = <ThrowOnError extends boolean = false>(options: Options<ThreadAddCommentData, ThrowOnError>) => (options.client ?? client).post<ThreadAddCommentResponses, ThreadAddCommentErrors, ThrowOnError>({
+    security: [{
+            in: 'cookie',
+            name: 'sid',
+            type: 'apiKey'
+        }],
+    url: '/api/threads/{threadId}/comments',
     ...options,
     headers: {
         'Content-Type': 'application/json',

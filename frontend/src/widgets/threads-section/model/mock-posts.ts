@@ -1,4 +1,4 @@
-import { Post } from '@/entities/post';
+import { Comment } from '@/entities/comment';
 
 export const threadsList = [
   {
@@ -61,4 +61,4 @@ export const threadsList = [
     answers: 12,
     views: 5300,
   },
-] as const satisfies Post[];
+] as const satisfies Comment[];

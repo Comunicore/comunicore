@@ -3,8 +3,8 @@
 import { type DefaultError, type InfiniteData, infiniteQueryOptions, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { analyticsMetricsGet, analyticsVisitBatchSubmit, authLogin, authLogout, mediaGet, mediaUpload, type Options, threadAddPost, threadCreate, threadGet, threadsList, userCreate, userDelete, userGet, userMe, userUpdate } from '../sdk.gen';
-import type { AnalyticsMetricsGetData, AnalyticsMetricsGetError, AnalyticsMetricsGetResponse, AnalyticsVisitBatchSubmitData, AnalyticsVisitBatchSubmitError, AnalyticsVisitBatchSubmitResponse, AuthLoginData, AuthLoginError, AuthLoginResponse, AuthLogoutData, AuthLogoutResponse, MediaGetData, MediaGetError, MediaGetResponse, MediaUploadData, MediaUploadError, MediaUploadResponse2, ThreadAddPostData, ThreadAddPostError, ThreadAddPostResponse, ThreadCreateData, ThreadCreateError, ThreadCreateResponse, ThreadGetData, ThreadGetError, ThreadGetResponse, ThreadsListData, ThreadsListError, ThreadsListResponse, UserCreateData, UserCreateError, UserCreateResponse2, UserDeleteData, UserDeleteResponse, UserGetData, UserGetError, UserGetResponse2, UserMeData, UserMeError, UserMeResponse, UserUpdateData, UserUpdateResponse } from '../types.gen';
+import { analyticsMetricsGet, analyticsVisitBatchSubmit, authLogin, authLogout, mediaGet, mediaUpload, type Options, threadAddComment, threadAddPost, threadCreate, threadGet, threadsList, userCreate, userDelete, userGet, userMe, userUpdate } from '../sdk.gen';
+import type { AnalyticsMetricsGetData, AnalyticsMetricsGetError, AnalyticsMetricsGetResponse, AnalyticsVisitBatchSubmitData, AnalyticsVisitBatchSubmitError, AnalyticsVisitBatchSubmitResponse, AuthLoginData, AuthLoginError, AuthLoginResponse, AuthLogoutData, AuthLogoutResponse, MediaGetData, MediaGetError, MediaGetResponse, MediaUploadData, MediaUploadError, MediaUploadResponse2, ThreadAddCommentData, ThreadAddCommentError, ThreadAddCommentResponse, ThreadAddPostData, ThreadAddPostError, ThreadAddPostResponse, ThreadCreateData, ThreadCreateError, ThreadCreateResponse, ThreadGetData, ThreadGetError, ThreadGetResponse, ThreadsListData, ThreadsListError, ThreadsListResponse, UserCreateData, UserCreateError, UserCreateResponse2, UserDeleteData, UserDeleteResponse, UserGetData, UserGetError, UserGetResponse2, UserMeData, UserMeError, UserMeResponse, UserUpdateData, UserUpdateResponse } from '../types.gen';
 
 /**
  * Create a new user
@@ -318,11 +318,30 @@ export const threadGetOptions = (options: Options<ThreadGetData>) => queryOption
 
 /**
  * Add a new post to thread
+ *
+ * @deprecated
  */
 export const threadAddPostMutation = (options?: Partial<Options<ThreadAddPostData>>): UseMutationOptions<ThreadAddPostResponse, ThreadAddPostError, Options<ThreadAddPostData>> => {
     const mutationOptions: UseMutationOptions<ThreadAddPostResponse, ThreadAddPostError, Options<ThreadAddPostData>> = {
         mutationFn: async (fnOptions) => {
             const { data } = await threadAddPost({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Add a new comment to thread
+ */
+export const threadAddCommentMutation = (options?: Partial<Options<ThreadAddCommentData>>): UseMutationOptions<ThreadAddCommentResponse, ThreadAddCommentError, Options<ThreadAddCommentData>> => {
+    const mutationOptions: UseMutationOptions<ThreadAddCommentResponse, ThreadAddCommentError, Options<ThreadAddCommentData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await threadAddComment({
                 ...options,
                 ...fnOptions,
                 throwOnError: true
