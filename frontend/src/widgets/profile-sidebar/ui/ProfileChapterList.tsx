@@ -21,7 +21,8 @@ export function ProfileChapterList(props: HTMLAttributes<HTMLDivElement>) {
     >
       <ul className='max-sm:grid max-sm:grid-cols-2 max-sm:grid-rows-2 sm:flex xl:flex-col xl:gap-y-2.5'>
         {profileChapters.map((item) => {
-          const isNotificationTab = item.href === AppRouter.notification;
+          const isNotificationTab =
+            item.href === AppRouter.profile.notifications;
 
           return (
             <ProfileChapterItem

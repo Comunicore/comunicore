@@ -1,106 +1,44 @@
-import { replaceRouteId } from '../lib/helpers/replaceRouteId';
-
-export const idTemplate = ':id';
+import { routeGroup } from '../lib/helpers/routeGroup';
 
 export const AppRouter = {
   main: '/',
   verification: '/verification',
   settings: '/settings',
   questions: '/questions',
-  posts: {
-    root: '/posts',
-    get new() {
-      return `${this.root}/new`;
-    },
-    get template() {
-      return `${this.root}/${idTemplate}`;
-    },
-    getRoute(id: string) {
-      return replaceRouteId(this.template, id);
-    },
-  },
-  tags: {
-    root: '/tags',
-    get template() {
-      return `${this.root}/${idTemplate}`;
-    },
-    getRoute(id: string) {
-      return replaceRouteId(this.template, id);
-    },
-  },
   support: '/support',
   award: '/award',
   notification: '/notifications',
-  blog: {
-    root: '/blog',
-  },
   participants: '/participants',
-  profile: {
-    root: '/profile',
-    get notifications() {
-      return `${this.root}/notifications`;
-    },
-    get messages() {
-      return `${this.root}/messages`;
-    },
-    get settings() {
-      return `${this.root}/settings`;
-    },
-    get favorites() {
-      return `${this.root}/favorites`;
-    },
-    get posts() {
-      return `${this.root}/posts`;
-    },
-  },
-  achivements: {
-    root: 'achivements',
-    getRoute(id: string) {
-      return `${this.root}/${id}`;
-    },
-  },
   faq: '/faq',
   favorites: '/favorites',
-  auth: {
-    root: '/auth',
-    get login() {
-      return `${this.root}?mode=login`;
-    },
-    get registration() {
-      return `${this.root}?mode=register`;
-    },
-  },
   editor: '/editor',
 
-  rules: {
-    root: '/rules',
-    get community() {
-      return `${this.root}/community`;
-    },
-  },
+  posts: routeGroup('/posts', { new: '/new' }).withId(),
+  tags: routeGroup('/tags').withId(),
+  user: routeGroup('/user').withId(),
+  achivements: routeGroup('/achivements').withId(),
+  blog: routeGroup('/blog'),
+
+  profile: routeGroup('/profile', {
+    notifications: '/notifications',
+    messages: '/messages',
+    settings: '/settings',
+    favorites: '/favorites',
+    posts: '/posts',
+  }),
+
+  auth: routeGroup('/auth', {
+    login: '?mode=login',
+    registration: '?mode=register',
+  }),
+
+  rules: routeGroup('/rules', { community: '/community' }),
 
   // Политика
-  policy: {
-    root: '/policy',
-    get privacy() {
-      return `${this.root}/privacy`; // Конфиденциальность
-    },
-    get userAgreement() {
-      return `${this.root}/user-agreement`; // Пользовательское соглашение
-    },
-  },
+  policy: routeGroup('/policy', {
+    privacy: '/privacy', // Конфиденциальность
+    userAgreement: '/user-agreement', // Пользовательское соглашение
+  }),
 
-  recovery: {
-    root: '/recovery',
-    get password() {
-      return `${this.root}/password`;
-    },
-  },
-
-  user: {
-    root: `/user/${idTemplate}`,
-    getRoute(id: string) {
-      return replaceRouteId(this.root, id);
-    },
-  },
+  recovery: routeGroup('/recovery', { password: '/password' }),
 } as const;
