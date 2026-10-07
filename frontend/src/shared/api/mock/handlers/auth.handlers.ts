@@ -27,7 +27,7 @@ class MockUser {
   readonly verify?: boolean;
   description?: string;
   rank?: number;
-  threadsQuantity?: number;
+  postsQuantity?: number;
   likes?: number;
   recivedLikes?: number;
   lastActivity?: string;
@@ -52,7 +52,7 @@ class MockUser {
     this.role = data.role;
     this.description = data.description ?? undefined;
     this.rank = data.rank ?? 0;
-    this.threadsQuantity = data.threadsQuantity ?? 0;
+    this.postsQuantity = data.postsQuantity ?? 0;
     this.likes = data.likes ?? 0;
     this.recivedLikes = data.recivedLikes ?? 0;
     this.lastActivity = data.lastActivity ?? new Date().toISOString();

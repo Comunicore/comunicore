@@ -19,8 +19,8 @@ export const PostCard = ({
     avatarUrl,
     id,
     authorName,
-    answers,
-    chapter,
+    commentsCount,
+    category,
     title,
     views,
     createdAt,
@@ -39,14 +39,14 @@ export const PostCard = ({
       <div className='grid gap-y-2.25'>
         <h2 className='line-clamp-2 max-w-65 text-start text-lg leading-5.5 2xl:max-w-80'>
           <Link
-            href={AppRouter.post.getRoute(String(id))}
+            href={AppRouter.posts.getRoute(String(id))}
             className='focus:outline-none'
           >
             {title}
           </Link>
         </h2>
         <Tag size='lg' className='md:hidden'>
-          {chapter}
+          {category}
         </Tag>
         <div className='text-gray-9e flex items-center gap-x-1.5'>
           <p>{authorName}</p>
@@ -56,7 +56,7 @@ export const PostCard = ({
           </time>
         </div>
         <div className='text-gray-9e flex flex-wrap gap-x-5 gap-y-1 whitespace-nowrap lg:hidden'>
-          <span>{answers} ответов</span>
+          <span>{commentsCount} комментариев</span>
           <span>{formatInt(views)} просмотров</span>
         </div>
       </div>
@@ -65,9 +65,9 @@ export const PostCard = ({
       size='lg'
       className='hidden md:inline-flex md:justify-self-center xl:px-2'
     >
-      {chapter}
+      {category}
     </Tag>
-    <span className='hidden text-lg lg:inline'>{answers}</span>
+    <span className='hidden text-lg lg:inline'>{commentsCount}</span>
     <span className='hidden whitespace-nowrap lg:inline'>
       {formatInt(views)}
     </span>

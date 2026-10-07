@@ -3,8 +3,8 @@ export interface Post {
   avatarUrl: string;
   title: string;
   authorName: string;
-  chapter: string;
-  answers: number;
+  category: string;
+  commentsCount: number;
   views: number;
   createdAt: string;
 }

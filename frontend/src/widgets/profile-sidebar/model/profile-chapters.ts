@@ -17,10 +17,10 @@ export const profileChapters = [
     href: AppRouter.profile.root,
   },
   {
-    id: 'threads',
+    id: 'posts',
     icon: LuClipboardList,
-    label: 'Мои треды',
-    href: AppRouter.profile.threads,
+    label: 'Мои посты',
+    href: AppRouter.profile.posts,
   },
   {
     id: 'messages',

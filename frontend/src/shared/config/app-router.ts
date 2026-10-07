@@ -7,10 +7,16 @@ export const AppRouter = {
   verification: '/verification',
   settings: '/settings',
   questions: '/questions',
-  threads: {
-    root: '/threads',
+  posts: {
+    root: '/posts',
     get new() {
       return `${this.root}/new`;
+    },
+    get template() {
+      return `${this.root}/${idTemplate}`;
+    },
+    getRoute(id: string) {
+      return replaceRouteId(this.template, id);
     },
   },
   tags: {
@@ -43,8 +49,8 @@ export const AppRouter = {
     get favorites() {
       return `${this.root}/favorites`;
     },
-    get threads() {
-      return `${this.root}/threads`;
+    get posts() {
+      return `${this.root}/posts`;
     },
   },
   achivements: {
@@ -93,13 +99,6 @@ export const AppRouter = {
 
   user: {
     root: `/user/${idTemplate}`,
-    getRoute(id: string) {
-      return replaceRouteId(this.root, id);
-    },
-  },
-
-  post: {
-    root: `/posts/${idTemplate}`,
     getRoute(id: string) {
       return replaceRouteId(this.root, id);
     },

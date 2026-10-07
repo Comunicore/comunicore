@@ -5,7 +5,7 @@ import { useWatch } from 'react-hook-form';
 import { LuCircleCheck, LuCircleX } from 'react-icons/lu';
 import { useSearchParams } from 'next/navigation';
 
-import { CreateThreadTypes } from '@/features/create-thread-panel';
+import { CreatePostTypes } from '@/features/create-post-panel';
 
 import { cn } from '@/shared/lib/classNames';
 import { Tile } from '@/shared/ui/Tile';
@@ -22,7 +22,7 @@ export function EditorFormTracker({
   className,
 }: EditorFormTrackerProps) {
   const searchParams = useSearchParams();
-  const formValues = useWatch<CreateThreadTypes>();
+  const formValues = useWatch<CreatePostTypes>();
   const [hasPreviewed, setHasPreviewed] = useState(false);
 
   const isPreviewMode = searchParams.get(editorModeParam) === previewMode;
@@ -47,9 +47,9 @@ export function EditorFormTracker({
       isCompleted: isValidText(formValues.title, 5),
     },
     {
-      id: 'chapter',
-      label: 'Выберите правильный раздел',
-      isCompleted: Boolean(formValues.chapter?.id),
+      id: 'category',
+      label: 'Выберите правильную категорию',
+      isCompleted: Boolean(formValues.category?.id),
     },
     {
       id: 'description',
