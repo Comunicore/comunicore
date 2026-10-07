@@ -21,7 +21,7 @@ export const mapApiUserToUser = (apiUser: ApiUser): User => ({
   verify: apiUser.verify ?? false,
   description: apiUser.description,
   rank: toCount(apiUser.rank),
-  threadsQuantity: toCount(apiUser.threadsQuantity),
+  postsQuantity: toCount(apiUser.postsQuantity),
   likes: toCount(apiUser.likes),
   recivedLikes: toCount(apiUser.recivedLikes),
   bookMarks: toCount(apiUser.bookMarks),

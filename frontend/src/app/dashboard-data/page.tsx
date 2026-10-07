@@ -71,14 +71,14 @@ function StatCard({ label, value }: { label: string; value: string }) {
   );
 }
 
-function ThreadHighlightCard({
+function PostHighlightCard({
   period,
-  threadId,
+  postId,
   title,
   repliesInWindow,
 }: {
   period: string;
-  threadId: number;
+  postId: number;
   title: string;
   repliesInWindow: number;
 }) {
@@ -98,7 +98,7 @@ function ThreadHighlightCard({
           </span>
         </div>
         <p className='mt-2 text-sm leading-relaxed text-slate-900'>
-          <span className='text-blue-16 text-xs'>#{threadId}</span> {title}
+          <span className='text-blue-16 text-xs'>#{postId}</span> {title}
         </p>
       </div>
     </div>
@@ -154,7 +154,7 @@ function MetricsBoard({ data }: { data: AnalyticsMetricsResponse }) {
             value={data.connectionDensity.toFixed(2)}
           />
           <StatCard
-            label={`Отток (≥${data.dropoffAfterMessages} постов, ${data.dropoffInactiveDays} дн.)`}
+            label={`Отток (≥${data.dropoffAfterMessages} комментариев, ${data.dropoffInactiveDays} дн.)`}
             value={formatPct(data.dropoffChurnPercent)}
           />
           <StatCard
@@ -193,20 +193,20 @@ function MetricsBoard({ data }: { data: AnalyticsMetricsResponse }) {
       ) : null}
 
       {(data.topThreadWeekly || data.topThreadMonthly) && (
-        <Section title='Топ-треды' description='По ответам в окне'>
+        <Section title='Топ-посты' description='По ответам в окне'>
           <div className='grid gap-2 md:grid-cols-2'>
             {data.topThreadWeekly ? (
-              <ThreadHighlightCard
+              <PostHighlightCard
                 period='7 дн.'
-                threadId={data.topThreadWeekly.threadId}
+                postId={data.topThreadWeekly.threadId}
                 title={data.topThreadWeekly.title}
                 repliesInWindow={data.topThreadWeekly.repliesInWindow}
               />
             ) : null}
             {data.topThreadMonthly ? (
-              <ThreadHighlightCard
+              <PostHighlightCard
                 period='30 дн.'
-                threadId={data.topThreadMonthly.threadId}
+                postId={data.topThreadMonthly.threadId}
                 title={data.topThreadMonthly.title}
                 repliesInWindow={data.topThreadMonthly.repliesInWindow}
               />
@@ -258,13 +258,13 @@ function MetricsBoard({ data }: { data: AnalyticsMetricsResponse }) {
       </Section>
 
       <section className='grid gap-5 lg:grid-cols-2'>
-        <Section title='Топ по постам'>
+        <Section title='Топ по комментариям'>
           <TableUserCounts rows={data.topUsersByPosts} />
         </Section>
-        <Section title='Топ по тредам'>
+        <Section title='Топ по постам'>
           <TableUserCounts rows={data.topUsersByThreads} />
         </Section>
-        <Section title='Только посты'>
+        <Section title='Только комментарии'>
           <TableUserCounts rows={data.postOnlyUsers} />
         </Section>
         <Section title='Популярные теги'>
@@ -275,7 +275,7 @@ function MetricsBoard({ data }: { data: AnalyticsMetricsResponse }) {
                   Тег
                 </th>
                 <th className='px-3 py-2.5 text-xs font-semibold tracking-wide'>
-                  Тредов
+                  Постов
                 </th>
               </TableHeadRow>
               <tbody className='divide-y divide-slate-100'>
@@ -300,7 +300,7 @@ function MetricsBoard({ data }: { data: AnalyticsMetricsResponse }) {
         </Section>
       </section>
 
-      <Section title='Посты по дням' description='Календарные дни'>
+      <Section title='Комментарии по дням' description='Календарные дни'>
         <TableShell>
           <table className='w-full text-sm'>
             <TableHeadRow>
@@ -308,7 +308,7 @@ function MetricsBoard({ data }: { data: AnalyticsMetricsResponse }) {
                 День
               </th>
               <th className='px-3 py-2.5 text-xs font-semibold tracking-wide'>
-                Постов
+                Комментариев
               </th>
             </TableHeadRow>
             <tbody className='divide-y divide-slate-100'>

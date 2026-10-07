@@ -1,2 +1,4 @@
 export type DashboardEntitiesTypes =
-  'activeThreads' | 'lastComments' | 'bookmarks';
+  | 'activePosts'
+  | 'lastComments'
+  | 'bookmarks';

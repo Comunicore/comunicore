@@ -13,7 +13,7 @@ import { AppRouter } from '@/shared/config/app-router';
 import { Button, Container, Input, Label } from '@/shared/ui';
 
 const navigationLinks = [
-  { label: 'Форум', href: AppRouter.threads.root },
+  { label: 'Форум', href: AppRouter.posts.root },
   { label: 'Участники', href: AppRouter.main },
   { label: 'Блог', href: AppRouter.main },
   { label: 'Правила', href: AppRouter.rules.root },

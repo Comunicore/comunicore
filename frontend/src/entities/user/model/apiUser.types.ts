@@ -12,7 +12,7 @@ export interface ApiUser {
   verify?: boolean;
   description?: string;
   rank?: number;
-  threadsQuantity?: number;
+  postsQuantity?: number;
   likes?: number;
   recivedLikes?: number;
   bookMarks?: number;

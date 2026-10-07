@@ -52,7 +52,7 @@ export default function NotFound() {
                 На главную
               </Button>
               <Button
-                href={AppRouter.threads.root}
+                href={AppRouter.posts.root}
                 color='bordered'
                 className='w-full gap-3 lg:w-auto'
               >

@@ -17,8 +17,8 @@ export const DashboardItem = memo(
   ({
     id,
     messageId,
-    answers,
-    chapter,
+    commentsCount,
+    category,
     title,
     updatedAt,
     views,
@@ -43,13 +43,13 @@ export const DashboardItem = memo(
           {hasMessage && (
             <p className='max-lg:hidden'>
               <Link
-                href={`${AppRouter.post.getRoute(id)}?message=${messageId}`}
+                href={`${AppRouter.posts.getRoute(id)}?message=${messageId}`}
               >
                 Message: {message}
               </Link>
             </p>
           )}
-          <Tag className='max-2xl:text-sm'>{chapter}</Tag>
+          <Tag className='max-2xl:text-sm'>{category}</Tag>
         </div>
         <div
           className={cn(
@@ -61,8 +61,8 @@ export const DashboardItem = memo(
           )}
         >
           <div className='flex flex-col'>
-            <span>{formatInt(answers)}</span>
-            <p>ответов</p>
+            <span>{formatInt(commentsCount)}</span>
+            <p>комментариев</p>
           </div>
           <div className='flex flex-col'>
             <span>{formatInt(views)}</span>

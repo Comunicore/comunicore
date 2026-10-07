@@ -6,10 +6,10 @@ import { formatInt } from '@/shared/lib/helpers/formatInt';
 export function ProfileStats(
   props: Pick<
     User,
-    'rank' | 'threadsQuantity' | 'likes' | 'bookMarks' | 'recivedLikes'
+    'rank' | 'postsQuantity' | 'likes' | 'bookMarks' | 'recivedLikes'
   >,
 ) {
-  const { bookMarks, likes, rank, threadsQuantity, recivedLikes } = props;
+  const { bookMarks, likes, rank, postsQuantity, recivedLikes } = props;
   const stats = [
     {
       id: 'rank',
@@ -17,9 +17,9 @@ export function ProfileStats(
       label: 'Ранг',
     },
     {
-      id: 'threads-quantity',
-      quantity: formatInt(threadsQuantity),
-      label: 'Треды',
+      id: 'posts-quantity',
+      quantity: formatInt(postsQuantity),
+      label: 'Посты',
     },
     {
       id: 'likes',

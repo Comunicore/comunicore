@@ -36,7 +36,7 @@ export default function Profile() {
         bookMarks={userData.bookMarks}
         likes={userData.likes}
         rank={userData.rank}
-        threadsQuantity={userData.threadsQuantity}
+        postsQuantity={userData.postsQuantity}
         recivedLikes={userData.recivedLikes}
       />
       <section

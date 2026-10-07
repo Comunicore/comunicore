@@ -355,7 +355,7 @@ export default function Home() {
                         {category}
                       </span>
 
-                      {/* Заголовок треда */}
+                      {/* Заголовок поста */}
                       <p className='min-w-0 flex-1 text-[20px] font-medium lg:order-1 lg:truncate'>
                         {title}
                       </p>

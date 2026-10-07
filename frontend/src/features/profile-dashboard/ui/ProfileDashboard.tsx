@@ -27,9 +27,9 @@ export function ProfileDashboard(_: { userId: User['id'] }) {
   return (
     <div className='flex flex-col gap-y-5'>
       <DashboardCard
-        href={AppRouter.profile.threads}
-        title='Активные треды'
-        items={dashboardItems.activeThreads}
+        href={AppRouter.profile.posts}
+        title='Активные посты'
+        items={dashboardItems.activePosts}
       />
       <DashboardCard
         href={AppRouter.profile.messages}
