@@ -20,7 +20,7 @@ var (
 	rn12AllowedHeaders = map[string]string{
 		"POST": "Content-Type",
 	}
-	rn18AllowedHeaders = map[string]string{
+	rn16AllowedHeaders = map[string]string{
 		"POST": "Content-Type",
 	}
 	rn15AllowedHeaders = map[string]string{
@@ -30,9 +30,6 @@ var (
 		"POST": "Content-Type",
 	}
 	rn19AllowedHeaders = map[string]string{
-		"POST": "Content-Type",
-	}
-	rn21AllowedHeaders = map[string]string{
 		"POST": "Content-Type",
 	}
 )
@@ -267,9 +264,9 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						return
 					}
 
-				case 't': // Prefix: "threads"
+				case 'p': // Prefix: "posts"
 
-					if l := len("threads"); len(elem) >= l && elem[0:l] == "threads" {
+					if l := len("posts"); len(elem) >= l && elem[0:l] == "posts" {
 						elem = elem[l:]
 					} else {
 						break
@@ -278,13 +275,13 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					if len(elem) == 0 {
 						switch r.Method {
 						case "GET":
-							s.handleThreadsListRequest([0]string{}, elemIsEscaped, w, r)
+							s.handlePostsListRequest([0]string{}, elemIsEscaped, w, r)
 						case "POST":
-							s.handleThreadCreateRequest([0]string{}, elemIsEscaped, w, r)
+							s.handlePostCreateRequest([0]string{}, elemIsEscaped, w, r)
 						default:
 							s.notAllowed(w, r, notAllowedParams{
 								allowedMethods: "GET,POST",
-								allowedHeaders: rn18AllowedHeaders,
+								allowedHeaders: rn16AllowedHeaders,
 								acceptPost:     "application/json",
 								acceptPatch:    "",
 							})
@@ -301,7 +298,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							break
 						}
 
-						// Param: "threadId"
+						// Param: "postId"
 						// Match until "/"
 						idx := strings.IndexByte(elem, '/')
 						if idx < 0 {
@@ -313,7 +310,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						if len(elem) == 0 {
 							switch r.Method {
 							case "GET":
-								s.handleThreadGetRequest([1]string{
+								s.handlePostGetRequest([1]string{
 									args[0],
 								}, elemIsEscaped, w, r)
 							default:
@@ -328,72 +325,31 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							return
 						}
 						switch elem[0] {
-						case '/': // Prefix: "/"
+						case '/': // Prefix: "/comments"
 
-							if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+							if l := len("/comments"); len(elem) >= l && elem[0:l] == "/comments" {
 								elem = elem[l:]
 							} else {
 								break
 							}
 
 							if len(elem) == 0 {
-								break
-							}
-							switch elem[0] {
-							case 'c': // Prefix: "comments"
-
-								if l := len("comments"); len(elem) >= l && elem[0:l] == "comments" {
-									elem = elem[l:]
-								} else {
-									break
+								// Leaf node.
+								switch r.Method {
+								case "POST":
+									s.handlePostAddCommentRequest([1]string{
+										args[0],
+									}, elemIsEscaped, w, r)
+								default:
+									s.notAllowed(w, r, notAllowedParams{
+										allowedMethods: "POST",
+										allowedHeaders: rn15AllowedHeaders,
+										acceptPost:     "application/json",
+										acceptPatch:    "",
+									})
 								}
 
-								if len(elem) == 0 {
-									// Leaf node.
-									switch r.Method {
-									case "POST":
-										s.handleThreadAddCommentRequest([1]string{
-											args[0],
-										}, elemIsEscaped, w, r)
-									default:
-										s.notAllowed(w, r, notAllowedParams{
-											allowedMethods: "POST",
-											allowedHeaders: rn15AllowedHeaders,
-											acceptPost:     "application/json",
-											acceptPatch:    "",
-										})
-									}
-
-									return
-								}
-
-							case 'p': // Prefix: "posts"
-
-								if l := len("posts"); len(elem) >= l && elem[0:l] == "posts" {
-									elem = elem[l:]
-								} else {
-									break
-								}
-
-								if len(elem) == 0 {
-									// Leaf node.
-									switch r.Method {
-									case "POST":
-										s.handleThreadAddPostRequest([1]string{
-											args[0],
-										}, elemIsEscaped, w, r)
-									default:
-										s.notAllowed(w, r, notAllowedParams{
-											allowedMethods: "POST",
-											allowedHeaders: rn17AllowedHeaders,
-											acceptPost:     "application/json",
-											acceptPatch:    "",
-										})
-									}
-
-									return
-								}
-
+								return
 							}
 
 						}
@@ -415,7 +371,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						default:
 							s.notAllowed(w, r, notAllowedParams{
 								allowedMethods: "POST",
-								allowedHeaders: rn19AllowedHeaders,
+								allowedHeaders: rn17AllowedHeaders,
 								acceptPost:     "application/json",
 								acceptPatch:    "",
 							})
@@ -490,7 +446,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							default:
 								s.notAllowed(w, r, notAllowedParams{
 									allowedMethods: "DELETE,GET,POST",
-									allowedHeaders: rn21AllowedHeaders,
+									allowedHeaders: rn19AllowedHeaders,
 									acceptPost:     "application/json",
 									acceptPatch:    "",
 								})
@@ -818,9 +774,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						}
 					}
 
-				case 't': // Prefix: "threads"
+				case 'p': // Prefix: "posts"
 
-					if l := len("threads"); len(elem) >= l && elem[0:l] == "threads" {
+					if l := len("posts"); len(elem) >= l && elem[0:l] == "posts" {
 						elem = elem[l:]
 					} else {
 						break
@@ -829,20 +785,20 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 					if len(elem) == 0 {
 						switch method {
 						case "GET":
-							r.name = ThreadsListOperation
-							r.summary = "Get list of threads with pagination"
-							r.operationID = "threadsList"
+							r.name = PostsListOperation
+							r.summary = "Get list of posts with pagination"
+							r.operationID = "postsList"
 							r.operationGroup = ""
-							r.pathPattern = "/api/threads"
+							r.pathPattern = "/api/posts"
 							r.args = args
 							r.count = 0
 							return r, true
 						case "POST":
-							r.name = ThreadCreateOperation
-							r.summary = "Create a new thread"
-							r.operationID = "threadCreate"
+							r.name = PostCreateOperation
+							r.summary = "Create a new post"
+							r.operationID = "postCreate"
 							r.operationGroup = ""
-							r.pathPattern = "/api/threads"
+							r.pathPattern = "/api/posts"
 							r.args = args
 							r.count = 0
 							return r, true
@@ -859,7 +815,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							break
 						}
 
-						// Param: "threadId"
+						// Param: "postId"
 						// Match until "/"
 						idx := strings.IndexByte(elem, '/')
 						if idx < 0 {
@@ -871,11 +827,11 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						if len(elem) == 0 {
 							switch method {
 							case "GET":
-								r.name = ThreadGetOperation
-								r.summary = "Get single thread with all posts by thread id"
-								r.operationID = "threadGet"
+								r.name = PostGetOperation
+								r.summary = "Get single post with all comments by post id"
+								r.operationID = "postGet"
 								r.operationGroup = ""
-								r.pathPattern = "/api/threads/{threadId}"
+								r.pathPattern = "/api/posts/{postId}"
 								r.args = args
 								r.count = 1
 								return r, true
@@ -884,68 +840,29 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							}
 						}
 						switch elem[0] {
-						case '/': // Prefix: "/"
+						case '/': // Prefix: "/comments"
 
-							if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+							if l := len("/comments"); len(elem) >= l && elem[0:l] == "/comments" {
 								elem = elem[l:]
 							} else {
 								break
 							}
 
 							if len(elem) == 0 {
-								break
-							}
-							switch elem[0] {
-							case 'c': // Prefix: "comments"
-
-								if l := len("comments"); len(elem) >= l && elem[0:l] == "comments" {
-									elem = elem[l:]
-								} else {
-									break
+								// Leaf node.
+								switch method {
+								case "POST":
+									r.name = PostAddCommentOperation
+									r.summary = "Add a new comment to post"
+									r.operationID = "postAddComment"
+									r.operationGroup = ""
+									r.pathPattern = "/api/posts/{postId}/comments"
+									r.args = args
+									r.count = 1
+									return r, true
+								default:
+									return
 								}
-
-								if len(elem) == 0 {
-									// Leaf node.
-									switch method {
-									case "POST":
-										r.name = ThreadAddCommentOperation
-										r.summary = "Add a new comment to thread"
-										r.operationID = "threadAddComment"
-										r.operationGroup = ""
-										r.pathPattern = "/api/threads/{threadId}/comments"
-										r.args = args
-										r.count = 1
-										return r, true
-									default:
-										return
-									}
-								}
-
-							case 'p': // Prefix: "posts"
-
-								if l := len("posts"); len(elem) >= l && elem[0:l] == "posts" {
-									elem = elem[l:]
-								} else {
-									break
-								}
-
-								if len(elem) == 0 {
-									// Leaf node.
-									switch method {
-									case "POST":
-										r.name = ThreadAddPostOperation
-										r.summary = "Add a new post to thread"
-										r.operationID = "threadAddPost"
-										r.operationGroup = ""
-										r.pathPattern = "/api/threads/{threadId}/posts"
-										r.args = args
-										r.count = 1
-										return r, true
-									default:
-										return
-									}
-								}
-
 							}
 
 						}

@@ -1,39 +1,39 @@
 // SPDX-License-Identifier: MIT
 // Copyright 2026 Alex Syrnikov <alex19srv@gmail.com>
 
-package threads
+package posts
 
 import (
 	"context"
 	"strings"
 
 	"github.com/comunicore/comunicore/backend/internal/repository"
-	threadDb "github.com/comunicore/comunicore/backend/internal/repository/sqlc/db"
+	postdDb "github.com/comunicore/comunicore/backend/internal/repository/sqlc/db"
 	"github.com/comunicore/comunicore/backend/internal/service/model"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-type ThreadsRepo struct {
+type PostsRepo struct {
 	dbpool  *pgxpool.Pool
-	queries *threadDb.Queries
+	queries *postdDb.Queries
 }
 
-func NewThreadsRepo(dsn string) (*ThreadsRepo, error) {
+func NewPostsRepo(dsn string) (*PostsRepo, error) {
 	pool, err := repository.PgPool(dsn)
 	if err != nil {
 		return nil, err
 	}
-	return &ThreadsRepo{dbpool: pool, queries: threadDb.New(pool)}, nil
+	return &PostsRepo{dbpool: pool, queries: postdDb.New(pool)}, nil
 }
 
-// create thread
-func (r *ThreadsRepo) Create(ctx context.Context, thread model.ThreadCreate) (model.ThreadRepoInfo, error) {
-	row, err := r.queries.ThreadCreate(ctx, threadDb.ThreadCreateParams{
-		Title:   thread.Title,
-		Content: thread.Content,
-		UserID:  int32(thread.UserID),
+// create post
+func (r *PostsRepo) Create(ctx context.Context, post model.PostCreate) (model.PostRepoInfo, error) {
+	row, err := r.queries.PostCreate(ctx, postdDb.PostCreateParams{
+		Title:   post.Title,
+		Content: post.Content,
+		UserID:  int32(post.UserID),
 	})
-	return model.ThreadRepoInfo{
+	return model.PostRepoInfo{
 		ID:            int(row.ID),
 		UserID:        int(row.UserID),
 		Title:         row.Title,
@@ -43,7 +43,7 @@ func (r *ThreadsRepo) Create(ctx context.Context, thread model.ThreadCreate) (mo
 	}, err
 }
 
-func (r *ThreadsRepo) InsertThreadTags(ctx context.Context, threadID int, tags []string) error {
+func (r *PostsRepo) InsertPostTags(ctx context.Context, postID int, tags []string) error {
 	seen := make(map[string]struct{}, len(tags))
 	for _, raw := range tags {
 		tag := strings.ToLower(strings.TrimSpace(raw))
@@ -54,9 +54,9 @@ func (r *ThreadsRepo) InsertThreadTags(ctx context.Context, threadID int, tags [
 			continue
 		}
 		seen[tag] = struct{}{}
-		if err := r.queries.ThreadTagInsert(ctx, threadDb.ThreadTagInsertParams{
-			ThreadID: int32(threadID),
-			Tag:      tag,
+		if err := r.queries.PostTagInsert(ctx, postdDb.PostTagInsertParams{
+			PostID: int32(postID),
+			Tag:    tag,
 		}); err != nil {
 			return err
 		}
@@ -64,19 +64,19 @@ func (r *ThreadsRepo) InsertThreadTags(ctx context.Context, threadID int, tags [
 	return nil
 }
 
-// list threads page
-func (r *ThreadsRepo) PageByPageID(ctx context.Context, page, limit int) (model.ThreadListRepo, error) {
-	rows, err := r.queries.ThreadPageByPageID(ctx, threadDb.ThreadPageByPageIDParams{
+// list posts page
+func (r *PostsRepo) PageByPageID(ctx context.Context, page, limit int) (model.PostListRepo, error) {
+	rows, err := r.queries.PostPageByPageID(ctx, postdDb.PostPageByPageIDParams{
 		Limit:  int32(limit),
 		Offset: int32((page - 1) * limit),
 	})
 	if err != nil {
-		return model.ThreadListRepo{}, err
+		return model.PostListRepo{}, err
 	}
 
-	threads := make([]model.ThreadRepoInfo, 0, limit)
+	posts := make([]model.PostRepoInfo, 0, limit)
 	for _, row := range rows {
-		threads = append(threads, model.ThreadRepoInfo{
+		posts = append(posts, model.PostRepoInfo{
 			ID:            int(row.ID),
 			UserID:        int(row.UserID),
 			Title:         row.Title,
@@ -85,35 +85,35 @@ func (r *ThreadsRepo) PageByPageID(ctx context.Context, page, limit int) (model.
 			CreatedAt:     row.CreatedAt.Time,
 		})
 	}
-	if len(threads) == 0 {
-		return model.ThreadListRepo{
+	if len(posts) == 0 {
+		return model.PostListRepo{
 			TotalCountEstimated: 0,
 			HaveNext:            false,
 			HavePrev:            false,
 		}, nil
 	}
-	res, err := r.threadListInfo(ctx, threads[len(threads)-1].ID, threads[0].ID)
+	res, err := r.postListInfo(ctx, posts[len(posts)-1].ID, posts[0].ID)
 	if err != nil {
-		return model.ThreadListRepo{}, err
+		return model.PostListRepo{}, err
 	}
-	res.Threads = threads
+	res.Posts = posts
 
 	return res, nil
 }
 
-// list threads page by page id, with next and prev page info
-func (r *ThreadsRepo) PageByOffset(ctx context.Context, threadId, limit int, before bool) (model.ThreadListRepo, error) {
-	threads := make([]model.ThreadRepoInfo, 0, limit)
+// list posts page by page id, with next and prev page info
+func (r *PostsRepo) PageByOffset(ctx context.Context, postId, limit int, before bool) (model.PostListRepo, error) {
+	posts := make([]model.PostRepoInfo, 0, limit)
 	if before {
-		rows, err := r.queries.ThreadPagesBeforeThreadID(ctx, threadDb.ThreadPagesBeforeThreadIDParams{
-			ID:    int32(threadId),
+		rows, err := r.queries.PostPagesBeforePostID(ctx, postdDb.PostPagesBeforePostIDParams{
+			ID:    int32(postId),
 			Limit: int32(limit),
 		})
 		if err != nil {
-			return model.ThreadListRepo{}, err
+			return model.PostListRepo{}, err
 		}
 		for _, row := range rows {
-			threads = append(threads, model.ThreadRepoInfo{
+			posts = append(posts, model.PostRepoInfo{
 				ID:            int(row.ID),
 				UserID:        int(row.UserID),
 				Title:         row.Title,
@@ -123,15 +123,15 @@ func (r *ThreadsRepo) PageByOffset(ctx context.Context, threadId, limit int, bef
 			})
 		}
 	} else {
-		rows, err := r.queries.ThreadPagesBeforeThreadID(ctx, threadDb.ThreadPagesBeforeThreadIDParams{
-			ID:    int32(threadId),
+		rows, err := r.queries.PostPagesBeforePostID(ctx, postdDb.PostPagesBeforePostIDParams{
+			ID:    int32(postId),
 			Limit: int32(limit),
 		})
 		if err != nil {
-			return model.ThreadListRepo{}, err
+			return model.PostListRepo{}, err
 		}
 		for _, row := range rows {
-			threads = append(threads, model.ThreadRepoInfo{
+			posts = append(posts, model.PostRepoInfo{
 				ID:            int(row.ID),
 				UserID:        int(row.UserID),
 				Title:         row.Title,
@@ -142,47 +142,47 @@ func (r *ThreadsRepo) PageByOffset(ctx context.Context, threadId, limit int, bef
 		}
 	}
 
-	res, err := r.threadListInfo(ctx, threads[len(threads)-1].ID, threads[0].ID)
+	res, err := r.postListInfo(ctx, posts[len(posts)-1].ID, posts[0].ID)
 	if err != nil {
-		return model.ThreadListRepo{}, err
+		return model.PostListRepo{}, err
 	}
-	res.Threads = threads
+	res.Posts = posts
 
 	return res, nil
 }
 
-func (r *ThreadsRepo) threadListInfo(ctx context.Context, minId, maxId int) (model.ThreadListRepo, error) {
+func (r *PostsRepo) postListInfo(ctx context.Context, minId, maxId int) (model.PostListRepo, error) {
 	row := r.dbpool.QueryRow(ctx,
-		`SELECT COUNT(*) FROM threads`)
+		`SELECT COUNT(*) FROM posts`)
 
 	var count int
 	if err := row.Scan(&count); err != nil {
-		return model.ThreadListRepo{}, err
+		return model.PostListRepo{}, err
 	}
-	res := model.ThreadListRepo{
+	res := model.PostListRepo{
 		TotalCountEstimated: count,
 	}
 	row = r.dbpool.QueryRow(ctx,
-		`SELECT id FROM threads WHERE id < $1 LIMIT 1`, minId)
+		`SELECT id FROM posts WHERE id < $1 LIMIT 1`, minId)
 	var prevId int
 	if err := row.Scan(&prevId); err != nil {
 		if err.Error() == "no rows in result set" { // FIXME: this is not a good way to check for no rows, but pgx does not export the error type
 			res.HaveNext = false
 		} else {
-			return model.ThreadListRepo{}, err
+			return model.PostListRepo{}, err
 		}
 	} else {
 		res.HaveNext = true
 	}
 
 	row = r.dbpool.QueryRow(ctx,
-		`SELECT id FROM threads WHERE id > $1 LIMIT 1`, maxId)
+		`SELECT id FROM posts WHERE id > $1 LIMIT 1`, maxId)
 	var nextId int
 	if err := row.Scan(&nextId); err != nil {
 		if err.Error() == "no rows in result set" { // FIXME: this is not a good way to check for no rows, but pgx does not export the error type
 			res.HavePrev = false
 		} else {
-			return model.ThreadListRepo{}, err
+			return model.PostListRepo{}, err
 		}
 	} else {
 		res.HavePrev = true
@@ -191,9 +191,9 @@ func (r *ThreadsRepo) threadListInfo(ctx context.Context, minId, maxId int) (mod
 	return res, nil
 }
 
-func (r *ThreadsRepo) Get(ctx context.Context, threadId int) (*model.ThreadRepoInfo, error) {
-	row, err := r.queries.ThreadGetById(ctx, int32(threadId))
-	return &model.ThreadRepoInfo{
+func (r *PostsRepo) Get(ctx context.Context, postId int) (*model.PostRepoInfo, error) {
+	row, err := r.queries.PostGetById(ctx, int32(postId))
+	return &model.PostRepoInfo{
 		ID:            int(row.ID),
 		UserID:        int(row.UserID),
 		Title:         row.Title,

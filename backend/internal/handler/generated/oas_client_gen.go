@@ -59,35 +59,27 @@ type Invoker interface {
 	//
 	// POST /api/media
 	MediaUpload(ctx context.Context, request *MediaUploadRequestMultipart) (MediaUploadRes, error)
-	// ThreadAddComment invokes threadAddComment operation.
+	// PostAddComment invokes postAddComment operation.
 	//
-	// Add a new comment to thread.
+	// Add a new comment to post.
 	//
-	// POST /api/threads/{threadId}/comments
-	ThreadAddComment(ctx context.Context, request *ThreadCreateCommentRequest, params ThreadAddCommentParams) (ThreadAddCommentRes, error)
-	// ThreadAddPost invokes threadAddPost operation.
+	// POST /api/posts/{postId}/comments
+	PostAddComment(ctx context.Context, request *PostCreateCommentRequest, params PostAddCommentParams) (PostAddCommentRes, error)
+	// PostCreate invokes postCreate operation.
 	//
-	// Add a new post to thread.
+	// Create a new post.
 	//
-	// Deprecated: schema marks this operation as deprecated.
+	// POST /api/posts
+	PostCreate(ctx context.Context, request *PostCreateRequest) (PostCreateRes, error)
+	// PostGet invokes postGet operation.
 	//
-	// POST /api/threads/{threadId}/posts
-	ThreadAddPost(ctx context.Context, request *ThreadCreatePostRequest, params ThreadAddPostParams) (ThreadAddPostRes, error)
-	// ThreadCreate invokes threadCreate operation.
+	// Get single post with all comments by post id.
 	//
-	// Create a new thread.
+	// GET /api/posts/{postId}
+	PostGet(ctx context.Context, params PostGetParams) (PostGetRes, error)
+	// PostsList invokes postsList operation.
 	//
-	// POST /api/threads
-	ThreadCreate(ctx context.Context, request *ThreadCreateRequest) (ThreadCreateRes, error)
-	// ThreadGet invokes threadGet operation.
-	//
-	// Get single thread with all posts by thread id.
-	//
-	// GET /api/threads/{threadId}
-	ThreadGet(ctx context.Context, params ThreadGetParams) (ThreadGetRes, error)
-	// ThreadsList invokes threadsList operation.
-	//
-	// Получить список веток с пагинацией. Можно
+	// Получить список постов с пагинацией. Можно
 	// использовать либо постраничную пагинацию (page + limit),
 	// либо курсорную пагинацию (after или before). Нужно
 	// использовать только один параметр. after, before или page с
@@ -123,8 +115,8 @@ type Invoker interface {
 	// более новым (after) - больший id. И при этом не важно,
 	// удалены эти сообщения или нет.
 	//
-	// GET /api/threads
-	ThreadsList(ctx context.Context, params ThreadsListParams) (ThreadsListRes, error)
+	// GET /api/posts
+	PostsList(ctx context.Context, params PostsListParams) (PostsListRes, error)
 	// UserCreate invokes userCreate operation.
 	//
 	// Create a new user.
@@ -620,30 +612,30 @@ func (c *Client) sendMediaUpload(ctx context.Context, request *MediaUploadReques
 	return result, nil
 }
 
-// ThreadAddComment invokes threadAddComment operation.
+// PostAddComment invokes postAddComment operation.
 //
-// Add a new comment to thread.
+// Add a new comment to post.
 //
-// POST /api/threads/{threadId}/comments
-func (c *Client) ThreadAddComment(ctx context.Context, request *ThreadCreateCommentRequest, params ThreadAddCommentParams) (ThreadAddCommentRes, error) {
-	res, err := c.sendThreadAddComment(ctx, request, params)
+// POST /api/posts/{postId}/comments
+func (c *Client) PostAddComment(ctx context.Context, request *PostCreateCommentRequest, params PostAddCommentParams) (PostAddCommentRes, error) {
+	res, err := c.sendPostAddComment(ctx, request, params)
 	return res, err
 }
 
-func (c *Client) sendThreadAddComment(ctx context.Context, request *ThreadCreateCommentRequest, params ThreadAddCommentParams) (res ThreadAddCommentRes, err error) {
+func (c *Client) sendPostAddComment(ctx context.Context, request *PostCreateCommentRequest, params PostAddCommentParams) (res PostAddCommentRes, err error) {
 
 	u := uri.Clone(c.requestURL(ctx))
 	var pathParts [3]string
-	pathParts[0] = "/api/threads/"
+	pathParts[0] = "/api/posts/"
 	{
-		// Encode "threadId" parameter.
+		// Encode "postId" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "threadId",
+			Param:   "postId",
 			Style:   uri.PathStyleSimple,
 			Explode: false,
 		})
 		if err := func() error {
-			return e.EncodeValue(conv.IntToString(params.ThreadId))
+			return e.EncodeValue(conv.IntToString(params.PostId))
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
@@ -660,7 +652,7 @@ func (c *Client) sendThreadAddComment(ctx context.Context, request *ThreadCreate
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
-	if err := encodeThreadAddCommentRequest(request, r); err != nil {
+	if err := encodePostAddCommentRequest(request, r); err != nil {
 		return res, errors.Wrap(err, "encode request")
 	}
 
@@ -669,7 +661,7 @@ func (c *Client) sendThreadAddComment(ctx context.Context, request *ThreadCreate
 		var satisfied bitset
 		{
 
-			switch err := c.securityCookieAuth(ctx, ThreadAddCommentOperation, r); {
+			switch err := c.securityCookieAuth(ctx, PostAddCommentOperation, r); {
 			case err == nil: // if NO error
 				satisfied[0] |= 1 << 0
 			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
@@ -710,7 +702,7 @@ func (c *Client) sendThreadAddComment(ctx context.Context, request *ThreadCreate
 		_ = body.Close()
 	}()
 
-	result, err := decodeThreadAddCommentResponse(resp)
+	result, err := decodePostAddCommentResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -718,128 +710,28 @@ func (c *Client) sendThreadAddComment(ctx context.Context, request *ThreadCreate
 	return result, nil
 }
 
-// ThreadAddPost invokes threadAddPost operation.
+// PostCreate invokes postCreate operation.
 //
-// Add a new post to thread.
+// Create a new post.
 //
-// Deprecated: schema marks this operation as deprecated.
-//
-// POST /api/threads/{threadId}/posts
-func (c *Client) ThreadAddPost(ctx context.Context, request *ThreadCreatePostRequest, params ThreadAddPostParams) (ThreadAddPostRes, error) {
-	res, err := c.sendThreadAddPost(ctx, request, params)
+// POST /api/posts
+func (c *Client) PostCreate(ctx context.Context, request *PostCreateRequest) (PostCreateRes, error) {
+	res, err := c.sendPostCreate(ctx, request)
 	return res, err
 }
 
-func (c *Client) sendThreadAddPost(ctx context.Context, request *ThreadCreatePostRequest, params ThreadAddPostParams) (res ThreadAddPostRes, err error) {
-
-	u := uri.Clone(c.requestURL(ctx))
-	var pathParts [3]string
-	pathParts[0] = "/api/threads/"
-	{
-		// Encode "threadId" parameter.
-		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "threadId",
-			Style:   uri.PathStyleSimple,
-			Explode: false,
-		})
-		if err := func() error {
-			return e.EncodeValue(conv.IntToString(params.ThreadId))
-		}(); err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		encoded, err := e.Result()
-		if err != nil {
-			return res, errors.Wrap(err, "encode path")
-		}
-		pathParts[1] = encoded
-	}
-	pathParts[2] = "/posts"
-	uri.AddPathParts(u, pathParts[:]...)
-
-	r, err := ht.NewRequest(ctx, "POST", u)
-	if err != nil {
-		return res, errors.Wrap(err, "create request")
-	}
-	if err := encodeThreadAddPostRequest(request, r); err != nil {
-		return res, errors.Wrap(err, "encode request")
-	}
-
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-
-			switch err := c.securityCookieAuth(ctx, ThreadAddPostOperation, r); {
-			case err == nil: // if NO error
-				satisfied[0] |= 1 << 0
-			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
-				// Skip this security.
-			default:
-				return res, errors.Wrap(err, "security \"CookieAuth\"")
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			return res, ogenerrors.ErrSecurityRequirementIsNotSatisfied
-		}
-	}
-
-	resp, err := c.cfg.Client.Do(r)
-	if err != nil {
-		return res, errors.Wrap(err, "do request")
-	}
-	body := resp.Body
-	defer func() {
-		// Drain the body to EOF before closing, so the underlying
-		// connection can be reused by the Transport regardless of the
-		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
-		_, _ = io.Copy(io.Discard, body)
-		_ = body.Close()
-	}()
-
-	result, err := decodeThreadAddPostResponse(resp)
-	if err != nil {
-		return res, errors.Wrap(err, "decode response")
-	}
-
-	return result, nil
-}
-
-// ThreadCreate invokes threadCreate operation.
-//
-// Create a new thread.
-//
-// POST /api/threads
-func (c *Client) ThreadCreate(ctx context.Context, request *ThreadCreateRequest) (ThreadCreateRes, error) {
-	res, err := c.sendThreadCreate(ctx, request)
-	return res, err
-}
-
-func (c *Client) sendThreadCreate(ctx context.Context, request *ThreadCreateRequest) (res ThreadCreateRes, err error) {
+func (c *Client) sendPostCreate(ctx context.Context, request *PostCreateRequest) (res PostCreateRes, err error) {
 
 	u := uri.Clone(c.requestURL(ctx))
 	var pathParts [1]string
-	pathParts[0] = "/api/threads"
+	pathParts[0] = "/api/posts"
 	uri.AddPathParts(u, pathParts[:]...)
 
 	r, err := ht.NewRequest(ctx, "POST", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
 	}
-	if err := encodeThreadCreateRequest(request, r); err != nil {
+	if err := encodePostCreateRequest(request, r); err != nil {
 		return res, errors.Wrap(err, "encode request")
 	}
 
@@ -848,7 +740,7 @@ func (c *Client) sendThreadCreate(ctx context.Context, request *ThreadCreateRequ
 		var satisfied bitset
 		{
 
-			switch err := c.securityCookieAuth(ctx, ThreadCreateOperation, r); {
+			switch err := c.securityCookieAuth(ctx, PostCreateOperation, r); {
 			case err == nil: // if NO error
 				satisfied[0] |= 1 << 0
 			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
@@ -889,7 +781,7 @@ func (c *Client) sendThreadCreate(ctx context.Context, request *ThreadCreateRequ
 		_ = body.Close()
 	}()
 
-	result, err := decodeThreadCreateResponse(resp)
+	result, err := decodePostCreateResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -897,30 +789,30 @@ func (c *Client) sendThreadCreate(ctx context.Context, request *ThreadCreateRequ
 	return result, nil
 }
 
-// ThreadGet invokes threadGet operation.
+// PostGet invokes postGet operation.
 //
-// Get single thread with all posts by thread id.
+// Get single post with all comments by post id.
 //
-// GET /api/threads/{threadId}
-func (c *Client) ThreadGet(ctx context.Context, params ThreadGetParams) (ThreadGetRes, error) {
-	res, err := c.sendThreadGet(ctx, params)
+// GET /api/posts/{postId}
+func (c *Client) PostGet(ctx context.Context, params PostGetParams) (PostGetRes, error) {
+	res, err := c.sendPostGet(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendThreadGet(ctx context.Context, params ThreadGetParams) (res ThreadGetRes, err error) {
+func (c *Client) sendPostGet(ctx context.Context, params PostGetParams) (res PostGetRes, err error) {
 
 	u := uri.Clone(c.requestURL(ctx))
 	var pathParts [2]string
-	pathParts[0] = "/api/threads/"
+	pathParts[0] = "/api/posts/"
 	{
-		// Encode "threadId" parameter.
+		// Encode "postId" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "threadId",
+			Param:   "postId",
 			Style:   uri.PathStyleSimple,
 			Explode: false,
 		})
 		if err := func() error {
-			return e.EncodeValue(conv.IntToString(params.ThreadId))
+			return e.EncodeValue(conv.IntToString(params.PostId))
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
@@ -942,7 +834,7 @@ func (c *Client) sendThreadGet(ctx context.Context, params ThreadGetParams) (res
 		var satisfied bitset
 		{
 
-			switch err := c.securityCookieAuth(ctx, ThreadGetOperation, r); {
+			switch err := c.securityCookieAuth(ctx, PostGetOperation, r); {
 			case err == nil: // if NO error
 				satisfied[0] |= 1 << 0
 			case errors.Is(err, ogenerrors.ErrSkipClientSecurity):
@@ -983,7 +875,7 @@ func (c *Client) sendThreadGet(ctx context.Context, params ThreadGetParams) (res
 		_ = body.Close()
 	}()
 
-	result, err := decodeThreadGetResponse(resp)
+	result, err := decodePostGetResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -991,9 +883,9 @@ func (c *Client) sendThreadGet(ctx context.Context, params ThreadGetParams) (res
 	return result, nil
 }
 
-// ThreadsList invokes threadsList operation.
+// PostsList invokes postsList operation.
 //
-// Получить список веток с пагинацией. Можно
+// Получить список постов с пагинацией. Можно
 // использовать либо постраничную пагинацию (page + limit),
 // либо курсорную пагинацию (after или before). Нужно
 // использовать только один параметр. after, before или page с
@@ -1029,17 +921,17 @@ func (c *Client) sendThreadGet(ctx context.Context, params ThreadGetParams) (res
 // более новым (after) - больший id. И при этом не важно,
 // удалены эти сообщения или нет.
 //
-// GET /api/threads
-func (c *Client) ThreadsList(ctx context.Context, params ThreadsListParams) (ThreadsListRes, error) {
-	res, err := c.sendThreadsList(ctx, params)
+// GET /api/posts
+func (c *Client) PostsList(ctx context.Context, params PostsListParams) (PostsListRes, error) {
+	res, err := c.sendPostsList(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendThreadsList(ctx context.Context, params ThreadsListParams) (res ThreadsListRes, err error) {
+func (c *Client) sendPostsList(ctx context.Context, params PostsListParams) (res PostsListRes, err error) {
 
 	u := uri.Clone(c.requestURL(ctx))
 	var pathParts [1]string
-	pathParts[0] = "/api/threads"
+	pathParts[0] = "/api/posts"
 	uri.AddPathParts(u, pathParts[:]...)
 
 	q := uri.NewQueryEncoder()
@@ -1131,7 +1023,7 @@ func (c *Client) sendThreadsList(ctx context.Context, params ThreadsListParams) 
 		_ = body.Close()
 	}()
 
-	result, err := decodeThreadsListResponse(resp)
+	result, err := decodePostsListResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}

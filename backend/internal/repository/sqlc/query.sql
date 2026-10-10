@@ -39,44 +39,35 @@ DELETE FROM sessions WHERE user_id = $1;
 -- name: AuthGetUserIDBySessionID :one
 SELECT user_id FROM sessions WHERE session_id = $1;
 
--- deprecated: use CommentCreate instead
--- name: PostCreate :one
-INSERT INTO comments (thread_id, user_id, content) VALUES ($1, $2, $3)
-RETURNING id, thread_id, user_id, content, created_at;
--- deprecated: use CommentListByThreadId instead
--- name: PostListByThreadId :many
-SELECT id, thread_id, user_id, content, created_at FROM comments
-WHERE thread_id = $1 ORDER BY created_at DESC;
-
 -- name: CommentCreate :one
-INSERT INTO comments (thread_id, user_id, content) VALUES ($1, $2, $3)
-RETURNING id, thread_id, user_id, content, created_at;
--- name: CommentListByThreadId :many
-SELECT id, thread_id, user_id, content, created_at FROM comments
-WHERE thread_id = $1 ORDER BY created_at DESC;
+INSERT INTO comments (post_id, user_id, content) VALUES ($1, $2, $3)
+RETURNING id, post_id, user_id, content, created_at;
+-- name: CommentListByPostId :many
+SELECT id, post_id, user_id, content, created_at FROM comments
+WHERE post_id = $1 ORDER BY created_at DESC;
 
--- name: ThreadCreate :one
-INSERT INTO threads (title, content, user_id, comments_count) VALUES ($1, $2, $3, 0)
+-- name: PostCreate :one
+INSERT INTO posts (title, content, user_id, comments_count) VALUES ($1, $2, $3, 0)
 RETURNING id, title, content, comments_count, user_id, created_at;
--- name: ThreadGetById :one
-SELECT id, title, content, user_id, comments_count, created_at FROM threads WHERE id = $1;
--- name: ThreadPageByPageID :many
+-- name: PostGetById :one
+SELECT id, title, content, user_id, comments_count, created_at FROM posts WHERE id = $1;
+-- name: PostPageByPageID :many
 SELECT id, title, content, user_id, comments_count, created_at
-FROM threads
+FROM posts
 ORDER BY id DESC LIMIT $1 OFFSET $2;
--- name: ThreadPagesBeforeThreadID :many
+-- name: PostPagesBeforePostID :many
 SELECT id, title, content, user_id, comments_count, created_at
-FROM threads
+FROM posts
 WHERE id < $1
 ORDER BY id DESC LIMIT $2;
--- name: ThreadPagesAfterThreadID :many
+-- name: PostPagesAfterPostID :many
 SELECT id, title, content, user_id, comments_count, created_at
-FROM threads
+FROM posts
 WHERE id > $1
 ORDER BY id DESC LIMIT $2;
 
--- name: ThreadTagInsert :exec
-INSERT INTO thread_tags (thread_id, tag) VALUES ($1, $2) ON CONFLICT DO NOTHING;
+-- name: PostTagInsert :exec
+INSERT INTO post_tags (post_id, tag) VALUES ($1, $2) ON CONFLICT DO NOTHING;
 
 -- name: AnalyticsVisitBatchInsert :exec
 INSERT INTO analytics_visit_batches (
@@ -99,7 +90,7 @@ SELECT
         SELECT COUNT(*)::double precision FROM (
             SELECT user_id FROM comments
             UNION
-            SELECT user_id FROM threads
+            SELECT user_id FROM posts
         ) AS u
     ), 0.0),
     0.0
@@ -167,15 +158,15 @@ ORDER BY hourly.hr;
 
 -- name: AnalyticsTopTag :one
 SELECT tag, COUNT(*)::bigint AS usage_count
-FROM thread_tags
+FROM post_tags
 GROUP BY tag
 ORDER BY usage_count DESC, tag ASC
 LIMIT 1;
 
--- name: AnalyticsTopThreadInRange :one
+-- name: AnalyticsTopPostInRange :one
 SELECT t.id, t.title, COUNT(c.id)::bigint AS reply_count_in_range
-FROM threads t
-LEFT JOIN comments c ON c.thread_id = t.id
+FROM posts t
+LEFT JOIN comments c ON c.post_id = t.id
     AND c.created_at >= sqlc.arg(start_at)
     AND c.created_at < sqlc.arg(end_at)
 GROUP BY t.id, t.title
@@ -190,11 +181,11 @@ GROUP BY u.id, u.name
 ORDER BY comment_count DESC, u.id ASC
 LIMIT 10;
 
--- name: AnalyticsPopularTagsByThreadCount :many
-SELECT tag, COUNT(*)::bigint AS thread_count
-FROM thread_tags
+-- name: AnalyticsPopularTagsByPostCount :many
+SELECT tag, COUNT(*)::bigint AS post_count
+FROM post_tags
 GROUP BY tag
-ORDER BY thread_count DESC, tag ASC;
+ORDER BY post_count DESC, tag ASC;
 
 -- name: AnalyticsCommentsActivityByDay :many
 SELECT DATE(created_at) AS day, COUNT(*)::bigint AS comments_count
@@ -202,18 +193,18 @@ FROM comments
 GROUP BY day
 ORDER BY day;
 
--- name: AnalyticsTopUsersByThreads :many
-SELECT u.id, u.name, COUNT(t.id)::bigint AS thread_count
+-- name: AnalyticsTopUsersByPosts :many
+SELECT u.id, u.name, COUNT(t.id)::bigint AS post_count
 FROM users u
-JOIN threads t ON u.id = t.user_id
+JOIN posts t ON u.id = t.user_id
 GROUP BY u.id, u.name
-ORDER BY thread_count DESC, u.id ASC;
+ORDER BY post_count DESC, u.id ASC;
 
--- name: AnalyticsUsersWithCommentsButNoThreads :many
+-- name: AnalyticsUsersWithCommentsButNoPosts :many
 SELECT u.id, u.name, COUNT(c.id)::bigint AS comment_count
 FROM users u
 JOIN comments c ON u.id = c.user_id
-LEFT JOIN threads t ON u.id = t.user_id
+LEFT JOIN posts t ON u.id = t.user_id
 WHERE t.id IS NULL
 GROUP BY u.id, u.name
 ORDER BY comment_count DESC, u.id ASC;

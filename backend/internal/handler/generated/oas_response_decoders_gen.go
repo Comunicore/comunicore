@@ -734,7 +734,7 @@ func decodeMediaUploadResponse(resp *http.Response) (res MediaUploadRes, _ error
 	return res, validate.UnexpectedStatusCodeWithResponse(resp)
 }
 
-func decodeThreadAddCommentResponse(resp *http.Response) (res ThreadAddCommentRes, _ error) {
+func decodePostAddCommentResponse(resp *http.Response) (res PostAddCommentRes, _ error) {
 	switch resp.StatusCode {
 	case 201:
 		// Code 201.
@@ -750,7 +750,7 @@ func decodeThreadAddCommentResponse(resp *http.Response) (res ThreadAddCommentRe
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response ThreadCommentItem
+			var response PostCommentItem
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -785,7 +785,7 @@ func decodeThreadAddCommentResponse(resp *http.Response) (res ThreadAddCommentRe
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response ThreadAddCommentBadRequest
+			var response PostAddCommentBadRequest
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -820,7 +820,7 @@ func decodeThreadAddCommentResponse(resp *http.Response) (res ThreadAddCommentRe
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response ThreadAddCommentInternalServerError
+			var response PostAddCommentInternalServerError
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -845,7 +845,7 @@ func decodeThreadAddCommentResponse(resp *http.Response) (res ThreadAddCommentRe
 	return res, validate.UnexpectedStatusCodeWithResponse(resp)
 }
 
-func decodeThreadAddPostResponse(resp *http.Response) (res ThreadAddPostRes, _ error) {
+func decodePostCreateResponse(resp *http.Response) (res PostCreateRes, _ error) {
 	switch resp.StatusCode {
 	case 201:
 		// Code 201.
@@ -861,118 +861,7 @@ func decodeThreadAddPostResponse(resp *http.Response) (res ThreadAddPostRes, _ e
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response ThreadPostItem
-			if err := func() error {
-				if err := response.Decode(d); err != nil {
-					return err
-				}
-				if err := d.Skip(); err != io.EOF {
-					return errors.New("unexpected trailing data")
-				}
-				return nil
-			}(); err != nil {
-				err = &ogenerrors.DecodeBodyError{
-					ContentType: ct,
-					Body:        buf,
-					Err:         err,
-				}
-				return res, err
-			}
-			return &response, nil
-		default:
-			return res, validate.InvalidContentType(ct)
-		}
-	case 400:
-		// Code 400.
-		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
-		if err != nil {
-			return res, errors.Wrap(err, "parse media type")
-		}
-		switch {
-		case ct == "application/json":
-			buf, err := io.ReadAll(resp.Body)
-			if err != nil {
-				return res, err
-			}
-			d := jx.DecodeBytes(buf)
-
-			var response ThreadAddPostBadRequest
-			if err := func() error {
-				if err := response.Decode(d); err != nil {
-					return err
-				}
-				if err := d.Skip(); err != io.EOF {
-					return errors.New("unexpected trailing data")
-				}
-				return nil
-			}(); err != nil {
-				err = &ogenerrors.DecodeBodyError{
-					ContentType: ct,
-					Body:        buf,
-					Err:         err,
-				}
-				return res, err
-			}
-			return &response, nil
-		default:
-			return res, validate.InvalidContentType(ct)
-		}
-	case 500:
-		// Code 500.
-		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
-		if err != nil {
-			return res, errors.Wrap(err, "parse media type")
-		}
-		switch {
-		case ct == "application/json":
-			buf, err := io.ReadAll(resp.Body)
-			if err != nil {
-				return res, err
-			}
-			d := jx.DecodeBytes(buf)
-
-			var response ThreadAddPostInternalServerError
-			if err := func() error {
-				if err := response.Decode(d); err != nil {
-					return err
-				}
-				if err := d.Skip(); err != io.EOF {
-					return errors.New("unexpected trailing data")
-				}
-				return nil
-			}(); err != nil {
-				err = &ogenerrors.DecodeBodyError{
-					ContentType: ct,
-					Body:        buf,
-					Err:         err,
-				}
-				return res, err
-			}
-			return &response, nil
-		default:
-			return res, validate.InvalidContentType(ct)
-		}
-	}
-	return res, validate.UnexpectedStatusCodeWithResponse(resp)
-}
-
-func decodeThreadCreateResponse(resp *http.Response) (res ThreadCreateRes, _ error) {
-	switch resp.StatusCode {
-	case 201:
-		// Code 201.
-		ct, _, err := mime.ParseMediaType(resp.Header.Get("Content-Type"))
-		if err != nil {
-			return res, errors.Wrap(err, "parse media type")
-		}
-		switch {
-		case ct == "application/json":
-			buf, err := io.ReadAll(resp.Body)
-			if err != nil {
-				return res, err
-			}
-			d := jx.DecodeBytes(buf)
-
-			var response ThreadListItem
+			var response PostListItem
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -1007,7 +896,7 @@ func decodeThreadCreateResponse(resp *http.Response) (res ThreadCreateRes, _ err
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response ThreadCreateUnauthorized
+			var response PostCreateUnauthorized
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -1042,7 +931,7 @@ func decodeThreadCreateResponse(resp *http.Response) (res ThreadCreateRes, _ err
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response ThreadCreateInternalServerError
+			var response PostCreateInternalServerError
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -1067,7 +956,7 @@ func decodeThreadCreateResponse(resp *http.Response) (res ThreadCreateRes, _ err
 	return res, validate.UnexpectedStatusCodeWithResponse(resp)
 }
 
-func decodeThreadGetResponse(resp *http.Response) (res ThreadGetRes, _ error) {
+func decodePostGetResponse(resp *http.Response) (res PostGetRes, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -1083,7 +972,7 @@ func decodeThreadGetResponse(resp *http.Response) (res ThreadGetRes, _ error) {
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response ThreadWithPostsListResponse
+			var response PostWithCommentsListResponse
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -1127,7 +1016,7 @@ func decodeThreadGetResponse(resp *http.Response) (res ThreadGetRes, _ error) {
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response ThreadGetBadRequest
+			var response PostGetBadRequest
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -1162,7 +1051,7 @@ func decodeThreadGetResponse(resp *http.Response) (res ThreadGetRes, _ error) {
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response ThreadGetInternalServerError
+			var response PostGetInternalServerError
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err
@@ -1187,7 +1076,7 @@ func decodeThreadGetResponse(resp *http.Response) (res ThreadGetRes, _ error) {
 	return res, validate.UnexpectedStatusCodeWithResponse(resp)
 }
 
-func decodeThreadsListResponse(resp *http.Response) (res ThreadsListRes, _ error) {
+func decodePostsListResponse(resp *http.Response) (res PostsListRes, _ error) {
 	switch resp.StatusCode {
 	case 200:
 		// Code 200.
@@ -1203,7 +1092,7 @@ func decodeThreadsListResponse(resp *http.Response) (res ThreadsListRes, _ error
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response ThreadListResponse
+			var response PostListResponse
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err

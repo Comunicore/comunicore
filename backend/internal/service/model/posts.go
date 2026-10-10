@@ -5,38 +5,64 @@ package model
 
 import "time"
 
-type Post struct {
-	ID        int
-	ThreadID  int
-	UserID    int
-	Content   string
-	CreatedAt time.Time
-}
-type PostInfo struct {
-	ID        int
-	ThreadID  int
-	UserID    int
-	UserName  string
-	Content   string
-	CreatedAt time.Time
-}
-type PostListItem struct {
+type PostWithComments struct {
 	ID              int
-	UserID          int
-	UserName        string
+	AuthorID        int
+	AuthorName      string
 	AuthorAvatarUrl string
+	Title           string
 	Content         string
+	CommentsCount   int
 	CreatedAt       time.Time
+	Comments        []CommentListItem
 }
 
 type PostCreate struct {
-	ThreadID int
-	UserID   int
-	Content  string
+	Title   string
+	Content string
+	UserID  int
+	Tags    []string
+}
+type PostRepoInfo struct {
+	ID            int
+	Title         string
+	Content       string
+	UserID        int
+	CommentsCount int
+	CreatedAt     time.Time
+}
+type PostListRepo struct {
+	Posts []PostRepoInfo
+
+	TotalCountEstimated int
+	HavePrev            bool
+	HaveNext            bool
+}
+type PostInfoResponse struct {
+	ID              int
+	Title           string
+	Content         string
+	AuthorID        int
+	AuthorName      string
+	AuthorAvatarUrl string
+	CommentsCount   int
+	CreatedAt       time.Time
 }
 
-// type PostListItem struct {
-// 	ID      int
-// 	UserID  int
-// 	Content string
-// }
+type PostListResponse struct {
+	Posts []PostInfoResponse
+
+	TotalCountEstimated int
+	HavePrev            bool
+	HaveNext            bool
+}
+
+type PostInfo struct {
+	ID            int
+	Title         string
+	Content       string
+	UserID        int
+	UserName      string
+	CommentsCount int
+	CreatedAt     time.Time
+}
