@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS sessions (
     session_id UUID PRIMARY KEY,
     user_id INTEGER NOT NULL
 );
-CREATE TABLE IF NOT EXISTS threads (
+CREATE TABLE IF NOT EXISTS posts (
     id SERIAL PRIMARY KEY,
     title TEXT NOT NULL,
     content TEXT NOT NULL,
@@ -28,18 +28,18 @@ CREATE TABLE IF NOT EXISTS threads (
 );
 CREATE TABLE IF NOT EXISTS comments (
     id SERIAL PRIMARY KEY,
-    thread_id INTEGER NOT NULL,
+    post_id INTEGER NOT NULL,
     user_id INTEGER NOT NULL,
     content TEXT NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NULL
 );
-CREATE TABLE IF NOT EXISTS thread_tags (
-    thread_id INTEGER NOT NULL REFERENCES threads (id) ON DELETE CASCADE,
+CREATE TABLE IF NOT EXISTS post_tags (
+    post_id INTEGER NOT NULL REFERENCES posts (id) ON DELETE CASCADE,
     tag TEXT NOT NULL,
-    PRIMARY KEY (thread_id, tag)
+    PRIMARY KEY (post_id, tag)
 );
-CREATE INDEX IF NOT EXISTS thread_tags_tag_idx ON thread_tags (tag);
+CREATE INDEX IF NOT EXISTS post_tags_tag_idx ON post_tags (tag);
 CREATE TABLE IF NOT EXISTS analytics_visit_batches (
     id BIGSERIAL PRIMARY KEY,
     user_id INTEGER REFERENCES users (id) ON DELETE SET NULL,
@@ -56,16 +56,16 @@ CREATE TABLE IF NOT EXISTS analytics_visit_batches (
 CREATE INDEX IF NOT EXISTS analytics_visit_batches_start_at_idx ON analytics_visit_batches (batch_start_at);
 CREATE INDEX IF NOT EXISTS analytics_visit_batches_user_id_idx ON analytics_visit_batches (user_id);
 
-CREATE OR REPLACE FUNCTION threads_bump_comments_count()
+CREATE OR REPLACE FUNCTION posts_bump_comments_count()
 RETURNS TRIGGER AS $$
 BEGIN
-    UPDATE threads SET comments_count = comments_count + 1 WHERE id = NEW.thread_id;
+    UPDATE posts SET comments_count = comments_count + 1 WHERE id = NEW.post_id;
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
-DROP TRIGGER IF EXISTS trg_comments_bump_thread_count ON comments;
-CREATE TRIGGER trg_comments_bump_thread_count
+DROP TRIGGER IF EXISTS trg_comments_bump_post_count ON comments;
+CREATE TRIGGER trg_comments_bump_post_count
 AFTER INSERT ON comments
 FOR EACH ROW
-EXECUTE FUNCTION threads_bump_comments_count();
+EXECUTE FUNCTION posts_bump_comments_count();

@@ -192,23 +192,23 @@ function MetricsBoard({ data }: { data: AnalyticsMetricsResponse }) {
         </Section>
       ) : null}
 
-      {(data.topThreadWeekly || data.topThreadMonthly) && (
+      {(data.topPostWeekly || data.topPostMonthly) && (
         <Section title='Топ-посты' description='По ответам в окне'>
           <div className='grid gap-2 md:grid-cols-2'>
-            {data.topThreadWeekly ? (
+            {data.topPostWeekly ? (
               <PostHighlightCard
                 period='7 дн.'
-                postId={data.topThreadWeekly.threadId}
-                title={data.topThreadWeekly.title}
-                repliesInWindow={data.topThreadWeekly.repliesInWindow}
+                postId={data.topPostWeekly.postId}
+                title={data.topPostWeekly.title}
+                repliesInWindow={data.topPostWeekly.repliesInWindow}
               />
             ) : null}
-            {data.topThreadMonthly ? (
+            {data.topPostMonthly ? (
               <PostHighlightCard
                 period='30 дн.'
-                postId={data.topThreadMonthly.threadId}
-                title={data.topThreadMonthly.title}
-                repliesInWindow={data.topThreadMonthly.repliesInWindow}
+                postId={data.topPostMonthly.postId}
+                title={data.topPostMonthly.title}
+                repliesInWindow={data.topPostMonthly.repliesInWindow}
               />
             ) : null}
           </div>
@@ -262,7 +262,7 @@ function MetricsBoard({ data }: { data: AnalyticsMetricsResponse }) {
           <TableUserCounts rows={data.topUsersByPosts} />
         </Section>
         <Section title='Топ по постам'>
-          <TableUserCounts rows={data.topUsersByThreads} />
+          <TableUserCounts rows={data.topUsersByPosts} />
         </Section>
         <Section title='Только комментарии'>
           <TableUserCounts rows={data.postOnlyUsers} />
@@ -290,7 +290,7 @@ function MetricsBoard({ data }: { data: AnalyticsMetricsResponse }) {
                       </span>
                     </td>
                     <td className='px-3 py-2 text-slate-800 tabular-nums'>
-                      {row.threadCount}
+                      {row.postsCount}
                     </td>
                   </tr>
                 ))}

@@ -21,24 +21,20 @@ type MediaUploadRes interface {
 	mediaUploadRes()
 }
 
-type ThreadAddCommentRes interface {
-	threadAddCommentRes()
+type PostAddCommentRes interface {
+	postAddCommentRes()
 }
 
-type ThreadAddPostRes interface {
-	threadAddPostRes()
+type PostCreateRes interface {
+	postCreateRes()
 }
 
-type ThreadCreateRes interface {
-	threadCreateRes()
+type PostGetRes interface {
+	postGetRes()
 }
 
-type ThreadGetRes interface {
-	threadGetRes()
-}
-
-type ThreadsListRes interface {
-	threadsListRes()
+type PostsListRes interface {
+	postsListRes()
 }
 
 type UserCreateRes interface {

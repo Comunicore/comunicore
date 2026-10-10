@@ -63,8 +63,8 @@ func encodeMediaUploadRequest(
 	return nil
 }
 
-func encodeThreadAddCommentRequest(
-	req *ThreadCreateCommentRequest,
+func encodePostAddCommentRequest(
+	req *PostCreateCommentRequest,
 	r *http.Request,
 ) error {
 	const contentType = "application/json"
@@ -77,22 +77,8 @@ func encodeThreadAddCommentRequest(
 	return nil
 }
 
-func encodeThreadAddPostRequest(
-	req *ThreadCreatePostRequest,
-	r *http.Request,
-) error {
-	const contentType = "application/json"
-	e := new(jx.Encoder)
-	{
-		req.Encode(e)
-	}
-	encoded := e.Bytes()
-	ht.SetBody(r, bytes.NewReader(encoded), contentType)
-	return nil
-}
-
-func encodeThreadCreateRequest(
-	req *ThreadCreateRequest,
+func encodePostCreateRequest(
+	req *PostCreateRequest,
 	r *http.Request,
 ) error {
 	const contentType = "application/json"

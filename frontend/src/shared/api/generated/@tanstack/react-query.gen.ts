@@ -3,8 +3,8 @@
 import { type DefaultError, type InfiniteData, infiniteQueryOptions, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { analyticsMetricsGet, analyticsVisitBatchSubmit, authLogin, authLogout, mediaGet, mediaUpload, type Options, threadAddPost, threadCreate, threadGet, threadsList, userCreate, userDelete, userGet, userMe, userUpdate } from '../sdk.gen';
-import type { AnalyticsMetricsGetData, AnalyticsMetricsGetError, AnalyticsMetricsGetResponse, AnalyticsVisitBatchSubmitData, AnalyticsVisitBatchSubmitError, AnalyticsVisitBatchSubmitResponse, AuthLoginData, AuthLoginError, AuthLoginResponse, AuthLogoutData, AuthLogoutResponse, MediaGetData, MediaGetError, MediaGetResponse, MediaUploadData, MediaUploadError, MediaUploadResponse2, ThreadAddPostData, ThreadAddPostError, ThreadAddPostResponse, ThreadCreateData, ThreadCreateError, ThreadCreateResponse, ThreadGetData, ThreadGetError, ThreadGetResponse, ThreadsListData, ThreadsListError, ThreadsListResponse, UserCreateData, UserCreateError, UserCreateResponse2, UserDeleteData, UserDeleteResponse, UserGetData, UserGetError, UserGetResponse2, UserMeData, UserMeError, UserMeResponse, UserUpdateData, UserUpdateResponse } from '../types.gen';
+import { analyticsMetricsGet, analyticsVisitBatchSubmit, authLogin, authLogout, mediaGet, mediaUpload, type Options, postAddComment, postCreate, postGet, postsList, userCreate, userDelete, userGet, userMe, userUpdate } from '../sdk.gen';
+import type { AnalyticsMetricsGetData, AnalyticsMetricsGetError, AnalyticsMetricsGetResponse, AnalyticsVisitBatchSubmitData, AnalyticsVisitBatchSubmitError, AnalyticsVisitBatchSubmitResponse, AuthLoginData, AuthLoginError, AuthLoginResponse, AuthLogoutData, AuthLogoutResponse, MediaGetData, MediaGetError, MediaGetResponse, MediaUploadData, MediaUploadError, MediaUploadResponse2, PostAddCommentData, PostAddCommentError, PostAddCommentResponse, PostCreateData, PostCreateError, PostCreateResponse, PostGetData, PostGetError, PostGetResponse, PostsListData, PostsListError, PostsListResponse, UserCreateData, UserCreateError, UserCreateResponse2, UserDeleteData, UserDeleteResponse, UserGetData, UserGetError, UserGetResponse2, UserMeData, UserMeError, UserMeResponse, UserUpdateData, UserUpdateResponse } from '../types.gen';
 
 /**
  * Create a new user
@@ -163,12 +163,12 @@ export const authLogoutMutation = (options?: Partial<Options<AuthLogoutData>>): 
     return mutationOptions;
 };
 
-export const threadsListQueryKey = (options?: Options<ThreadsListData>) => createQueryKey('threadsList', options);
+export const postsListQueryKey = (options?: Options<PostsListData>) => createQueryKey('postsList', options);
 
 /**
- * Get list of threads with pagination
+ * Get list of posts with pagination
  *
- * Получить список веток с пагинацией. Можно использовать либо постраничную пагинацию (page + limit),
+ * Получить список постов с пагинацией. Можно использовать либо постраничную пагинацию (page + limit),
  * либо курсорную пагинацию (after или before). Нужно использовать только один параметр.
  * after, before или page с номером страницы. Если ни один не указан - выводятся самые свежие сообщения.
  * limit - количество сообщений на страницу, по умолчанию 20.
@@ -190,9 +190,9 @@ export const threadsListQueryKey = (options?: Options<ThreadsListData>) => creat
  * а более новым (after) - больший id. И при этом не важно, удалены эти сообщения или нет.
  *
  */
-export const threadsListOptions = (options?: Options<ThreadsListData>) => queryOptions<ThreadsListResponse, ThreadsListError, ThreadsListResponse, ReturnType<typeof threadsListQueryKey>>({
+export const postsListOptions = (options?: Options<PostsListData>) => queryOptions<PostsListResponse, PostsListError, PostsListResponse, ReturnType<typeof postsListQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
-        const { data } = await threadsList({
+        const { data } = await postsList({
             ...options,
             ...queryKey[0],
             signal,
@@ -200,7 +200,7 @@ export const threadsListOptions = (options?: Options<ThreadsListData>) => queryO
         });
         return data;
     },
-    queryKey: threadsListQueryKey(options)
+    queryKey: postsListQueryKey(options)
 });
 
 const createInfiniteParams = <K extends Pick<QueryKey<Options>[0], 'body' | 'headers' | 'path' | 'query'>>(queryKey: QueryKey<Options>, page: K) => {
@@ -232,12 +232,12 @@ const createInfiniteParams = <K extends Pick<QueryKey<Options>[0], 'body' | 'hea
     return params as unknown as typeof page;
 };
 
-export const threadsListInfiniteQueryKey = (options?: Options<ThreadsListData>): QueryKey<Options<ThreadsListData>> => createQueryKey('threadsList', options, true);
+export const postsListInfiniteQueryKey = (options?: Options<PostsListData>): QueryKey<Options<PostsListData>> => createQueryKey('postsList', options, true);
 
 /**
- * Get list of threads with pagination
+ * Get list of posts with pagination
  *
- * Получить список веток с пагинацией. Можно использовать либо постраничную пагинацию (page + limit),
+ * Получить список постов с пагинацией. Можно использовать либо постраничную пагинацию (page + limit),
  * либо курсорную пагинацию (after или before). Нужно использовать только один параметр.
  * after, before или page с номером страницы. Если ни один не указан - выводятся самые свежие сообщения.
  * limit - количество сообщений на страницу, по умолчанию 20.
@@ -259,35 +259,38 @@ export const threadsListInfiniteQueryKey = (options?: Options<ThreadsListData>):
  * а более новым (after) - больший id. И при этом не важно, удалены эти сообщения или нет.
  *
  */
-export const threadsListInfiniteOptions = (options?: Options<ThreadsListData>) => infiniteQueryOptions<ThreadsListResponse, ThreadsListError, InfiniteData<ThreadsListResponse>, QueryKey<Options<ThreadsListData>>, number | Pick<QueryKey<Options<ThreadsListData>>[0], 'body' | 'headers' | 'path' | 'query'>>(
-// @ts-ignore
-{
-    queryFn: async ({ pageParam, queryKey, signal }) => {
-        // @ts-ignore
-        const page: Pick<QueryKey<Options<ThreadsListData>>[0], 'body' | 'headers' | 'path' | 'query'> = typeof pageParam === 'object' ? pageParam : {
-            query: {
-                page: pageParam
-            }
-        };
-        const params = createInfiniteParams(queryKey, page);
-        const { data } = await threadsList({
-            ...options,
-            ...params,
-            signal,
-            throwOnError: true
-        });
-        return data;
-    },
-    queryKey: threadsListInfiniteQueryKey(options)
-});
+export const postsListInfiniteOptions = (options?: Options<PostsListData>) => {
+    const opts = infiniteQueryOptions<PostsListResponse, PostsListError, InfiniteData<PostsListResponse>, QueryKey<Options<PostsListData>>, number | Pick<QueryKey<Options<PostsListData>>[0], 'body' | 'headers' | 'path' | 'query'>>(
+    // @ts-ignore
+    {
+        queryFn: async ({ pageParam, queryKey, signal }) => {
+            // @ts-ignore
+            const page: Pick<QueryKey<Options<PostsListData>>[0], 'body' | 'headers' | 'path' | 'query'> = typeof pageParam === 'object' ? pageParam : {
+                query: {
+                    page: pageParam
+                }
+            };
+            const params = createInfiniteParams(queryKey, page);
+            const { data } = await postsList({
+                ...options,
+                ...params,
+                signal,
+                throwOnError: true
+            });
+            return data;
+        },
+        queryKey: postsListInfiniteQueryKey(options)
+    });
+    return opts as Omit<typeof opts, 'initialData'>;
+};
 
 /**
- * Create a new thread
+ * Create a new post
  */
-export const threadCreateMutation = (options?: Partial<Options<ThreadCreateData>>): UseMutationOptions<ThreadCreateResponse, ThreadCreateError, Options<ThreadCreateData>> => {
-    const mutationOptions: UseMutationOptions<ThreadCreateResponse, ThreadCreateError, Options<ThreadCreateData>> = {
+export const postCreateMutation = (options?: Partial<Options<PostCreateData>>): UseMutationOptions<PostCreateResponse, PostCreateError, Options<PostCreateData>> => {
+    const mutationOptions: UseMutationOptions<PostCreateResponse, PostCreateError, Options<PostCreateData>> = {
         mutationFn: async (fnOptions) => {
-            const { data } = await threadCreate({
+            const { data } = await postCreate({
                 ...options,
                 ...fnOptions,
                 throwOnError: true
@@ -298,14 +301,14 @@ export const threadCreateMutation = (options?: Partial<Options<ThreadCreateData>
     return mutationOptions;
 };
 
-export const threadGetQueryKey = (options: Options<ThreadGetData>) => createQueryKey('threadGet', options);
+export const postGetQueryKey = (options: Options<PostGetData>) => createQueryKey('postGet', options);
 
 /**
- * Get single thread with all posts by thread id
+ * Get single post with all comments by post id
  */
-export const threadGetOptions = (options: Options<ThreadGetData>) => queryOptions<ThreadGetResponse, ThreadGetError, ThreadGetResponse, ReturnType<typeof threadGetQueryKey>>({
+export const postGetOptions = (options: Options<PostGetData>) => queryOptions<PostGetResponse, PostGetError, PostGetResponse, ReturnType<typeof postGetQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
-        const { data } = await threadGet({
+        const { data } = await postGet({
             ...options,
             ...queryKey[0],
             signal,
@@ -313,16 +316,16 @@ export const threadGetOptions = (options: Options<ThreadGetData>) => queryOption
         });
         return data;
     },
-    queryKey: threadGetQueryKey(options)
+    queryKey: postGetQueryKey(options)
 });
 
 /**
- * Add a new post to thread
+ * Add a new comment to post
  */
-export const threadAddPostMutation = (options?: Partial<Options<ThreadAddPostData>>): UseMutationOptions<ThreadAddPostResponse, ThreadAddPostError, Options<ThreadAddPostData>> => {
-    const mutationOptions: UseMutationOptions<ThreadAddPostResponse, ThreadAddPostError, Options<ThreadAddPostData>> = {
+export const postAddCommentMutation = (options?: Partial<Options<PostAddCommentData>>): UseMutationOptions<PostAddCommentResponse, PostAddCommentError, Options<PostAddCommentData>> => {
+    const mutationOptions: UseMutationOptions<PostAddCommentResponse, PostAddCommentError, Options<PostAddCommentData>> = {
         mutationFn: async (fnOptions) => {
-            const { data } = await threadAddPost({
+            const { data } = await postAddComment({
                 ...options,
                 ...fnOptions,
                 throwOnError: true

@@ -159,12 +159,12 @@ paths:
       responses:
         '204':
           description: No Content
-  /api/threads:
+  /api/posts:
     get:
-      operationId: threadsList
-      summary: Get list of threads with pagination
+      operationId: postsList
+      summary: Get list of posts with pagination
       description: |
-        Получить список веток с пагинацией. Можно использовать либо постраничную пагинацию (page + limit),
+        Получить список постов с пагинацией. Можно использовать либо постраничную пагинацию (page + limit),
         либо курсорную пагинацию (after или before). Нужно использовать только один параметр.
         after, before или page с номером страницы. Если ни один не указан - выводятся самые свежие сообщения.
         limit - количество сообщений на страницу, по умолчанию 20.
@@ -188,7 +188,7 @@ paths:
       parameters:
         - name: limit
           in: query
-          description: Number of threads to return
+          description: Number of posts to return
           required: false
           schema:
             type: integer
@@ -202,13 +202,13 @@ paths:
             default: 1
         - name: after
           in: query
-          description: Return threads created after this id (for cursor pagination)
+          description: Return posts created after this id (for cursor pagination)
           required: false
           schema:
             type: integer
         - name: before
           in: query
-          description: Return threads created before this id (for cursor pagination)
+          description: Return posts created before this id (for cursor pagination)
           required: false
           schema:
             type: integer
@@ -218,9 +218,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ThreadListResponse'
+                $ref: '#/components/schemas/PostListResponse'
         "401":
-          description: client must be authenticated to get threads list
+          description: client must be authenticated to get posts list
           content:
             application/json:
               schema:
@@ -228,33 +228,33 @@ paths:
         "500":
           $ref: '#/components/responses/ErrorStringDescription'
     post:
-      operationId: threadCreate
-      summary: Create a new thread
+      operationId: postCreate
+      summary: Create a new post
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ThreadCreateRequest'
+              $ref: '#/components/schemas/PostCreateRequest'
       responses:
         '201':
           description: Created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ThreadListItem'
+                $ref: '#/components/schemas/PostListItem'
         "401":
           $ref: '#/components/responses/ErrorStringDescription'
         "500":
           $ref: '#/components/responses/ErrorStringDescription'
-  /api/threads/{threadId}:
+  /api/posts/{postId}:
     get:
-      operationId: threadGet
-      summary: Get single thread with all posts by thread id
+      operationId: postGet
+      summary: Get single post with all comments by post id
       parameters:
-        - name: threadId
+        - name: postId
           in: path
-          description: Thread id
+          description: Post id
           required: true
           schema:
             type: integer
@@ -264,20 +264,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ThreadWithPostsListResponse'
+                $ref: '#/components/schemas/PostWithCommentsListResponse'
         "400":
           $ref: '#/components/responses/ErrorStringDescription'
         "500":
           $ref: '#/components/responses/ErrorStringDescription'
-  /api/threads/{threadId}/posts:
+  /api/posts/{postId}/comments:
     post:
-      operationId: threadAddPost
-      deprecated: true
-      summary: Add a new post to thread
+      operationId: postAddComment
+      summary: Add a new comment to post
       parameters:
-        - name: threadId
+        - name: postId
           in: path
-          description: Thread id
+          description: Post id
           required: true
           schema:
             type: integer
@@ -286,42 +285,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ThreadCreatePostRequest'
+              $ref: '#/components/schemas/PostCreateCommentRequest'
       responses:
         '201':
           description: Created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ThreadPostItem'
-        "400":
-          $ref: '#/components/responses/ErrorStringDescription'
-        "500":
-          $ref: '#/components/responses/ErrorStringDescription'
-  /api/threads/{threadId}/comments:
-    post:
-      operationId: threadAddComment
-      summary: Add a new comment to thread
-      parameters:
-        - name: threadId
-          in: path
-          description: Thread id
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ThreadCreateCommentRequest'
-      responses:
-        '201':
-          description: Created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ThreadCommentItem'
+                $ref: '#/components/schemas/PostCommentItem'
         "400":
           $ref: '#/components/responses/ErrorStringDescription'
         "500":
@@ -570,13 +541,13 @@ components:
       example:
         login: "john.doe@example.com"
         password: "securepassword123"
-    ThreadListResponse:
+    PostListResponse:
       type: object
       properties:
-        threads:
+        posts:
           type: array
           items:
-            $ref: '#/components/schemas/ThreadListItem'
+            $ref: '#/components/schemas/PostListItem'
         totalCountEstimated:
           type: integer
         havePrev:
@@ -584,22 +555,22 @@ components:
         haveNext:
           type: boolean
       required:
-        - threads
+        - posts
         - totalCountEstimated
         - havePrev
         - haveNext
       example:
-        threads:
+        posts:
           - id: 1
-            title: "First thread"
-            content: "This is the content of the first thread."
+            title: "First post"
+            content: "This is the content of the first post."
             authorId: 42
             authorName: "Petr Semenov"
             postsCount: 5
             createdAt: "2024-01-01T12:00:00Z"
           - id: 2
-            title: "Second thread"
-            content: "This is the content of the second thread."
+            title: "Second post"
+            content: "This is the content of the second post."
             authorId: 43
             authorName: "Anna Ivanova"
             postsCount: 3
@@ -607,7 +578,7 @@ components:
         totalCountEstimated: 100
         havePrev: false
         haveNext: true
-    ThreadListItem:
+    PostListItem:
       type: object
       properties:
         id:
@@ -645,15 +616,15 @@ components:
         - createdAt
       example:
         id: 1
-        title: "First thread"
-        content: "This is the content of the first thread."
+        title: "First post"
+        content: "This is the content of the first post."
         authorId: 42
         authorName: "Petr Semenov"
         authorAvatarUrl: "https://comunicore.mooo.com/storage/media/avatar1.png"
         postsCount: 5
         commentsCount: 5
         createdAt: "2024-01-01T12:00:00Z"
-    ThreadWithPostsListResponse:
+    PostWithCommentsListResponse:
       type: object
       properties:
         id:
@@ -669,9 +640,6 @@ components:
           type: string
         content:
           type: string
-        postsCount:
-          deprecated: true
-          type: integer
           description: Number of reply posts (rows in posts). The opening message is not included.
         commentsCount:
           type: integer
@@ -679,10 +647,10 @@ components:
         createdAt:
           type: string
           format: date-time
-        posts:
+        comments:
           type: array
           items:
-            $ref: '#/components/schemas/ThreadPostItem'
+            $ref: '#/components/schemas/PostCommentItem'
       required:
         - id
         - authorId
@@ -690,20 +658,19 @@ components:
         - authorAvatarUrl
         - title
         - content
-        - postsCount
         - commentsCount
         - createdAt
-        - posts
+        - comments
       example:
         id: 1
-        title: "First thread"
-        content: "This is the content of the first thread."
+        title: "First post"
+        content: "This is the content of the first post."
         authorId: 42
         authorName: "Petr Semenov"
         authorAvatarUrl: "https://comunicore.mooo.com/storage/media/avatar1.png"
-        postsCount: 5
+        commentsCount: 5
         createdAt: "2024-01-01T12:00:00Z"
-        posts:
+        comments:
           - id: 1
             content: "This is the content of the first post."
             authorId: 42
@@ -716,41 +683,7 @@ components:
             authorName: "Anna Ivanova"
             authorAvatarUrl: "https://comunicore.mooo.com/storage/media/avatar2.png"
             createdAt: "2024-01-02T15:30:00Z"
-    ThreadPostItem:
-      deprecated: true
-      type: object
-      properties:
-        id:
-          type: integer
-        authorId:
-          type: integer
-        authorName:
-          type: string
-        authorAvatarUrl:
-          type: string
-          format: uri
-        content:
-          type: string
-        createdAt:
-          type: string
-          format: date-time
-      required:
-        - id
-        - authorId
-        - authorName
-        - authorAvatarUrl
-        - content
-        - createdAt
-      example:
-        id: 1
-        content: "Первый ответ в ветке."
-        authorId: 42
-        authorName: "Petr Semenov"
-        authorAvatarUrl: "https://comunicore.mooo.com/storage/media/avatar1.png"
-        postsCount: 5
-        commentsCount: 3
-        createdAt: "2024-01-01T12:00:00Z"
-    ThreadCommentItem:
+    PostCommentItem:
       type: object
       properties:
         id:
@@ -781,7 +714,7 @@ components:
         authorName: "Petr Semenov"
         authorAvatarUrl: "https://comunicore.mooo.com/storage/media/avatar1.png"
         createdAt: "2024-01-01T12:00:00Z"
-    ThreadCreateRequest:
+    PostCreateRequest:
       type: object
       properties:
         title:
@@ -799,17 +732,7 @@ components:
       example:
         title: "How to learn Go?"
         content: "I want to learn Go, but I don't know where to start. Any advice?"
-    ThreadCreatePostRequest:
-      deprecated: true
-      type: object
-      properties:
-        content:
-          type: string
-      required:
-        - content
-      example:
-        content: "I want to learn Go, but I don't know where to start. Any advice?"
-    ThreadCreateCommentRequest:
+    PostCreateCommentRequest:
       type: object
       properties:
         content:
@@ -896,14 +819,14 @@ components:
         usageCount:
           type: integer
           format: int64
-    AnalyticsTopThread:
+    AnalyticsTopPost:
       type: object
       required:
-        - threadId
+        - postId
         - title
         - repliesInWindow
       properties:
-        threadId:
+        postId:
           type: integer
         title:
           type: string
@@ -929,11 +852,11 @@ components:
       type: object
       required:
         - tag
-        - threadCount
+        - postsCount
       properties:
         tag:
           type: string
-        threadCount:
+        postsCount:
           type: integer
           format: int64
     AnalyticsDayPosts:
@@ -966,7 +889,7 @@ components:
         - topUsersByPosts
         - popularTags
         - postsActivityByDay
-        - topUsersByThreads
+        - topUsersByComments
         - postOnlyUsers
       properties:
         avgActiveTimeMs:
@@ -983,7 +906,7 @@ components:
         connectionDensity:
           type: number
           format: double
-          description: Total replies divided by distinct participants (posts + thread authors)
+          description: Total replies divided by distinct participants (comments + posts authors)
         dropoffChurnPercent:
           type: number
           format: double
@@ -1011,35 +934,35 @@ components:
             $ref: '#/components/schemas/AnalyticsHourBucket'
         topTag:
           $ref: '#/components/schemas/AnalyticsTopTag'
-        topThreadWeekly:
-          $ref: '#/components/schemas/AnalyticsTopThread'
-        topThreadMonthly:
-          $ref: '#/components/schemas/AnalyticsTopThread'
-        topUsersByPosts:
+        topPostWeekly:
+          $ref: '#/components/schemas/AnalyticsTopPost'
+        topPostMonthly:
+          $ref: '#/components/schemas/AnalyticsTopPost'
+        topUsersByComments:
           type: array
           items:
             $ref: '#/components/schemas/AnalyticsUserCount'
-          description: Top-10 users ranked by total posts count
+          description: Top-10 users ranked by total comments count
         popularTags:
           type: array
           items:
             $ref: '#/components/schemas/AnalyticsTagCount'
-          description: Tags ranked by number of tagged threads
+          description: Tags ranked by number of tagged posts
         postsActivityByDay:
           type: array
           items:
             $ref: '#/components/schemas/AnalyticsDayPosts'
           description: Daily posts count time series
-        topUsersByThreads:
+        topUsersByPosts:
           type: array
           items:
             $ref: '#/components/schemas/AnalyticsUserCount'
-          description: Users ranked by total created threads
+          description: Users ranked by total created posts
         postOnlyUsers:
           type: array
           items:
             $ref: '#/components/schemas/AnalyticsUserCount'
-          description: Users with posts but without created threads
+          description: Users with posts but without created posts
     # errors
     ErrorStringMessage:
       description: |

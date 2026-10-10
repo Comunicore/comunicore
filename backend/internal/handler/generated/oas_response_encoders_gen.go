@@ -262,9 +262,9 @@ func encodeMediaUploadResponse(response MediaUploadRes, w http.ResponseWriter) e
 	}
 }
 
-func encodeThreadAddCommentResponse(response ThreadAddCommentRes, w http.ResponseWriter) error {
+func encodePostAddCommentResponse(response PostAddCommentRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
-	case *ThreadCommentItem:
+	case *PostCommentItem:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(201)
 
@@ -276,7 +276,7 @@ func encodeThreadAddCommentResponse(response ThreadAddCommentRes, w http.Respons
 
 		return nil
 
-	case *ThreadAddCommentBadRequest:
+	case *PostAddCommentBadRequest:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(400)
 
@@ -288,7 +288,7 @@ func encodeThreadAddCommentResponse(response ThreadAddCommentRes, w http.Respons
 
 		return nil
 
-	case *ThreadAddCommentInternalServerError:
+	case *PostAddCommentInternalServerError:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(500)
 
@@ -305,9 +305,9 @@ func encodeThreadAddCommentResponse(response ThreadAddCommentRes, w http.Respons
 	}
 }
 
-func encodeThreadAddPostResponse(response ThreadAddPostRes, w http.ResponseWriter) error {
+func encodePostCreateResponse(response PostCreateRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
-	case *ThreadPostItem:
+	case *PostListItem:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(201)
 
@@ -319,50 +319,7 @@ func encodeThreadAddPostResponse(response ThreadAddPostRes, w http.ResponseWrite
 
 		return nil
 
-	case *ThreadAddPostBadRequest:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(400)
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	case *ThreadAddPostInternalServerError:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(500)
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	default:
-		return errors.Errorf("unexpected response type: %T", response)
-	}
-}
-
-func encodeThreadCreateResponse(response ThreadCreateRes, w http.ResponseWriter) error {
-	switch response := response.(type) {
-	case *ThreadListItem:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(201)
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	case *ThreadCreateUnauthorized:
+	case *PostCreateUnauthorized:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(401)
 
@@ -374,7 +331,7 @@ func encodeThreadCreateResponse(response ThreadCreateRes, w http.ResponseWriter)
 
 		return nil
 
-	case *ThreadCreateInternalServerError:
+	case *PostCreateInternalServerError:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(500)
 
@@ -391,9 +348,9 @@ func encodeThreadCreateResponse(response ThreadCreateRes, w http.ResponseWriter)
 	}
 }
 
-func encodeThreadGetResponse(response ThreadGetRes, w http.ResponseWriter) error {
+func encodePostGetResponse(response PostGetRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
-	case *ThreadWithPostsListResponse:
+	case *PostWithCommentsListResponse:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
 
@@ -405,7 +362,7 @@ func encodeThreadGetResponse(response ThreadGetRes, w http.ResponseWriter) error
 
 		return nil
 
-	case *ThreadGetBadRequest:
+	case *PostGetBadRequest:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(400)
 
@@ -417,7 +374,7 @@ func encodeThreadGetResponse(response ThreadGetRes, w http.ResponseWriter) error
 
 		return nil
 
-	case *ThreadGetInternalServerError:
+	case *PostGetInternalServerError:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(500)
 
@@ -434,9 +391,9 @@ func encodeThreadGetResponse(response ThreadGetRes, w http.ResponseWriter) error
 	}
 }
 
-func encodeThreadsListResponse(response ThreadsListRes, w http.ResponseWriter) error {
+func encodePostsListResponse(response PostsListRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
-	case *ThreadListResponse:
+	case *PostListResponse:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
 

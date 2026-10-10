@@ -121,7 +121,7 @@ func (r *AnalyticsRepo) GetMetrics(ctx context.Context, dropoffN, dropoffInactiv
 	weekStart := now.AddDate(0, 0, -7)
 	monthStart := now.AddDate(0, -1, 0)
 
-	weekRow, err := r.queries.AnalyticsTopThreadInRange(ctx, analyticsDb.AnalyticsTopThreadInRangeParams{
+	weekRow, err := r.queries.AnalyticsTopPostInRange(ctx, analyticsDb.AnalyticsTopPostInRangeParams{
 		StartAt: pgTimestamptz(weekStart),
 		EndAt:   pgTimestamptz(now),
 	})
@@ -139,7 +139,7 @@ func (r *AnalyticsRepo) GetMetrics(ctx context.Context, dropoffN, dropoffInactiv
 		}
 	}
 
-	monthRow, err := r.queries.AnalyticsTopThreadInRange(ctx, analyticsDb.AnalyticsTopThreadInRangeParams{
+	monthRow, err := r.queries.AnalyticsTopPostInRange(ctx, analyticsDb.AnalyticsTopPostInRangeParams{
 		StartAt: pgTimestamptz(monthStart),
 		EndAt:   pgTimestamptz(now),
 	})
@@ -157,7 +157,7 @@ func (r *AnalyticsRepo) GetMetrics(ctx context.Context, dropoffN, dropoffInactiv
 		}
 	}
 
-	topUsersByPosts, err := r.queries.AnalyticsTopUsersByComments(ctx)
+	topUsersByPosts, err := r.queries.AnalyticsTopUsersByPosts(ctx)
 	if err != nil {
 		return out, err
 	}
@@ -166,19 +166,19 @@ func (r *AnalyticsRepo) GetMetrics(ctx context.Context, dropoffN, dropoffInactiv
 		out.TopUsersByPosts = append(out.TopUsersByPosts, model.AnalyticsUserCount{
 			UserID: int(row.ID),
 			Name:   row.Name,
-			Count:  row.CommentCount,
+			Count:  row.PostCount,
 		})
 	}
 
-	popularTags, err := r.queries.AnalyticsPopularTagsByThreadCount(ctx)
+	popularTags, err := r.queries.AnalyticsPopularTagsByPostCount(ctx)
 	if err != nil {
 		return out, err
 	}
 	out.PopularTags = make([]model.AnalyticsTagCount, 0, len(popularTags))
 	for _, row := range popularTags {
 		out.PopularTags = append(out.PopularTags, model.AnalyticsTagCount{
-			Tag:         row.Tag,
-			ThreadCount: row.ThreadCount,
+			Tag:       row.Tag,
+			PostCount: row.PostCount,
 		})
 	}
 
@@ -194,20 +194,20 @@ func (r *AnalyticsRepo) GetMetrics(ctx context.Context, dropoffN, dropoffInactiv
 		})
 	}
 
-	topUsersByThreads, err := r.queries.AnalyticsTopUsersByThreads(ctx)
-	if err != nil {
-		return out, err
-	}
-	out.TopUsersByThreads = make([]model.AnalyticsUserCount, 0, len(topUsersByThreads))
-	for _, row := range topUsersByThreads {
-		out.TopUsersByThreads = append(out.TopUsersByThreads, model.AnalyticsUserCount{
-			UserID: int(row.ID),
-			Name:   row.Name,
-			Count:  row.ThreadCount,
-		})
-	}
+	// topUsersByPosts, err := r.queries.AnalyticsTopUsersByPosts(ctx)
+	// if err != nil {
+	// 	return out, err
+	// }
+	// out.TopUsersByPosts = make([]model.AnalyticsUserCount, 0, len(topUsersByPosts))
+	// for _, row := range topUsersByPosts {
+	// 	out.TopUsersByPosts = append(out.TopUsersByPosts, model.AnalyticsUserCount{
+	// 		UserID: int(row.ID),
+	// 		Name:   row.Name,
+	// 		Count:  row.PostCount,
+	// 	})
+	// }
 
-	postOnlyUsers, err := r.queries.AnalyticsUsersWithCommentsButNoThreads(ctx)
+	postOnlyUsers, err := r.queries.AnalyticsUsersWithCommentsButNoPosts(ctx)
 	if err != nil {
 		return out, err
 	}

@@ -654,12 +654,12 @@ func (s *Server) handleMediaUploadRequest(args [0]string, argsEscaped bool, w ht
 	}
 }
 
-// handleThreadAddCommentRequest handles threadAddComment operation.
+// handlePostAddCommentRequest handles postAddComment operation.
 //
-// Add a new comment to thread.
+// Add a new comment to post.
 //
-// POST /api/threads/{threadId}/comments
-func (s *Server) handleThreadAddCommentRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
+// POST /api/posts/{postId}/comments
+func (s *Server) handlePostAddCommentRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	statusWriter := &codeRecorder{ResponseWriter: w}
 	w = statusWriter
 	ctx := r.Context()
@@ -667,15 +667,15 @@ func (s *Server) handleThreadAddCommentRequest(args [1]string, argsEscaped bool,
 	var (
 		err          error
 		opErrContext = ogenerrors.OperationContext{
-			Name: ThreadAddCommentOperation,
-			ID:   "threadAddComment",
+			Name: PostAddCommentOperation,
+			ID:   "postAddComment",
 		}
 	)
 	{
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityCookieAuth(ctx, ThreadAddCommentOperation, r)
+			sctx, ok, err := s.securityCookieAuth(ctx, PostAddCommentOperation, r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
@@ -715,7 +715,7 @@ func (s *Server) handleThreadAddCommentRequest(args [1]string, argsEscaped bool,
 			return
 		}
 	}
-	params, err := decodeThreadAddCommentParams(args, argsEscaped, r)
+	params, err := decodePostAddCommentParams(args, argsEscaped, r)
 	if err != nil {
 		err = &ogenerrors.DecodeParamsError{
 			OperationContext: opErrContext,
@@ -727,7 +727,7 @@ func (s *Server) handleThreadAddCommentRequest(args [1]string, argsEscaped bool,
 	}
 
 	var rawBody []byte
-	request, rawBody, close, err := s.decodeThreadAddCommentRequest(r)
+	request, rawBody, close, err := s.decodePostAddCommentRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
 			OperationContext: opErrContext,
@@ -743,28 +743,28 @@ func (s *Server) handleThreadAddCommentRequest(args [1]string, argsEscaped bool,
 		}
 	}()
 
-	var response ThreadAddCommentRes
+	var response PostAddCommentRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
-			OperationName:    ThreadAddCommentOperation,
-			OperationSummary: "Add a new comment to thread",
-			OperationID:      "threadAddComment",
+			OperationName:    PostAddCommentOperation,
+			OperationSummary: "Add a new comment to post",
+			OperationID:      "postAddComment",
 			Body:             request,
 			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
-					Name: "threadId",
+					Name: "postId",
 					In:   "path",
-				}: params.ThreadId,
+				}: params.PostId,
 			},
 			Raw: r,
 		}
 
 		type (
-			Request  = *ThreadCreateCommentRequest
-			Params   = ThreadAddCommentParams
-			Response = ThreadAddCommentRes
+			Request  = *PostCreateCommentRequest
+			Params   = PostAddCommentParams
+			Response = PostAddCommentRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -773,14 +773,14 @@ func (s *Server) handleThreadAddCommentRequest(args [1]string, argsEscaped bool,
 		](
 			m,
 			mreq,
-			unpackThreadAddCommentParams,
+			unpackPostAddCommentParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.ThreadAddComment(ctx, request, params)
+				response, err = s.h.PostAddComment(ctx, request, params)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.ThreadAddComment(ctx, request, params)
+		response, err = s.h.PostAddComment(ctx, request, params)
 	}
 	if err != nil {
 		defer recordError("Internal", err)
@@ -788,7 +788,7 @@ func (s *Server) handleThreadAddCommentRequest(args [1]string, argsEscaped bool,
 		return
 	}
 
-	if err := encodeThreadAddCommentResponse(response, w); err != nil {
+	if err := encodePostAddCommentResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -797,14 +797,12 @@ func (s *Server) handleThreadAddCommentRequest(args [1]string, argsEscaped bool,
 	}
 }
 
-// handleThreadAddPostRequest handles threadAddPost operation.
+// handlePostCreateRequest handles postCreate operation.
 //
-// Add a new post to thread.
+// Create a new post.
 //
-// Deprecated: schema marks this operation as deprecated.
-//
-// POST /api/threads/{threadId}/posts
-func (s *Server) handleThreadAddPostRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
+// POST /api/posts
+func (s *Server) handlePostCreateRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	statusWriter := &codeRecorder{ResponseWriter: w}
 	w = statusWriter
 	ctx := r.Context()
@@ -812,158 +810,15 @@ func (s *Server) handleThreadAddPostRequest(args [1]string, argsEscaped bool, w 
 	var (
 		err          error
 		opErrContext = ogenerrors.OperationContext{
-			Name: ThreadAddPostOperation,
-			ID:   "threadAddPost",
+			Name: PostCreateOperation,
+			ID:   "postCreate",
 		}
 	)
 	{
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityCookieAuth(ctx, ThreadAddPostOperation, r)
-			if err != nil {
-				err = &ogenerrors.SecurityError{
-					OperationContext: opErrContext,
-					Security:         "CookieAuth",
-					Err:              err,
-				}
-				defer recordError("Security:CookieAuth", err)
-				s.cfg.ErrorHandler(ctx, w, r, err)
-				return
-			}
-			if ok {
-				satisfied[0] |= 1 << 0
-				ctx = sctx
-			}
-		}
-
-		if ok := func() bool {
-		nextRequirement:
-			for _, requirement := range []bitset{
-				{0b00000001},
-			} {
-				for i, mask := range requirement {
-					if satisfied[i]&mask != mask {
-						continue nextRequirement
-					}
-				}
-				return true
-			}
-			return false
-		}(); !ok {
-			err = &ogenerrors.SecurityError{
-				OperationContext: opErrContext,
-				Err:              ogenerrors.ErrSecurityRequirementIsNotSatisfied,
-			}
-			defer recordError("Security", err)
-			s.cfg.ErrorHandler(ctx, w, r, err)
-			return
-		}
-	}
-	params, err := decodeThreadAddPostParams(args, argsEscaped, r)
-	if err != nil {
-		err = &ogenerrors.DecodeParamsError{
-			OperationContext: opErrContext,
-			Err:              err,
-		}
-		defer recordError("DecodeParams", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
-		return
-	}
-
-	var rawBody []byte
-	request, rawBody, close, err := s.decodeThreadAddPostRequest(r)
-	if err != nil {
-		err = &ogenerrors.DecodeRequestError{
-			OperationContext: opErrContext,
-			Err:              err,
-		}
-		defer recordError("DecodeRequest", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
-		return
-	}
-	defer func() {
-		if err := close(); err != nil {
-			recordError("CloseRequest", err)
-		}
-	}()
-
-	var response ThreadAddPostRes
-	if m := s.cfg.Middleware; m != nil {
-		mreq := middleware.Request{
-			Context:          ctx,
-			OperationName:    ThreadAddPostOperation,
-			OperationSummary: "Add a new post to thread",
-			OperationID:      "threadAddPost",
-			Body:             request,
-			RawBody:          rawBody,
-			Params: middleware.Parameters{
-				{
-					Name: "threadId",
-					In:   "path",
-				}: params.ThreadId,
-			},
-			Raw: r,
-		}
-
-		type (
-			Request  = *ThreadCreatePostRequest
-			Params   = ThreadAddPostParams
-			Response = ThreadAddPostRes
-		)
-		response, err = middleware.HookMiddleware[
-			Request,
-			Params,
-			Response,
-		](
-			m,
-			mreq,
-			unpackThreadAddPostParams,
-			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.ThreadAddPost(ctx, request, params)
-				return response, err
-			},
-		)
-	} else {
-		response, err = s.h.ThreadAddPost(ctx, request, params)
-	}
-	if err != nil {
-		defer recordError("Internal", err)
-		s.cfg.ErrorHandler(ctx, w, r, err)
-		return
-	}
-
-	if err := encodeThreadAddPostResponse(response, w); err != nil {
-		defer recordError("EncodeResponse", err)
-		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
-			s.cfg.ErrorHandler(ctx, w, r, err)
-		}
-		return
-	}
-}
-
-// handleThreadCreateRequest handles threadCreate operation.
-//
-// Create a new thread.
-//
-// POST /api/threads
-func (s *Server) handleThreadCreateRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
-	statusWriter := &codeRecorder{ResponseWriter: w}
-	w = statusWriter
-	ctx := r.Context()
-
-	var (
-		err          error
-		opErrContext = ogenerrors.OperationContext{
-			Name: ThreadCreateOperation,
-			ID:   "threadCreate",
-		}
-	)
-	{
-		type bitset = [1]uint8
-		var satisfied bitset
-		{
-			sctx, ok, err := s.securityCookieAuth(ctx, ThreadCreateOperation, r)
+			sctx, ok, err := s.securityCookieAuth(ctx, PostCreateOperation, r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
@@ -1005,7 +860,7 @@ func (s *Server) handleThreadCreateRequest(args [0]string, argsEscaped bool, w h
 	}
 
 	var rawBody []byte
-	request, rawBody, close, err := s.decodeThreadCreateRequest(r)
+	request, rawBody, close, err := s.decodePostCreateRequest(r)
 	if err != nil {
 		err = &ogenerrors.DecodeRequestError{
 			OperationContext: opErrContext,
@@ -1021,13 +876,13 @@ func (s *Server) handleThreadCreateRequest(args [0]string, argsEscaped bool, w h
 		}
 	}()
 
-	var response ThreadCreateRes
+	var response PostCreateRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
-			OperationName:    ThreadCreateOperation,
-			OperationSummary: "Create a new thread",
-			OperationID:      "threadCreate",
+			OperationName:    PostCreateOperation,
+			OperationSummary: "Create a new post",
+			OperationID:      "postCreate",
 			Body:             request,
 			RawBody:          rawBody,
 			Params:           middleware.Parameters{},
@@ -1035,9 +890,9 @@ func (s *Server) handleThreadCreateRequest(args [0]string, argsEscaped bool, w h
 		}
 
 		type (
-			Request  = *ThreadCreateRequest
+			Request  = *PostCreateRequest
 			Params   = struct{}
-			Response = ThreadCreateRes
+			Response = PostCreateRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -1048,12 +903,12 @@ func (s *Server) handleThreadCreateRequest(args [0]string, argsEscaped bool, w h
 			mreq,
 			nil,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.ThreadCreate(ctx, request)
+				response, err = s.h.PostCreate(ctx, request)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.ThreadCreate(ctx, request)
+		response, err = s.h.PostCreate(ctx, request)
 	}
 	if err != nil {
 		defer recordError("Internal", err)
@@ -1061,7 +916,7 @@ func (s *Server) handleThreadCreateRequest(args [0]string, argsEscaped bool, w h
 		return
 	}
 
-	if err := encodeThreadCreateResponse(response, w); err != nil {
+	if err := encodePostCreateResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -1070,12 +925,12 @@ func (s *Server) handleThreadCreateRequest(args [0]string, argsEscaped bool, w h
 	}
 }
 
-// handleThreadGetRequest handles threadGet operation.
+// handlePostGetRequest handles postGet operation.
 //
-// Get single thread with all posts by thread id.
+// Get single post with all comments by post id.
 //
-// GET /api/threads/{threadId}
-func (s *Server) handleThreadGetRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
+// GET /api/posts/{postId}
+func (s *Server) handlePostGetRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	statusWriter := &codeRecorder{ResponseWriter: w}
 	w = statusWriter
 	ctx := r.Context()
@@ -1083,15 +938,15 @@ func (s *Server) handleThreadGetRequest(args [1]string, argsEscaped bool, w http
 	var (
 		err          error
 		opErrContext = ogenerrors.OperationContext{
-			Name: ThreadGetOperation,
-			ID:   "threadGet",
+			Name: PostGetOperation,
+			ID:   "postGet",
 		}
 	)
 	{
 		type bitset = [1]uint8
 		var satisfied bitset
 		{
-			sctx, ok, err := s.securityCookieAuth(ctx, ThreadGetOperation, r)
+			sctx, ok, err := s.securityCookieAuth(ctx, PostGetOperation, r)
 			if err != nil {
 				err = &ogenerrors.SecurityError{
 					OperationContext: opErrContext,
@@ -1131,7 +986,7 @@ func (s *Server) handleThreadGetRequest(args [1]string, argsEscaped bool, w http
 			return
 		}
 	}
-	params, err := decodeThreadGetParams(args, argsEscaped, r)
+	params, err := decodePostGetParams(args, argsEscaped, r)
 	if err != nil {
 		err = &ogenerrors.DecodeParamsError{
 			OperationContext: opErrContext,
@@ -1144,28 +999,28 @@ func (s *Server) handleThreadGetRequest(args [1]string, argsEscaped bool, w http
 
 	var rawBody []byte
 
-	var response ThreadGetRes
+	var response PostGetRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
-			OperationName:    ThreadGetOperation,
-			OperationSummary: "Get single thread with all posts by thread id",
-			OperationID:      "threadGet",
+			OperationName:    PostGetOperation,
+			OperationSummary: "Get single post with all comments by post id",
+			OperationID:      "postGet",
 			Body:             nil,
 			RawBody:          rawBody,
 			Params: middleware.Parameters{
 				{
-					Name: "threadId",
+					Name: "postId",
 					In:   "path",
-				}: params.ThreadId,
+				}: params.PostId,
 			},
 			Raw: r,
 		}
 
 		type (
 			Request  = struct{}
-			Params   = ThreadGetParams
-			Response = ThreadGetRes
+			Params   = PostGetParams
+			Response = PostGetRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -1174,14 +1029,14 @@ func (s *Server) handleThreadGetRequest(args [1]string, argsEscaped bool, w http
 		](
 			m,
 			mreq,
-			unpackThreadGetParams,
+			unpackPostGetParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.ThreadGet(ctx, params)
+				response, err = s.h.PostGet(ctx, params)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.ThreadGet(ctx, params)
+		response, err = s.h.PostGet(ctx, params)
 	}
 	if err != nil {
 		defer recordError("Internal", err)
@@ -1189,7 +1044,7 @@ func (s *Server) handleThreadGetRequest(args [1]string, argsEscaped bool, w http
 		return
 	}
 
-	if err := encodeThreadGetResponse(response, w); err != nil {
+	if err := encodePostGetResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -1198,9 +1053,9 @@ func (s *Server) handleThreadGetRequest(args [1]string, argsEscaped bool, w http
 	}
 }
 
-// handleThreadsListRequest handles threadsList operation.
+// handlePostsListRequest handles postsList operation.
 //
-// Получить список веток с пагинацией. Можно
+// Получить список постов с пагинацией. Можно
 // использовать либо постраничную пагинацию (page + limit),
 // либо курсорную пагинацию (after или before). Нужно
 // использовать только один параметр. after, before или page с
@@ -1236,8 +1091,8 @@ func (s *Server) handleThreadGetRequest(args [1]string, argsEscaped bool, w http
 // более новым (after) - больший id. И при этом не важно,
 // удалены эти сообщения или нет.
 //
-// GET /api/threads
-func (s *Server) handleThreadsListRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
+// GET /api/posts
+func (s *Server) handlePostsListRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	statusWriter := &codeRecorder{ResponseWriter: w}
 	w = statusWriter
 	ctx := r.Context()
@@ -1245,11 +1100,11 @@ func (s *Server) handleThreadsListRequest(args [0]string, argsEscaped bool, w ht
 	var (
 		err          error
 		opErrContext = ogenerrors.OperationContext{
-			Name: ThreadsListOperation,
-			ID:   "threadsList",
+			Name: PostsListOperation,
+			ID:   "postsList",
 		}
 	)
-	params, err := decodeThreadsListParams(args, argsEscaped, r)
+	params, err := decodePostsListParams(args, argsEscaped, r)
 	if err != nil {
 		err = &ogenerrors.DecodeParamsError{
 			OperationContext: opErrContext,
@@ -1262,13 +1117,13 @@ func (s *Server) handleThreadsListRequest(args [0]string, argsEscaped bool, w ht
 
 	var rawBody []byte
 
-	var response ThreadsListRes
+	var response PostsListRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
-			OperationName:    ThreadsListOperation,
-			OperationSummary: "Get list of threads with pagination",
-			OperationID:      "threadsList",
+			OperationName:    PostsListOperation,
+			OperationSummary: "Get list of posts with pagination",
+			OperationID:      "postsList",
 			Body:             nil,
 			RawBody:          rawBody,
 			Params: middleware.Parameters{
@@ -1294,8 +1149,8 @@ func (s *Server) handleThreadsListRequest(args [0]string, argsEscaped bool, w ht
 
 		type (
 			Request  = struct{}
-			Params   = ThreadsListParams
-			Response = ThreadsListRes
+			Params   = PostsListParams
+			Response = PostsListRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -1304,14 +1159,14 @@ func (s *Server) handleThreadsListRequest(args [0]string, argsEscaped bool, w ht
 		](
 			m,
 			mreq,
-			unpackThreadsListParams,
+			unpackPostsListParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.ThreadsList(ctx, params)
+				response, err = s.h.PostsList(ctx, params)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.ThreadsList(ctx, params)
+		response, err = s.h.PostsList(ctx, params)
 	}
 	if err != nil {
 		defer recordError("Internal", err)
@@ -1319,7 +1174,7 @@ func (s *Server) handleThreadsListRequest(args [0]string, argsEscaped bool, w ht
 		return
 	}
 
-	if err := encodeThreadsListResponse(response, w); err != nil {
+	if err := encodePostsListResponse(response, w); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)

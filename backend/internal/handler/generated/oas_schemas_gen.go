@@ -70,7 +70,7 @@ func (*AnalyticsMetricsGetInternalServerErrorApplicationJSON) analyticsMetricsGe
 func (*AnalyticsMetricsGetInternalServerErrorApplicationJSON) analyticsVisitBatchSubmitRes() {}
 func (*AnalyticsMetricsGetInternalServerErrorApplicationJSON) authLoginRes()                 {}
 func (*AnalyticsMetricsGetInternalServerErrorApplicationJSON) mediaGetRes()                  {}
-func (*AnalyticsMetricsGetInternalServerErrorApplicationJSON) threadsListRes()               {}
+func (*AnalyticsMetricsGetInternalServerErrorApplicationJSON) postsListRes()                 {}
 func (*AnalyticsMetricsGetInternalServerErrorApplicationJSON) userCreateRes()                {}
 func (*AnalyticsMetricsGetInternalServerErrorApplicationJSON) userMeRes()                    {}
 
@@ -81,7 +81,7 @@ type AnalyticsMetricsResponse struct {
 	// Mean tab visible duration per batch, ms.
 	AvgVisibleTimeMs float64 `json:"avgVisibleTimeMs"`
 	MaxActiveTimeMs  int64   `json:"maxActiveTimeMs"`
-	// Total replies divided by distinct participants (posts + thread authors).
+	// Total replies divided by distinct participants (comments + posts authors).
 	ConnectionDensity float64 `json:"connectionDensity"`
 	// Share of users with ≥N posts inactive for dropoffInactiveDays.
 	DropoffChurnPercent  float64 `json:"dropoffChurnPercent"`
@@ -94,17 +94,17 @@ type AnalyticsMetricsResponse struct {
 	MobilePctUsers    float64               `json:"mobilePctUsers"`
 	ActivityByHourUtc []AnalyticsHourBucket `json:"activityByHourUtc"`
 	TopTag            OptAnalyticsTopTag    `json:"topTag"`
-	TopThreadWeekly   OptAnalyticsTopThread `json:"topThreadWeekly"`
-	TopThreadMonthly  OptAnalyticsTopThread `json:"topThreadMonthly"`
-	// Top-10 users ranked by total posts count.
-	TopUsersByPosts []AnalyticsUserCount `json:"topUsersByPosts"`
-	// Tags ranked by number of tagged threads.
+	TopPostWeekly     OptAnalyticsTopPost   `json:"topPostWeekly"`
+	TopPostMonthly    OptAnalyticsTopPost   `json:"topPostMonthly"`
+	// Top-10 users ranked by total comments count.
+	TopUsersByComments []AnalyticsUserCount `json:"topUsersByComments"`
+	// Tags ranked by number of tagged posts.
 	PopularTags []AnalyticsTagCount `json:"popularTags"`
 	// Daily posts count time series.
 	PostsActivityByDay []AnalyticsDayPosts `json:"postsActivityByDay"`
-	// Users ranked by total created threads.
-	TopUsersByThreads []AnalyticsUserCount `json:"topUsersByThreads"`
-	// Users with posts but without created threads.
+	// Users ranked by total created posts.
+	TopUsersByPosts []AnalyticsUserCount `json:"topUsersByPosts"`
+	// Users with posts but without created posts.
 	PostOnlyUsers []AnalyticsUserCount `json:"postOnlyUsers"`
 }
 
@@ -173,19 +173,19 @@ func (s *AnalyticsMetricsResponse) GetTopTag() OptAnalyticsTopTag {
 	return s.TopTag
 }
 
-// GetTopThreadWeekly returns the value of TopThreadWeekly.
-func (s *AnalyticsMetricsResponse) GetTopThreadWeekly() OptAnalyticsTopThread {
-	return s.TopThreadWeekly
+// GetTopPostWeekly returns the value of TopPostWeekly.
+func (s *AnalyticsMetricsResponse) GetTopPostWeekly() OptAnalyticsTopPost {
+	return s.TopPostWeekly
 }
 
-// GetTopThreadMonthly returns the value of TopThreadMonthly.
-func (s *AnalyticsMetricsResponse) GetTopThreadMonthly() OptAnalyticsTopThread {
-	return s.TopThreadMonthly
+// GetTopPostMonthly returns the value of TopPostMonthly.
+func (s *AnalyticsMetricsResponse) GetTopPostMonthly() OptAnalyticsTopPost {
+	return s.TopPostMonthly
 }
 
-// GetTopUsersByPosts returns the value of TopUsersByPosts.
-func (s *AnalyticsMetricsResponse) GetTopUsersByPosts() []AnalyticsUserCount {
-	return s.TopUsersByPosts
+// GetTopUsersByComments returns the value of TopUsersByComments.
+func (s *AnalyticsMetricsResponse) GetTopUsersByComments() []AnalyticsUserCount {
+	return s.TopUsersByComments
 }
 
 // GetPopularTags returns the value of PopularTags.
@@ -198,9 +198,9 @@ func (s *AnalyticsMetricsResponse) GetPostsActivityByDay() []AnalyticsDayPosts {
 	return s.PostsActivityByDay
 }
 
-// GetTopUsersByThreads returns the value of TopUsersByThreads.
-func (s *AnalyticsMetricsResponse) GetTopUsersByThreads() []AnalyticsUserCount {
-	return s.TopUsersByThreads
+// GetTopUsersByPosts returns the value of TopUsersByPosts.
+func (s *AnalyticsMetricsResponse) GetTopUsersByPosts() []AnalyticsUserCount {
+	return s.TopUsersByPosts
 }
 
 // GetPostOnlyUsers returns the value of PostOnlyUsers.
@@ -273,19 +273,19 @@ func (s *AnalyticsMetricsResponse) SetTopTag(val OptAnalyticsTopTag) {
 	s.TopTag = val
 }
 
-// SetTopThreadWeekly sets the value of TopThreadWeekly.
-func (s *AnalyticsMetricsResponse) SetTopThreadWeekly(val OptAnalyticsTopThread) {
-	s.TopThreadWeekly = val
+// SetTopPostWeekly sets the value of TopPostWeekly.
+func (s *AnalyticsMetricsResponse) SetTopPostWeekly(val OptAnalyticsTopPost) {
+	s.TopPostWeekly = val
 }
 
-// SetTopThreadMonthly sets the value of TopThreadMonthly.
-func (s *AnalyticsMetricsResponse) SetTopThreadMonthly(val OptAnalyticsTopThread) {
-	s.TopThreadMonthly = val
+// SetTopPostMonthly sets the value of TopPostMonthly.
+func (s *AnalyticsMetricsResponse) SetTopPostMonthly(val OptAnalyticsTopPost) {
+	s.TopPostMonthly = val
 }
 
-// SetTopUsersByPosts sets the value of TopUsersByPosts.
-func (s *AnalyticsMetricsResponse) SetTopUsersByPosts(val []AnalyticsUserCount) {
-	s.TopUsersByPosts = val
+// SetTopUsersByComments sets the value of TopUsersByComments.
+func (s *AnalyticsMetricsResponse) SetTopUsersByComments(val []AnalyticsUserCount) {
+	s.TopUsersByComments = val
 }
 
 // SetPopularTags sets the value of PopularTags.
@@ -298,9 +298,9 @@ func (s *AnalyticsMetricsResponse) SetPostsActivityByDay(val []AnalyticsDayPosts
 	s.PostsActivityByDay = val
 }
 
-// SetTopUsersByThreads sets the value of TopUsersByThreads.
-func (s *AnalyticsMetricsResponse) SetTopUsersByThreads(val []AnalyticsUserCount) {
-	s.TopUsersByThreads = val
+// SetTopUsersByPosts sets the value of TopUsersByPosts.
+func (s *AnalyticsMetricsResponse) SetTopUsersByPosts(val []AnalyticsUserCount) {
+	s.TopUsersByPosts = val
 }
 
 // SetPostOnlyUsers sets the value of PostOnlyUsers.
@@ -312,8 +312,8 @@ func (*AnalyticsMetricsResponse) analyticsMetricsGetRes() {}
 
 // Ref: #/components/schemas/AnalyticsTagCount
 type AnalyticsTagCount struct {
-	Tag         string `json:"tag"`
-	ThreadCount int64  `json:"threadCount"`
+	Tag        string `json:"tag"`
+	PostsCount int64  `json:"postsCount"`
 }
 
 // GetTag returns the value of Tag.
@@ -321,9 +321,9 @@ func (s *AnalyticsTagCount) GetTag() string {
 	return s.Tag
 }
 
-// GetThreadCount returns the value of ThreadCount.
-func (s *AnalyticsTagCount) GetThreadCount() int64 {
-	return s.ThreadCount
+// GetPostsCount returns the value of PostsCount.
+func (s *AnalyticsTagCount) GetPostsCount() int64 {
+	return s.PostsCount
 }
 
 // SetTag sets the value of Tag.
@@ -331,9 +331,47 @@ func (s *AnalyticsTagCount) SetTag(val string) {
 	s.Tag = val
 }
 
-// SetThreadCount sets the value of ThreadCount.
-func (s *AnalyticsTagCount) SetThreadCount(val int64) {
-	s.ThreadCount = val
+// SetPostsCount sets the value of PostsCount.
+func (s *AnalyticsTagCount) SetPostsCount(val int64) {
+	s.PostsCount = val
+}
+
+// Ref: #/components/schemas/AnalyticsTopPost
+type AnalyticsTopPost struct {
+	PostId int    `json:"postId"`
+	Title  string `json:"title"`
+	// Number of reply posts in the selected time window.
+	RepliesInWindow int64 `json:"repliesInWindow"`
+}
+
+// GetPostId returns the value of PostId.
+func (s *AnalyticsTopPost) GetPostId() int {
+	return s.PostId
+}
+
+// GetTitle returns the value of Title.
+func (s *AnalyticsTopPost) GetTitle() string {
+	return s.Title
+}
+
+// GetRepliesInWindow returns the value of RepliesInWindow.
+func (s *AnalyticsTopPost) GetRepliesInWindow() int64 {
+	return s.RepliesInWindow
+}
+
+// SetPostId sets the value of PostId.
+func (s *AnalyticsTopPost) SetPostId(val int) {
+	s.PostId = val
+}
+
+// SetTitle sets the value of Title.
+func (s *AnalyticsTopPost) SetTitle(val string) {
+	s.Title = val
+}
+
+// SetRepliesInWindow sets the value of RepliesInWindow.
+func (s *AnalyticsTopPost) SetRepliesInWindow(val int64) {
+	s.RepliesInWindow = val
 }
 
 // Ref: #/components/schemas/AnalyticsTopTag
@@ -360,44 +398,6 @@ func (s *AnalyticsTopTag) SetTag(val string) {
 // SetUsageCount sets the value of UsageCount.
 func (s *AnalyticsTopTag) SetUsageCount(val int64) {
 	s.UsageCount = val
-}
-
-// Ref: #/components/schemas/AnalyticsTopThread
-type AnalyticsTopThread struct {
-	ThreadId int    `json:"threadId"`
-	Title    string `json:"title"`
-	// Number of reply posts in the selected time window.
-	RepliesInWindow int64 `json:"repliesInWindow"`
-}
-
-// GetThreadId returns the value of ThreadId.
-func (s *AnalyticsTopThread) GetThreadId() int {
-	return s.ThreadId
-}
-
-// GetTitle returns the value of Title.
-func (s *AnalyticsTopThread) GetTitle() string {
-	return s.Title
-}
-
-// GetRepliesInWindow returns the value of RepliesInWindow.
-func (s *AnalyticsTopThread) GetRepliesInWindow() int64 {
-	return s.RepliesInWindow
-}
-
-// SetThreadId sets the value of ThreadId.
-func (s *AnalyticsTopThread) SetThreadId(val int) {
-	s.ThreadId = val
-}
-
-// SetTitle sets the value of Title.
-func (s *AnalyticsTopThread) SetTitle(val string) {
-	s.Title = val
-}
-
-// SetRepliesInWindow sets the value of RepliesInWindow.
-func (s *AnalyticsTopThread) SetRepliesInWindow(val int64) {
-	s.RepliesInWindow = val
 }
 
 // Ref: #/components/schemas/AnalyticsUserCount
@@ -689,7 +689,7 @@ func (s *ErrorStringMessage) SetMessage(val string) {
 
 func (*ErrorStringMessage) analyticsMetricsGetRes()       {}
 func (*ErrorStringMessage) analyticsVisitBatchSubmitRes() {}
-func (*ErrorStringMessage) threadsListRes()               {}
+func (*ErrorStringMessage) postsListRes()                 {}
 func (*ErrorStringMessage) userMeRes()                    {}
 
 type ErrorStringMessageCode string
@@ -805,6 +805,52 @@ type MediaUploadUnauthorized ErrorStringMessage
 
 func (*MediaUploadUnauthorized) mediaUploadRes() {}
 
+// NewOptAnalyticsTopPost returns new OptAnalyticsTopPost with value set to v.
+func NewOptAnalyticsTopPost(v AnalyticsTopPost) OptAnalyticsTopPost {
+	return OptAnalyticsTopPost{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptAnalyticsTopPost is optional AnalyticsTopPost.
+type OptAnalyticsTopPost struct {
+	Value AnalyticsTopPost
+	Set   bool
+}
+
+// IsSet returns true if OptAnalyticsTopPost was set.
+func (o OptAnalyticsTopPost) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptAnalyticsTopPost) Reset() {
+	var v AnalyticsTopPost
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptAnalyticsTopPost) SetTo(v AnalyticsTopPost) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptAnalyticsTopPost) Get() (v AnalyticsTopPost, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptAnalyticsTopPost) Or(d AnalyticsTopPost) AnalyticsTopPost {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptAnalyticsTopTag returns new OptAnalyticsTopTag with value set to v.
 func NewOptAnalyticsTopTag(v AnalyticsTopTag) OptAnalyticsTopTag {
 	return OptAnalyticsTopTag{
@@ -845,52 +891,6 @@ func (o OptAnalyticsTopTag) Get() (v AnalyticsTopTag, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptAnalyticsTopTag) Or(d AnalyticsTopTag) AnalyticsTopTag {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptAnalyticsTopThread returns new OptAnalyticsTopThread with value set to v.
-func NewOptAnalyticsTopThread(v AnalyticsTopThread) OptAnalyticsTopThread {
-	return OptAnalyticsTopThread{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptAnalyticsTopThread is optional AnalyticsTopThread.
-type OptAnalyticsTopThread struct {
-	Value AnalyticsTopThread
-	Set   bool
-}
-
-// IsSet returns true if OptAnalyticsTopThread was set.
-func (o OptAnalyticsTopThread) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptAnalyticsTopThread) Reset() {
-	var v AnalyticsTopThread
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptAnalyticsTopThread) SetTo(v AnalyticsTopThread) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptAnalyticsTopThread) Get() (v AnalyticsTopThread, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptAnalyticsTopThread) Or(d AnalyticsTopThread) AnalyticsTopThread {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -1035,24 +1035,16 @@ func (o OptInt) Or(d int) int {
 	return d
 }
 
-type ThreadAddCommentBadRequest AnalyticsMetricsGetInternalServerErrorApplicationJSON
+type PostAddCommentBadRequest AnalyticsMetricsGetInternalServerErrorApplicationJSON
 
-func (*ThreadAddCommentBadRequest) threadAddCommentRes() {}
+func (*PostAddCommentBadRequest) postAddCommentRes() {}
 
-type ThreadAddCommentInternalServerError AnalyticsMetricsGetInternalServerErrorApplicationJSON
+type PostAddCommentInternalServerError AnalyticsMetricsGetInternalServerErrorApplicationJSON
 
-func (*ThreadAddCommentInternalServerError) threadAddCommentRes() {}
+func (*PostAddCommentInternalServerError) postAddCommentRes() {}
 
-type ThreadAddPostBadRequest AnalyticsMetricsGetInternalServerErrorApplicationJSON
-
-func (*ThreadAddPostBadRequest) threadAddPostRes() {}
-
-type ThreadAddPostInternalServerError AnalyticsMetricsGetInternalServerErrorApplicationJSON
-
-func (*ThreadAddPostInternalServerError) threadAddPostRes() {}
-
-// Ref: #/components/schemas/ThreadCommentItem
-type ThreadCommentItem struct {
+// Ref: #/components/schemas/PostCommentItem
+type PostCommentItem struct {
 	ID              int       `json:"id"`
 	AuthorId        int       `json:"authorId"`
 	AuthorName      string    `json:"authorName"`
@@ -1062,104 +1054,88 @@ type ThreadCommentItem struct {
 }
 
 // GetID returns the value of ID.
-func (s *ThreadCommentItem) GetID() int {
+func (s *PostCommentItem) GetID() int {
 	return s.ID
 }
 
 // GetAuthorId returns the value of AuthorId.
-func (s *ThreadCommentItem) GetAuthorId() int {
+func (s *PostCommentItem) GetAuthorId() int {
 	return s.AuthorId
 }
 
 // GetAuthorName returns the value of AuthorName.
-func (s *ThreadCommentItem) GetAuthorName() string {
+func (s *PostCommentItem) GetAuthorName() string {
 	return s.AuthorName
 }
 
 // GetAuthorAvatarUrl returns the value of AuthorAvatarUrl.
-func (s *ThreadCommentItem) GetAuthorAvatarUrl() url.URL {
+func (s *PostCommentItem) GetAuthorAvatarUrl() url.URL {
 	return s.AuthorAvatarUrl
 }
 
 // GetContent returns the value of Content.
-func (s *ThreadCommentItem) GetContent() string {
+func (s *PostCommentItem) GetContent() string {
 	return s.Content
 }
 
 // GetCreatedAt returns the value of CreatedAt.
-func (s *ThreadCommentItem) GetCreatedAt() time.Time {
+func (s *PostCommentItem) GetCreatedAt() time.Time {
 	return s.CreatedAt
 }
 
 // SetID sets the value of ID.
-func (s *ThreadCommentItem) SetID(val int) {
+func (s *PostCommentItem) SetID(val int) {
 	s.ID = val
 }
 
 // SetAuthorId sets the value of AuthorId.
-func (s *ThreadCommentItem) SetAuthorId(val int) {
+func (s *PostCommentItem) SetAuthorId(val int) {
 	s.AuthorId = val
 }
 
 // SetAuthorName sets the value of AuthorName.
-func (s *ThreadCommentItem) SetAuthorName(val string) {
+func (s *PostCommentItem) SetAuthorName(val string) {
 	s.AuthorName = val
 }
 
 // SetAuthorAvatarUrl sets the value of AuthorAvatarUrl.
-func (s *ThreadCommentItem) SetAuthorAvatarUrl(val url.URL) {
+func (s *PostCommentItem) SetAuthorAvatarUrl(val url.URL) {
 	s.AuthorAvatarUrl = val
 }
 
 // SetContent sets the value of Content.
-func (s *ThreadCommentItem) SetContent(val string) {
+func (s *PostCommentItem) SetContent(val string) {
 	s.Content = val
 }
 
 // SetCreatedAt sets the value of CreatedAt.
-func (s *ThreadCommentItem) SetCreatedAt(val time.Time) {
+func (s *PostCommentItem) SetCreatedAt(val time.Time) {
 	s.CreatedAt = val
 }
 
-func (*ThreadCommentItem) threadAddCommentRes() {}
+func (*PostCommentItem) postAddCommentRes() {}
 
-// Ref: #/components/schemas/ThreadCreateCommentRequest
-type ThreadCreateCommentRequest struct {
+// Ref: #/components/schemas/PostCreateCommentRequest
+type PostCreateCommentRequest struct {
 	Content string `json:"content"`
 }
 
 // GetContent returns the value of Content.
-func (s *ThreadCreateCommentRequest) GetContent() string {
+func (s *PostCreateCommentRequest) GetContent() string {
 	return s.Content
 }
 
 // SetContent sets the value of Content.
-func (s *ThreadCreateCommentRequest) SetContent(val string) {
+func (s *PostCreateCommentRequest) SetContent(val string) {
 	s.Content = val
 }
 
-type ThreadCreateInternalServerError AnalyticsMetricsGetInternalServerErrorApplicationJSON
+type PostCreateInternalServerError AnalyticsMetricsGetInternalServerErrorApplicationJSON
 
-func (*ThreadCreateInternalServerError) threadCreateRes() {}
+func (*PostCreateInternalServerError) postCreateRes() {}
 
-// Deprecated: schema marks this type as deprecated.
-// Ref: #/components/schemas/ThreadCreatePostRequest
-type ThreadCreatePostRequest struct {
-	Content string `json:"content"`
-}
-
-// GetContent returns the value of Content.
-func (s *ThreadCreatePostRequest) GetContent() string {
-	return s.Content
-}
-
-// SetContent sets the value of Content.
-func (s *ThreadCreatePostRequest) SetContent(val string) {
-	s.Content = val
-}
-
-// Ref: #/components/schemas/ThreadCreateRequest
-type ThreadCreateRequest struct {
+// Ref: #/components/schemas/PostCreateRequest
+type PostCreateRequest struct {
 	Title   string `json:"title"`
 	Content string `json:"content"`
 	// Optional tags for analytics (normalized to lowercase on server).
@@ -1167,49 +1143,49 @@ type ThreadCreateRequest struct {
 }
 
 // GetTitle returns the value of Title.
-func (s *ThreadCreateRequest) GetTitle() string {
+func (s *PostCreateRequest) GetTitle() string {
 	return s.Title
 }
 
 // GetContent returns the value of Content.
-func (s *ThreadCreateRequest) GetContent() string {
+func (s *PostCreateRequest) GetContent() string {
 	return s.Content
 }
 
 // GetTags returns the value of Tags.
-func (s *ThreadCreateRequest) GetTags() []string {
+func (s *PostCreateRequest) GetTags() []string {
 	return s.Tags
 }
 
 // SetTitle sets the value of Title.
-func (s *ThreadCreateRequest) SetTitle(val string) {
+func (s *PostCreateRequest) SetTitle(val string) {
 	s.Title = val
 }
 
 // SetContent sets the value of Content.
-func (s *ThreadCreateRequest) SetContent(val string) {
+func (s *PostCreateRequest) SetContent(val string) {
 	s.Content = val
 }
 
 // SetTags sets the value of Tags.
-func (s *ThreadCreateRequest) SetTags(val []string) {
+func (s *PostCreateRequest) SetTags(val []string) {
 	s.Tags = val
 }
 
-type ThreadCreateUnauthorized AnalyticsMetricsGetInternalServerErrorApplicationJSON
+type PostCreateUnauthorized AnalyticsMetricsGetInternalServerErrorApplicationJSON
 
-func (*ThreadCreateUnauthorized) threadCreateRes() {}
+func (*PostCreateUnauthorized) postCreateRes() {}
 
-type ThreadGetBadRequest AnalyticsMetricsGetInternalServerErrorApplicationJSON
+type PostGetBadRequest AnalyticsMetricsGetInternalServerErrorApplicationJSON
 
-func (*ThreadGetBadRequest) threadGetRes() {}
+func (*PostGetBadRequest) postGetRes() {}
 
-type ThreadGetInternalServerError AnalyticsMetricsGetInternalServerErrorApplicationJSON
+type PostGetInternalServerError AnalyticsMetricsGetInternalServerErrorApplicationJSON
 
-func (*ThreadGetInternalServerError) threadGetRes() {}
+func (*PostGetInternalServerError) postGetRes() {}
 
-// Ref: #/components/schemas/ThreadListItem
-type ThreadListItem struct {
+// Ref: #/components/schemas/PostListItem
+type PostListItem struct {
 	ID              int     `json:"id"`
 	AuthorId        int     `json:"authorId"`
 	AuthorName      string  `json:"authorName"`
@@ -1228,339 +1204,253 @@ type ThreadListItem struct {
 }
 
 // GetID returns the value of ID.
-func (s *ThreadListItem) GetID() int {
+func (s *PostListItem) GetID() int {
 	return s.ID
 }
 
 // GetAuthorId returns the value of AuthorId.
-func (s *ThreadListItem) GetAuthorId() int {
+func (s *PostListItem) GetAuthorId() int {
 	return s.AuthorId
 }
 
 // GetAuthorName returns the value of AuthorName.
-func (s *ThreadListItem) GetAuthorName() string {
+func (s *PostListItem) GetAuthorName() string {
 	return s.AuthorName
 }
 
 // GetAuthorAvatarUrl returns the value of AuthorAvatarUrl.
-func (s *ThreadListItem) GetAuthorAvatarUrl() url.URL {
+func (s *PostListItem) GetAuthorAvatarUrl() url.URL {
 	return s.AuthorAvatarUrl
 }
 
 // GetTitle returns the value of Title.
-func (s *ThreadListItem) GetTitle() string {
+func (s *PostListItem) GetTitle() string {
 	return s.Title
 }
 
 // GetContent returns the value of Content.
-func (s *ThreadListItem) GetContent() string {
+func (s *PostListItem) GetContent() string {
 	return s.Content
 }
 
 // GetPostsCount returns the value of PostsCount.
-func (s *ThreadListItem) GetPostsCount() int {
+func (s *PostListItem) GetPostsCount() int {
 	return s.PostsCount
 }
 
 // GetCommentsCount returns the value of CommentsCount.
-func (s *ThreadListItem) GetCommentsCount() int {
+func (s *PostListItem) GetCommentsCount() int {
 	return s.CommentsCount
 }
 
 // GetCreatedAt returns the value of CreatedAt.
-func (s *ThreadListItem) GetCreatedAt() time.Time {
+func (s *PostListItem) GetCreatedAt() time.Time {
 	return s.CreatedAt
 }
 
 // SetID sets the value of ID.
-func (s *ThreadListItem) SetID(val int) {
+func (s *PostListItem) SetID(val int) {
 	s.ID = val
 }
 
 // SetAuthorId sets the value of AuthorId.
-func (s *ThreadListItem) SetAuthorId(val int) {
+func (s *PostListItem) SetAuthorId(val int) {
 	s.AuthorId = val
 }
 
 // SetAuthorName sets the value of AuthorName.
-func (s *ThreadListItem) SetAuthorName(val string) {
+func (s *PostListItem) SetAuthorName(val string) {
 	s.AuthorName = val
 }
 
 // SetAuthorAvatarUrl sets the value of AuthorAvatarUrl.
-func (s *ThreadListItem) SetAuthorAvatarUrl(val url.URL) {
+func (s *PostListItem) SetAuthorAvatarUrl(val url.URL) {
 	s.AuthorAvatarUrl = val
 }
 
 // SetTitle sets the value of Title.
-func (s *ThreadListItem) SetTitle(val string) {
+func (s *PostListItem) SetTitle(val string) {
 	s.Title = val
 }
 
 // SetContent sets the value of Content.
-func (s *ThreadListItem) SetContent(val string) {
+func (s *PostListItem) SetContent(val string) {
 	s.Content = val
 }
 
 // SetPostsCount sets the value of PostsCount.
-func (s *ThreadListItem) SetPostsCount(val int) {
+func (s *PostListItem) SetPostsCount(val int) {
 	s.PostsCount = val
 }
 
 // SetCommentsCount sets the value of CommentsCount.
-func (s *ThreadListItem) SetCommentsCount(val int) {
+func (s *PostListItem) SetCommentsCount(val int) {
 	s.CommentsCount = val
 }
 
 // SetCreatedAt sets the value of CreatedAt.
-func (s *ThreadListItem) SetCreatedAt(val time.Time) {
+func (s *PostListItem) SetCreatedAt(val time.Time) {
 	s.CreatedAt = val
 }
 
-func (*ThreadListItem) threadCreateRes() {}
+func (*PostListItem) postCreateRes() {}
 
-// Ref: #/components/schemas/ThreadListResponse
-type ThreadListResponse struct {
-	Threads             []ThreadListItem `json:"threads"`
-	TotalCountEstimated int              `json:"totalCountEstimated"`
-	HavePrev            bool             `json:"havePrev"`
-	HaveNext            bool             `json:"haveNext"`
+// Ref: #/components/schemas/PostListResponse
+type PostListResponse struct {
+	Posts               []PostListItem `json:"posts"`
+	TotalCountEstimated int            `json:"totalCountEstimated"`
+	HavePrev            bool           `json:"havePrev"`
+	HaveNext            bool           `json:"haveNext"`
 }
 
-// GetThreads returns the value of Threads.
-func (s *ThreadListResponse) GetThreads() []ThreadListItem {
-	return s.Threads
+// GetPosts returns the value of Posts.
+func (s *PostListResponse) GetPosts() []PostListItem {
+	return s.Posts
 }
 
 // GetTotalCountEstimated returns the value of TotalCountEstimated.
-func (s *ThreadListResponse) GetTotalCountEstimated() int {
+func (s *PostListResponse) GetTotalCountEstimated() int {
 	return s.TotalCountEstimated
 }
 
 // GetHavePrev returns the value of HavePrev.
-func (s *ThreadListResponse) GetHavePrev() bool {
+func (s *PostListResponse) GetHavePrev() bool {
 	return s.HavePrev
 }
 
 // GetHaveNext returns the value of HaveNext.
-func (s *ThreadListResponse) GetHaveNext() bool {
+func (s *PostListResponse) GetHaveNext() bool {
 	return s.HaveNext
 }
 
-// SetThreads sets the value of Threads.
-func (s *ThreadListResponse) SetThreads(val []ThreadListItem) {
-	s.Threads = val
+// SetPosts sets the value of Posts.
+func (s *PostListResponse) SetPosts(val []PostListItem) {
+	s.Posts = val
 }
 
 // SetTotalCountEstimated sets the value of TotalCountEstimated.
-func (s *ThreadListResponse) SetTotalCountEstimated(val int) {
+func (s *PostListResponse) SetTotalCountEstimated(val int) {
 	s.TotalCountEstimated = val
 }
 
 // SetHavePrev sets the value of HavePrev.
-func (s *ThreadListResponse) SetHavePrev(val bool) {
+func (s *PostListResponse) SetHavePrev(val bool) {
 	s.HavePrev = val
 }
 
 // SetHaveNext sets the value of HaveNext.
-func (s *ThreadListResponse) SetHaveNext(val bool) {
+func (s *PostListResponse) SetHaveNext(val bool) {
 	s.HaveNext = val
 }
 
-func (*ThreadListResponse) threadsListRes() {}
+func (*PostListResponse) postsListRes() {}
 
-// Deprecated: schema marks this type as deprecated.
-// Ref: #/components/schemas/ThreadPostItem
-type ThreadPostItem struct {
-	ID              int       `json:"id"`
-	AuthorId        int       `json:"authorId"`
-	AuthorName      string    `json:"authorName"`
-	AuthorAvatarUrl url.URL   `json:"authorAvatarUrl"`
-	Content         string    `json:"content"`
-	CreatedAt       time.Time `json:"createdAt"`
-}
-
-// GetID returns the value of ID.
-func (s *ThreadPostItem) GetID() int {
-	return s.ID
-}
-
-// GetAuthorId returns the value of AuthorId.
-func (s *ThreadPostItem) GetAuthorId() int {
-	return s.AuthorId
-}
-
-// GetAuthorName returns the value of AuthorName.
-func (s *ThreadPostItem) GetAuthorName() string {
-	return s.AuthorName
-}
-
-// GetAuthorAvatarUrl returns the value of AuthorAvatarUrl.
-func (s *ThreadPostItem) GetAuthorAvatarUrl() url.URL {
-	return s.AuthorAvatarUrl
-}
-
-// GetContent returns the value of Content.
-func (s *ThreadPostItem) GetContent() string {
-	return s.Content
-}
-
-// GetCreatedAt returns the value of CreatedAt.
-func (s *ThreadPostItem) GetCreatedAt() time.Time {
-	return s.CreatedAt
-}
-
-// SetID sets the value of ID.
-func (s *ThreadPostItem) SetID(val int) {
-	s.ID = val
-}
-
-// SetAuthorId sets the value of AuthorId.
-func (s *ThreadPostItem) SetAuthorId(val int) {
-	s.AuthorId = val
-}
-
-// SetAuthorName sets the value of AuthorName.
-func (s *ThreadPostItem) SetAuthorName(val string) {
-	s.AuthorName = val
-}
-
-// SetAuthorAvatarUrl sets the value of AuthorAvatarUrl.
-func (s *ThreadPostItem) SetAuthorAvatarUrl(val url.URL) {
-	s.AuthorAvatarUrl = val
-}
-
-// SetContent sets the value of Content.
-func (s *ThreadPostItem) SetContent(val string) {
-	s.Content = val
-}
-
-// SetCreatedAt sets the value of CreatedAt.
-func (s *ThreadPostItem) SetCreatedAt(val time.Time) {
-	s.CreatedAt = val
-}
-
-func (*ThreadPostItem) threadAddPostRes() {}
-
-// Ref: #/components/schemas/ThreadWithPostsListResponse
-type ThreadWithPostsListResponse struct {
+// Ref: #/components/schemas/PostWithCommentsListResponse
+type PostWithCommentsListResponse struct {
 	ID              int     `json:"id"`
 	AuthorId        int     `json:"authorId"`
 	AuthorName      string  `json:"authorName"`
 	AuthorAvatarUrl url.URL `json:"authorAvatarUrl"`
 	Title           string  `json:"title"`
-	Content         string  `json:"content"`
 	// Number of reply posts (rows in posts). The opening message is not included.
-	//
-	// Deprecated: schema marks this property as deprecated.
-	PostsCount int `json:"postsCount"`
+	Content string `json:"content"`
 	// Number of comments (rows in comments). The opening message is not included.
-	CommentsCount int              `json:"commentsCount"`
-	CreatedAt     time.Time        `json:"createdAt"`
-	Posts         []ThreadPostItem `json:"posts"`
+	CommentsCount int               `json:"commentsCount"`
+	CreatedAt     time.Time         `json:"createdAt"`
+	Comments      []PostCommentItem `json:"comments"`
 }
 
 // GetID returns the value of ID.
-func (s *ThreadWithPostsListResponse) GetID() int {
+func (s *PostWithCommentsListResponse) GetID() int {
 	return s.ID
 }
 
 // GetAuthorId returns the value of AuthorId.
-func (s *ThreadWithPostsListResponse) GetAuthorId() int {
+func (s *PostWithCommentsListResponse) GetAuthorId() int {
 	return s.AuthorId
 }
 
 // GetAuthorName returns the value of AuthorName.
-func (s *ThreadWithPostsListResponse) GetAuthorName() string {
+func (s *PostWithCommentsListResponse) GetAuthorName() string {
 	return s.AuthorName
 }
 
 // GetAuthorAvatarUrl returns the value of AuthorAvatarUrl.
-func (s *ThreadWithPostsListResponse) GetAuthorAvatarUrl() url.URL {
+func (s *PostWithCommentsListResponse) GetAuthorAvatarUrl() url.URL {
 	return s.AuthorAvatarUrl
 }
 
 // GetTitle returns the value of Title.
-func (s *ThreadWithPostsListResponse) GetTitle() string {
+func (s *PostWithCommentsListResponse) GetTitle() string {
 	return s.Title
 }
 
 // GetContent returns the value of Content.
-func (s *ThreadWithPostsListResponse) GetContent() string {
+func (s *PostWithCommentsListResponse) GetContent() string {
 	return s.Content
 }
 
-// GetPostsCount returns the value of PostsCount.
-func (s *ThreadWithPostsListResponse) GetPostsCount() int {
-	return s.PostsCount
-}
-
 // GetCommentsCount returns the value of CommentsCount.
-func (s *ThreadWithPostsListResponse) GetCommentsCount() int {
+func (s *PostWithCommentsListResponse) GetCommentsCount() int {
 	return s.CommentsCount
 }
 
 // GetCreatedAt returns the value of CreatedAt.
-func (s *ThreadWithPostsListResponse) GetCreatedAt() time.Time {
+func (s *PostWithCommentsListResponse) GetCreatedAt() time.Time {
 	return s.CreatedAt
 }
 
-// GetPosts returns the value of Posts.
-func (s *ThreadWithPostsListResponse) GetPosts() []ThreadPostItem {
-	return s.Posts
+// GetComments returns the value of Comments.
+func (s *PostWithCommentsListResponse) GetComments() []PostCommentItem {
+	return s.Comments
 }
 
 // SetID sets the value of ID.
-func (s *ThreadWithPostsListResponse) SetID(val int) {
+func (s *PostWithCommentsListResponse) SetID(val int) {
 	s.ID = val
 }
 
 // SetAuthorId sets the value of AuthorId.
-func (s *ThreadWithPostsListResponse) SetAuthorId(val int) {
+func (s *PostWithCommentsListResponse) SetAuthorId(val int) {
 	s.AuthorId = val
 }
 
 // SetAuthorName sets the value of AuthorName.
-func (s *ThreadWithPostsListResponse) SetAuthorName(val string) {
+func (s *PostWithCommentsListResponse) SetAuthorName(val string) {
 	s.AuthorName = val
 }
 
 // SetAuthorAvatarUrl sets the value of AuthorAvatarUrl.
-func (s *ThreadWithPostsListResponse) SetAuthorAvatarUrl(val url.URL) {
+func (s *PostWithCommentsListResponse) SetAuthorAvatarUrl(val url.URL) {
 	s.AuthorAvatarUrl = val
 }
 
 // SetTitle sets the value of Title.
-func (s *ThreadWithPostsListResponse) SetTitle(val string) {
+func (s *PostWithCommentsListResponse) SetTitle(val string) {
 	s.Title = val
 }
 
 // SetContent sets the value of Content.
-func (s *ThreadWithPostsListResponse) SetContent(val string) {
+func (s *PostWithCommentsListResponse) SetContent(val string) {
 	s.Content = val
 }
 
-// SetPostsCount sets the value of PostsCount.
-func (s *ThreadWithPostsListResponse) SetPostsCount(val int) {
-	s.PostsCount = val
-}
-
 // SetCommentsCount sets the value of CommentsCount.
-func (s *ThreadWithPostsListResponse) SetCommentsCount(val int) {
+func (s *PostWithCommentsListResponse) SetCommentsCount(val int) {
 	s.CommentsCount = val
 }
 
 // SetCreatedAt sets the value of CreatedAt.
-func (s *ThreadWithPostsListResponse) SetCreatedAt(val time.Time) {
+func (s *PostWithCommentsListResponse) SetCreatedAt(val time.Time) {
 	s.CreatedAt = val
 }
 
-// SetPosts sets the value of Posts.
-func (s *ThreadWithPostsListResponse) SetPosts(val []ThreadPostItem) {
-	s.Posts = val
+// SetComments sets the value of Comments.
+func (s *PostWithCommentsListResponse) SetComments(val []PostCommentItem) {
+	s.Comments = val
 }
 
-func (*ThreadWithPostsListResponse) threadGetRes() {}
+func (*PostWithCommentsListResponse) postGetRes() {}
 
 // UserCreateBadRequest represents sum type.
 type UserCreateBadRequest struct {

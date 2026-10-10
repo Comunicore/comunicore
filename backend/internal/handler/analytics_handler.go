@@ -93,16 +93,16 @@ func (h *AnalyticsHandler) AnalyticsMetricsGet(ctx context.Context, params api.A
 	}
 
 	if m.TopThreadWeekly != nil {
-		resp.TopThreadWeekly = api.NewOptAnalyticsTopThread(api.AnalyticsTopThread{
-			ThreadId:        m.TopThreadWeekly.ThreadID,
+		resp.TopPostWeekly = api.NewOptAnalyticsTopPost(api.AnalyticsTopPost{
+			PostId:          m.TopThreadWeekly.ThreadID,
 			Title:           m.TopThreadWeekly.Title,
 			RepliesInWindow: m.TopThreadWeekly.RepliesInWindow,
 		})
 	}
 
 	if m.TopThreadMonthly != nil {
-		resp.TopThreadMonthly = api.NewOptAnalyticsTopThread(api.AnalyticsTopThread{
-			ThreadId:        m.TopThreadMonthly.ThreadID,
+		resp.TopPostMonthly = api.NewOptAnalyticsTopPost(api.AnalyticsTopPost{
+			PostId:          m.TopThreadMonthly.ThreadID,
 			Title:           m.TopThreadMonthly.Title,
 			RepliesInWindow: m.TopThreadMonthly.RepliesInWindow,
 		})
@@ -118,8 +118,8 @@ func (h *AnalyticsHandler) AnalyticsMetricsGet(ctx context.Context, params api.A
 
 	for _, row := range m.PopularTags {
 		resp.PopularTags = append(resp.PopularTags, api.AnalyticsTagCount{
-			Tag:         row.Tag,
-			ThreadCount: row.ThreadCount,
+			Tag:        row.Tag,
+			PostsCount: row.PostCount,
 		})
 	}
 
@@ -131,7 +131,7 @@ func (h *AnalyticsHandler) AnalyticsMetricsGet(ctx context.Context, params api.A
 	}
 
 	for _, row := range m.TopUsersByThreads {
-		resp.TopUsersByThreads = append(resp.TopUsersByThreads, api.AnalyticsUserCount{
+		resp.TopUsersByPosts = append(resp.TopUsersByPosts, api.AnalyticsUserCount{
 			UserId: row.UserID,
 			Name:   row.Name,
 			Count:  row.Count,

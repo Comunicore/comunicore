@@ -44,8 +44,8 @@ const (
 	userUpdatePath   = "/api/user/{id}"
 	authLoginPath    = "/api/auth/login"
 	authLogoutPath   = "/api/auth/logout"
-	threadCreatePath = "/api/threads"
-	threadPostsPath  = "/api/threads/{threadId}/posts"
+	postCreatePath   = "/api/posts"
+	postCommentsPath = "/api/posts/{postId}/comments"
 )
 
 func TestMain(m *testing.M) { // for global setup and teardown

@@ -256,25 +256,25 @@ func decodeMediaGetParams(args [1]string, argsEscaped bool, r *http.Request) (pa
 	return params, nil
 }
 
-// ThreadAddCommentParams is parameters of threadAddComment operation.
-type ThreadAddCommentParams struct {
-	// Thread id.
-	ThreadId int
+// PostAddCommentParams is parameters of postAddComment operation.
+type PostAddCommentParams struct {
+	// Post id.
+	PostId int
 }
 
-func unpackThreadAddCommentParams(packed middleware.Parameters) (params ThreadAddCommentParams) {
+func unpackPostAddCommentParams(packed middleware.Parameters) (params PostAddCommentParams) {
 	{
 		key := middleware.ParameterKey{
-			Name: "threadId",
+			Name: "postId",
 			In:   "path",
 		}
-		params.ThreadId = packed[key].(int)
+		params.PostId = packed[key].(int)
 	}
 	return params
 }
 
-func decodeThreadAddCommentParams(args [1]string, argsEscaped bool, r *http.Request) (params ThreadAddCommentParams, _ error) {
-	// Decode path: threadId.
+func decodePostAddCommentParams(args [1]string, argsEscaped bool, r *http.Request) (params PostAddCommentParams, _ error) {
+	// Decode path: postId.
 	if err := func() error {
 		param := args[0]
 		if argsEscaped {
@@ -286,7 +286,7 @@ func decodeThreadAddCommentParams(args [1]string, argsEscaped bool, r *http.Requ
 		}
 		if len(param) > 0 {
 			d := uri.NewPathDecoder(uri.PathDecoderConfig{
-				Param:   "threadId",
+				Param:   "postId",
 				Value:   param,
 				Style:   uri.PathStyleSimple,
 				Explode: false,
@@ -303,7 +303,7 @@ func decodeThreadAddCommentParams(args [1]string, argsEscaped bool, r *http.Requ
 					return err
 				}
 
-				params.ThreadId = c
+				params.PostId = c
 				return nil
 			}(); err != nil {
 				return err
@@ -314,7 +314,7 @@ func decodeThreadAddCommentParams(args [1]string, argsEscaped bool, r *http.Requ
 		return nil
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
-			Name: "threadId",
+			Name: "postId",
 			In:   "path",
 			Err:  err,
 		}
@@ -322,25 +322,25 @@ func decodeThreadAddCommentParams(args [1]string, argsEscaped bool, r *http.Requ
 	return params, nil
 }
 
-// ThreadAddPostParams is parameters of threadAddPost operation.
-type ThreadAddPostParams struct {
-	// Thread id.
-	ThreadId int
+// PostGetParams is parameters of postGet operation.
+type PostGetParams struct {
+	// Post id.
+	PostId int
 }
 
-func unpackThreadAddPostParams(packed middleware.Parameters) (params ThreadAddPostParams) {
+func unpackPostGetParams(packed middleware.Parameters) (params PostGetParams) {
 	{
 		key := middleware.ParameterKey{
-			Name: "threadId",
+			Name: "postId",
 			In:   "path",
 		}
-		params.ThreadId = packed[key].(int)
+		params.PostId = packed[key].(int)
 	}
 	return params
 }
 
-func decodeThreadAddPostParams(args [1]string, argsEscaped bool, r *http.Request) (params ThreadAddPostParams, _ error) {
-	// Decode path: threadId.
+func decodePostGetParams(args [1]string, argsEscaped bool, r *http.Request) (params PostGetParams, _ error) {
+	// Decode path: postId.
 	if err := func() error {
 		param := args[0]
 		if argsEscaped {
@@ -352,7 +352,7 @@ func decodeThreadAddPostParams(args [1]string, argsEscaped bool, r *http.Request
 		}
 		if len(param) > 0 {
 			d := uri.NewPathDecoder(uri.PathDecoderConfig{
-				Param:   "threadId",
+				Param:   "postId",
 				Value:   param,
 				Style:   uri.PathStyleSimple,
 				Explode: false,
@@ -369,7 +369,7 @@ func decodeThreadAddPostParams(args [1]string, argsEscaped bool, r *http.Request
 					return err
 				}
 
-				params.ThreadId = c
+				params.PostId = c
 				return nil
 			}(); err != nil {
 				return err
@@ -380,7 +380,7 @@ func decodeThreadAddPostParams(args [1]string, argsEscaped bool, r *http.Request
 		return nil
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
-			Name: "threadId",
+			Name: "postId",
 			In:   "path",
 			Err:  err,
 		}
@@ -388,85 +388,19 @@ func decodeThreadAddPostParams(args [1]string, argsEscaped bool, r *http.Request
 	return params, nil
 }
 
-// ThreadGetParams is parameters of threadGet operation.
-type ThreadGetParams struct {
-	// Thread id.
-	ThreadId int
-}
-
-func unpackThreadGetParams(packed middleware.Parameters) (params ThreadGetParams) {
-	{
-		key := middleware.ParameterKey{
-			Name: "threadId",
-			In:   "path",
-		}
-		params.ThreadId = packed[key].(int)
-	}
-	return params
-}
-
-func decodeThreadGetParams(args [1]string, argsEscaped bool, r *http.Request) (params ThreadGetParams, _ error) {
-	// Decode path: threadId.
-	if err := func() error {
-		param := args[0]
-		if argsEscaped {
-			unescaped, err := url.PathUnescape(args[0])
-			if err != nil {
-				return errors.Wrap(err, "unescape path")
-			}
-			param = unescaped
-		}
-		if len(param) > 0 {
-			d := uri.NewPathDecoder(uri.PathDecoderConfig{
-				Param:   "threadId",
-				Value:   param,
-				Style:   uri.PathStyleSimple,
-				Explode: false,
-			})
-
-			if err := func() error {
-				val, err := d.DecodeValue()
-				if err != nil {
-					return err
-				}
-
-				c, err := conv.ToInt(val)
-				if err != nil {
-					return err
-				}
-
-				params.ThreadId = c
-				return nil
-			}(); err != nil {
-				return err
-			}
-		} else {
-			return validate.ErrFieldRequired
-		}
-		return nil
-	}(); err != nil {
-		return params, &ogenerrors.DecodeParamError{
-			Name: "threadId",
-			In:   "path",
-			Err:  err,
-		}
-	}
-	return params, nil
-}
-
-// ThreadsListParams is parameters of threadsList operation.
-type ThreadsListParams struct {
-	// Number of threads to return.
+// PostsListParams is parameters of postsList operation.
+type PostsListParams struct {
+	// Number of posts to return.
 	Limit OptInt `json:",omitempty,omitzero"`
 	// Page number (starting from 1).
 	Page OptInt `json:",omitempty,omitzero"`
-	// Return threads created after this id (for cursor pagination).
+	// Return posts created after this id (for cursor pagination).
 	After OptInt `json:",omitempty,omitzero"`
-	// Return threads created before this id (for cursor pagination).
+	// Return posts created before this id (for cursor pagination).
 	Before OptInt `json:",omitempty,omitzero"`
 }
 
-func unpackThreadsListParams(packed middleware.Parameters) (params ThreadsListParams) {
+func unpackPostsListParams(packed middleware.Parameters) (params PostsListParams) {
 	{
 		key := middleware.ParameterKey{
 			Name: "limit",
@@ -506,7 +440,7 @@ func unpackThreadsListParams(packed middleware.Parameters) (params ThreadsListPa
 	return params
 }
 
-func decodeThreadsListParams(args [0]string, argsEscaped bool, r *http.Request) (params ThreadsListParams, _ error) {
+func decodePostsListParams(args [0]string, argsEscaped bool, r *http.Request) (params PostsListParams, _ error) {
 	q := uri.NewQueryDecoder(r.URL.Query())
 	// Set default value for query: limit.
 	{

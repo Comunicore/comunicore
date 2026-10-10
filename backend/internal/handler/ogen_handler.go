@@ -26,13 +26,13 @@ import (
 	authRepo "github.com/comunicore/comunicore/backend/internal/repository/auth"
 	commentsRepo "github.com/comunicore/comunicore/backend/internal/repository/comments"
 	mediaRepo "github.com/comunicore/comunicore/backend/internal/repository/media"
-	threadsRepo "github.com/comunicore/comunicore/backend/internal/repository/threads"
+	postsRepo "github.com/comunicore/comunicore/backend/internal/repository/posts"
 	userRepo "github.com/comunicore/comunicore/backend/internal/repository/user"
 
 	analyticsService "github.com/comunicore/comunicore/backend/internal/service/analytics"
 	authService "github.com/comunicore/comunicore/backend/internal/service/auth"
 	mediaService "github.com/comunicore/comunicore/backend/internal/service/media"
-	threadsService "github.com/comunicore/comunicore/backend/internal/service/threads"
+	postsService "github.com/comunicore/comunicore/backend/internal/service/posts"
 	userService "github.com/comunicore/comunicore/backend/internal/service/user"
 )
 
@@ -40,7 +40,7 @@ import (
 type OgenHandler struct {
 	authHandler      *AuthHandler
 	userHandler      *UserHandler
-	threadsHandler   *ThreadsHandler
+	postsHandler     *PostsHandler
 	mediaHandler     *MediaHandler
 	analyticsHandler *AnalyticsHandler
 	api.UnimplementedHandler
@@ -49,13 +49,13 @@ type OgenHandler struct {
 func NewOgenHandler(
 	authHandler *AuthHandler,
 	userHandler *UserHandler,
-	threadsHandler *ThreadsHandler,
+	postsHandler *PostsHandler,
 	mediaHandler *MediaHandler,
 	analyticsHandler *AnalyticsHandler,
 ) *OgenHandler {
 
 	return &OgenHandler{
-		threadsHandler:   threadsHandler,
+		postsHandler:     postsHandler,
 		userHandler:      userHandler,
 		authHandler:      authHandler,
 		mediaHandler:     mediaHandler,
@@ -206,7 +206,7 @@ func RegisterOgenRoutes(mux *http.ServeMux, cfg *config.AppConfig) {
 	if err != nil {
 		panic(err)
 	}
-	threadR, err := threadsRepo.NewThreadsRepo(cfg.Database.DSN())
+	postsR, err := postsRepo.NewPostsRepo(cfg.Database.DSN())
 	if err != nil {
 		panic(err)
 	}
@@ -219,17 +219,17 @@ func RegisterOgenRoutes(mux *http.ServeMux, cfg *config.AppConfig) {
 	userS := userService.NewUserService(userR, authR)
 	mediaS := mediaService.NewMediaService(cfg.Server.BaseURL, mediaR)
 
-	threadsS := threadsService.NewThreadsService(threadR, commentR, userR)
+	postsS := postsService.NewPostsService(postsR, commentR, userR)
 	analyticsS := analyticsService.NewAnalyticsService(analyticsR)
 
 	secure, sameSite := config.SessionCookieOpts(cfg.Server.BaseURL)
 	authH := NewAuthHandler(authS, secure, sameSite)
 	userH := NewUserHandler(userS)
-	threadsH := NewThreadsHandler(threadsS)
+	postsH := NewPostsHandler(postsS)
 	mediaH := NewMediaHandler(mediaS)
 	analyticsH := NewAnalyticsHandler(analyticsS)
 
-	ogenHandler := NewOgenHandler(authH, userH, threadsH, mediaH, analyticsH)
+	ogenHandler := NewOgenHandler(authH, userH, postsH, mediaH, analyticsH)
 	secHandler := NewSecurityHandler(authR)
 
 	errHandler := &errorHandler{}
@@ -253,25 +253,24 @@ func RegisterOgenRoutes(mux *http.ServeMux, cfg *config.AppConfig) {
 	mux.Handle("/api/", apiHandler)
 }
 
-// Thread handlers
-// deprecated: use ThreadsAddComments instead
-func (h *OgenHandler) ThreadAddPost(ctx context.Context, req *api.ThreadCreatePostRequest, params api.ThreadAddPostParams) (api.ThreadAddPostRes, error) {
-	return h.threadsHandler.ThreadAddPost(ctx, req, params)
-}
-func (h *OgenHandler) ThreadAddComment(ctx context.Context, req *api.ThreadCreateCommentRequest, params api.ThreadAddCommentParams) (api.ThreadAddCommentRes, error) {
-	return h.threadsHandler.ThreadAddComment(ctx, req, params)
+// Post handlers
+func (h *OgenHandler) PostAddComment(
+	ctx context.Context, req *api.PostCreateCommentRequest, params api.PostAddCommentParams) (
+	api.PostAddCommentRes, error) {
+
+	return h.postsHandler.PostAddComment(ctx, req, params)
 }
 
-func (h *OgenHandler) ThreadCreate(ctx context.Context, req *api.ThreadCreateRequest) (api.ThreadCreateRes, error) {
-	return h.threadsHandler.ThreadCreate(ctx, req)
+func (h *OgenHandler) PostCreate(ctx context.Context, req *api.PostCreateRequest) (api.PostCreateRes, error) {
+	return h.postsHandler.PostCreate(ctx, req)
 }
 
-func (h *OgenHandler) ThreadGet(ctx context.Context, params api.ThreadGetParams) (api.ThreadGetRes, error) {
-	return h.threadsHandler.ThreadGet(ctx, params)
+func (h *OgenHandler) PostGet(ctx context.Context, params api.PostGetParams) (api.PostGetRes, error) {
+	return h.postsHandler.PostGet(ctx, params)
 }
 
-func (h *OgenHandler) ThreadsList(ctx context.Context, params api.ThreadsListParams) (api.ThreadsListRes, error) {
-	return h.threadsHandler.ThreadsList(ctx, params)
+func (h *OgenHandler) PostsList(ctx context.Context, params api.PostsListParams) (api.PostsListRes, error) {
+	return h.postsHandler.PostsList(ctx, params)
 }
 
 // User handlers

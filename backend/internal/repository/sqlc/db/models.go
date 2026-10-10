@@ -30,19 +30,14 @@ type AuthPassword struct {
 
 type Comment struct {
 	ID        int32
-	ThreadID  int32
+	PostID    int32
 	UserID    int32
 	Content   string
 	CreatedAt pgtype.Timestamptz
 	UpdatedAt pgtype.Timestamptz
 }
 
-type Session struct {
-	SessionID pgtype.UUID
-	UserID    int32
-}
-
-type Thread struct {
+type Post struct {
 	ID            int32
 	Title         string
 	Content       string
@@ -52,9 +47,14 @@ type Thread struct {
 	UpdatedAt     pgtype.Timestamptz
 }
 
-type ThreadTag struct {
-	ThreadID int32
-	Tag      string
+type PostTag struct {
+	PostID int32
+	Tag    string
+}
+
+type Session struct {
+	SessionID pgtype.UUID
+	UserID    int32
 }
 
 type User struct {
