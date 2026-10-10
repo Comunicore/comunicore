@@ -105,14 +105,14 @@ export default function PostSidebar({
               key={id}
               className='text-gray-9e flex items-center justify-between gap-x-4'
             >
-              <div className='flex max-w-70 flex-col gap-y-1.25'>
+              <div className='flex flex-col gap-y-1.25'>
                 <Link
                   href={AppRouter.posts.getRoute(id)}
                   className='hover:text-light text-lg leading-normal transition-colors'
                 >
                   {title}
                 </Link>
-                <div className='flex items-center gap-x-2.5 text-xs leading-3'>
+                <div className='flex items-center gap-x-2.5 leading-3'>
                   <span className='flex items-center gap-x-1.25'>
                     <CommentsIcon className='text-light shrink-0' />
                     {commentsCount}
