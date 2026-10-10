@@ -23,35 +23,35 @@ func NewCommentsRepo(dsn string) (*CommentsRepo, error) {
 	return &CommentsRepo{queries: commentsDb.New(pool)}, nil
 }
 
-// create comment in thread
-func (r *CommentsRepo) Create(ctx context.Context, comment model.PostCreate) (model.Post, error) {
+// create comment in post
+func (r *CommentsRepo) Create(ctx context.Context, comment model.CommentCreate) (model.Comment, error) {
 	row, err := r.queries.CommentCreate(ctx, commentsDb.CommentCreateParams{
-		ThreadID: int32(comment.ThreadID),
-		UserID:   int32(comment.UserID),
-		Content:  comment.Content,
+		PostID:  int32(comment.PostID),
+		UserID:  int32(comment.UserID),
+		Content: comment.Content,
 	})
-	return model.Post{
+	return model.Comment{
 		ID:        int(row.ID),
-		ThreadID:  int(row.ThreadID),
+		PostID:    int(row.PostID),
 		UserID:    int(row.UserID),
 		Content:   row.Content,
 		CreatedAt: row.CreatedAt.Time,
 	}, err
 }
 
-// list comments by thread id
-func (r *CommentsRepo) List(ctx context.Context, threadId int) ([]model.Post, error) {
-	rows, err := r.queries.CommentListByThreadId(ctx, int32(threadId))
+// list comments by post id
+func (r *CommentsRepo) List(ctx context.Context, postId int) ([]model.Comment, error) {
+	rows, err := r.queries.CommentListByPostId(ctx, int32(postId))
 
-	var posts []model.Post
+	var comments []model.Comment
 	for _, data := range rows {
-		posts = append(posts, model.Post{
+		comments = append(comments, model.Comment{
 			ID:        int(data.ID),
-			ThreadID:  int(data.ThreadID),
+			PostID:    int(data.PostID),
 			UserID:    int(data.UserID),
 			Content:   data.Content,
 			CreatedAt: data.CreatedAt.Time,
 		})
 	}
-	return posts, err
+	return comments, err
 }

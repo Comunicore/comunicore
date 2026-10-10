@@ -68,47 +68,36 @@ func (UnimplementedHandler) MediaUpload(ctx context.Context, req *MediaUploadReq
 	return r, ht.ErrNotImplemented
 }
 
-// ThreadAddComment implements threadAddComment operation.
+// PostAddComment implements postAddComment operation.
 //
-// Add a new comment to thread.
+// Add a new comment to post.
 //
-// POST /api/threads/{threadId}/comments
-func (UnimplementedHandler) ThreadAddComment(ctx context.Context, req *ThreadCreateCommentRequest, params ThreadAddCommentParams) (r ThreadAddCommentRes, _ error) {
+// POST /api/posts/{postId}/comments
+func (UnimplementedHandler) PostAddComment(ctx context.Context, req *PostCreateCommentRequest, params PostAddCommentParams) (r PostAddCommentRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
-// ThreadAddPost implements threadAddPost operation.
+// PostCreate implements postCreate operation.
 //
-// Add a new post to thread.
+// Create a new post.
 //
-// Deprecated: schema marks this operation as deprecated.
-//
-// POST /api/threads/{threadId}/posts
-func (UnimplementedHandler) ThreadAddPost(ctx context.Context, req *ThreadCreatePostRequest, params ThreadAddPostParams) (r ThreadAddPostRes, _ error) {
+// POST /api/posts
+func (UnimplementedHandler) PostCreate(ctx context.Context, req *PostCreateRequest) (r PostCreateRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
-// ThreadCreate implements threadCreate operation.
+// PostGet implements postGet operation.
 //
-// Create a new thread.
+// Get single post with all comments by post id.
 //
-// POST /api/threads
-func (UnimplementedHandler) ThreadCreate(ctx context.Context, req *ThreadCreateRequest) (r ThreadCreateRes, _ error) {
+// GET /api/posts/{postId}
+func (UnimplementedHandler) PostGet(ctx context.Context, params PostGetParams) (r PostGetRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
-// ThreadGet implements threadGet operation.
+// PostsList implements postsList operation.
 //
-// Get single thread with all posts by thread id.
-//
-// GET /api/threads/{threadId}
-func (UnimplementedHandler) ThreadGet(ctx context.Context, params ThreadGetParams) (r ThreadGetRes, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
-// ThreadsList implements threadsList operation.
-//
-// Получить список веток с пагинацией. Можно
+// Получить список постов с пагинацией. Можно
 // использовать либо постраничную пагинацию (page + limit),
 // либо курсорную пагинацию (after или before). Нужно
 // использовать только один параметр. after, before или page с
@@ -144,8 +133,8 @@ func (UnimplementedHandler) ThreadGet(ctx context.Context, params ThreadGetParam
 // более новым (after) - больший id. И при этом не важно,
 // удалены эти сообщения или нет.
 //
-// GET /api/threads
-func (UnimplementedHandler) ThreadsList(ctx context.Context, params ThreadsListParams) (r ThreadsListRes, _ error) {
+// GET /api/posts
+func (UnimplementedHandler) PostsList(ctx context.Context, params PostsListParams) (r PostsListRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 

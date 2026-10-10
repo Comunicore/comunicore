@@ -45,35 +45,27 @@ type Handler interface {
 	//
 	// POST /api/media
 	MediaUpload(ctx context.Context, req *MediaUploadRequestMultipart) (MediaUploadRes, error)
-	// ThreadAddComment implements threadAddComment operation.
+	// PostAddComment implements postAddComment operation.
 	//
-	// Add a new comment to thread.
+	// Add a new comment to post.
 	//
-	// POST /api/threads/{threadId}/comments
-	ThreadAddComment(ctx context.Context, req *ThreadCreateCommentRequest, params ThreadAddCommentParams) (ThreadAddCommentRes, error)
-	// ThreadAddPost implements threadAddPost operation.
+	// POST /api/posts/{postId}/comments
+	PostAddComment(ctx context.Context, req *PostCreateCommentRequest, params PostAddCommentParams) (PostAddCommentRes, error)
+	// PostCreate implements postCreate operation.
 	//
-	// Add a new post to thread.
+	// Create a new post.
 	//
-	// Deprecated: schema marks this operation as deprecated.
+	// POST /api/posts
+	PostCreate(ctx context.Context, req *PostCreateRequest) (PostCreateRes, error)
+	// PostGet implements postGet operation.
 	//
-	// POST /api/threads/{threadId}/posts
-	ThreadAddPost(ctx context.Context, req *ThreadCreatePostRequest, params ThreadAddPostParams) (ThreadAddPostRes, error)
-	// ThreadCreate implements threadCreate operation.
+	// Get single post with all comments by post id.
 	//
-	// Create a new thread.
+	// GET /api/posts/{postId}
+	PostGet(ctx context.Context, params PostGetParams) (PostGetRes, error)
+	// PostsList implements postsList operation.
 	//
-	// POST /api/threads
-	ThreadCreate(ctx context.Context, req *ThreadCreateRequest) (ThreadCreateRes, error)
-	// ThreadGet implements threadGet operation.
-	//
-	// Get single thread with all posts by thread id.
-	//
-	// GET /api/threads/{threadId}
-	ThreadGet(ctx context.Context, params ThreadGetParams) (ThreadGetRes, error)
-	// ThreadsList implements threadsList operation.
-	//
-	// Получить список веток с пагинацией. Можно
+	// Получить список постов с пагинацией. Можно
 	// использовать либо постраничную пагинацию (page + limit),
 	// либо курсорную пагинацию (after или before). Нужно
 	// использовать только один параметр. after, before или page с
@@ -109,8 +101,8 @@ type Handler interface {
 	// более новым (after) - больший id. И при этом не важно,
 	// удалены эти сообщения или нет.
 	//
-	// GET /api/threads
-	ThreadsList(ctx context.Context, params ThreadsListParams) (ThreadsListRes, error)
+	// GET /api/posts
+	PostsList(ctx context.Context, params PostsListParams) (PostsListRes, error)
 	// UserCreate implements userCreate operation.
 	//
 	// Create a new user.

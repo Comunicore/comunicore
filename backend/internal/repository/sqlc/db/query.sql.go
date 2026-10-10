@@ -110,7 +110,7 @@ SELECT
         SELECT COUNT(*)::double precision FROM (
             SELECT user_id FROM comments
             UNION
-            SELECT user_id FROM threads
+            SELECT user_id FROM posts
         ) AS u
     ), 0.0),
     0.0
@@ -206,28 +206,28 @@ func (q *Queries) AnalyticsMobileUserPercent(ctx context.Context) (float64, erro
 	return pct_users_with_mobile, err
 }
 
-const analyticsPopularTagsByThreadCount = `-- name: AnalyticsPopularTagsByThreadCount :many
-SELECT tag, COUNT(*)::bigint AS thread_count
-FROM thread_tags
+const analyticsPopularTagsByPostCount = `-- name: AnalyticsPopularTagsByPostCount :many
+SELECT tag, COUNT(*)::bigint AS post_count
+FROM post_tags
 GROUP BY tag
-ORDER BY thread_count DESC, tag ASC
+ORDER BY post_count DESC, tag ASC
 `
 
-type AnalyticsPopularTagsByThreadCountRow struct {
-	Tag         string
-	ThreadCount int64
+type AnalyticsPopularTagsByPostCountRow struct {
+	Tag       string
+	PostCount int64
 }
 
-func (q *Queries) AnalyticsPopularTagsByThreadCount(ctx context.Context) ([]AnalyticsPopularTagsByThreadCountRow, error) {
-	rows, err := q.db.Query(ctx, analyticsPopularTagsByThreadCount)
+func (q *Queries) AnalyticsPopularTagsByPostCount(ctx context.Context) ([]AnalyticsPopularTagsByPostCountRow, error) {
+	rows, err := q.db.Query(ctx, analyticsPopularTagsByPostCount)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []AnalyticsPopularTagsByThreadCountRow
+	var items []AnalyticsPopularTagsByPostCountRow
 	for rows.Next() {
-		var i AnalyticsPopularTagsByThreadCountRow
-		if err := rows.Scan(&i.Tag, &i.ThreadCount); err != nil {
+		var i AnalyticsPopularTagsByPostCountRow
+		if err := rows.Scan(&i.Tag, &i.PostCount); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -238,9 +238,38 @@ func (q *Queries) AnalyticsPopularTagsByThreadCount(ctx context.Context) ([]Anal
 	return items, nil
 }
 
+const analyticsTopPostInRange = `-- name: AnalyticsTopPostInRange :one
+SELECT t.id, t.title, COUNT(c.id)::bigint AS reply_count_in_range
+FROM posts t
+LEFT JOIN comments c ON c.post_id = t.id
+    AND c.created_at >= $1
+    AND c.created_at < $2
+GROUP BY t.id, t.title
+ORDER BY reply_count_in_range DESC, t.id ASC
+LIMIT 1
+`
+
+type AnalyticsTopPostInRangeParams struct {
+	StartAt pgtype.Timestamptz
+	EndAt   pgtype.Timestamptz
+}
+
+type AnalyticsTopPostInRangeRow struct {
+	ID                int32
+	Title             string
+	ReplyCountInRange int64
+}
+
+func (q *Queries) AnalyticsTopPostInRange(ctx context.Context, arg AnalyticsTopPostInRangeParams) (AnalyticsTopPostInRangeRow, error) {
+	row := q.db.QueryRow(ctx, analyticsTopPostInRange, arg.StartAt, arg.EndAt)
+	var i AnalyticsTopPostInRangeRow
+	err := row.Scan(&i.ID, &i.Title, &i.ReplyCountInRange)
+	return i, err
+}
+
 const analyticsTopTag = `-- name: AnalyticsTopTag :one
 SELECT tag, COUNT(*)::bigint AS usage_count
-FROM thread_tags
+FROM post_tags
 GROUP BY tag
 ORDER BY usage_count DESC, tag ASC
 LIMIT 1
@@ -255,35 +284,6 @@ func (q *Queries) AnalyticsTopTag(ctx context.Context) (AnalyticsTopTagRow, erro
 	row := q.db.QueryRow(ctx, analyticsTopTag)
 	var i AnalyticsTopTagRow
 	err := row.Scan(&i.Tag, &i.UsageCount)
-	return i, err
-}
-
-const analyticsTopThreadInRange = `-- name: AnalyticsTopThreadInRange :one
-SELECT t.id, t.title, COUNT(c.id)::bigint AS reply_count_in_range
-FROM threads t
-LEFT JOIN comments c ON c.thread_id = t.id
-    AND c.created_at >= $1
-    AND c.created_at < $2
-GROUP BY t.id, t.title
-ORDER BY reply_count_in_range DESC, t.id ASC
-LIMIT 1
-`
-
-type AnalyticsTopThreadInRangeParams struct {
-	StartAt pgtype.Timestamptz
-	EndAt   pgtype.Timestamptz
-}
-
-type AnalyticsTopThreadInRangeRow struct {
-	ID                int32
-	Title             string
-	ReplyCountInRange int64
-}
-
-func (q *Queries) AnalyticsTopThreadInRange(ctx context.Context, arg AnalyticsTopThreadInRangeParams) (AnalyticsTopThreadInRangeRow, error) {
-	row := q.db.QueryRow(ctx, analyticsTopThreadInRange, arg.StartAt, arg.EndAt)
-	var i AnalyticsTopThreadInRangeRow
-	err := row.Scan(&i.ID, &i.Title, &i.ReplyCountInRange)
 	return i, err
 }
 
@@ -322,30 +322,30 @@ func (q *Queries) AnalyticsTopUsersByComments(ctx context.Context) ([]AnalyticsT
 	return items, nil
 }
 
-const analyticsTopUsersByThreads = `-- name: AnalyticsTopUsersByThreads :many
-SELECT u.id, u.name, COUNT(t.id)::bigint AS thread_count
+const analyticsTopUsersByPosts = `-- name: AnalyticsTopUsersByPosts :many
+SELECT u.id, u.name, COUNT(t.id)::bigint AS post_count
 FROM users u
-JOIN threads t ON u.id = t.user_id
+JOIN posts t ON u.id = t.user_id
 GROUP BY u.id, u.name
-ORDER BY thread_count DESC, u.id ASC
+ORDER BY post_count DESC, u.id ASC
 `
 
-type AnalyticsTopUsersByThreadsRow struct {
-	ID          int32
-	Name        string
-	ThreadCount int64
+type AnalyticsTopUsersByPostsRow struct {
+	ID        int32
+	Name      string
+	PostCount int64
 }
 
-func (q *Queries) AnalyticsTopUsersByThreads(ctx context.Context) ([]AnalyticsTopUsersByThreadsRow, error) {
-	rows, err := q.db.Query(ctx, analyticsTopUsersByThreads)
+func (q *Queries) AnalyticsTopUsersByPosts(ctx context.Context) ([]AnalyticsTopUsersByPostsRow, error) {
+	rows, err := q.db.Query(ctx, analyticsTopUsersByPosts)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []AnalyticsTopUsersByThreadsRow
+	var items []AnalyticsTopUsersByPostsRow
 	for rows.Next() {
-		var i AnalyticsTopUsersByThreadsRow
-		if err := rows.Scan(&i.ID, &i.Name, &i.ThreadCount); err != nil {
+		var i AnalyticsTopUsersByPostsRow
+		if err := rows.Scan(&i.ID, &i.Name, &i.PostCount); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
@@ -356,31 +356,31 @@ func (q *Queries) AnalyticsTopUsersByThreads(ctx context.Context) ([]AnalyticsTo
 	return items, nil
 }
 
-const analyticsUsersWithCommentsButNoThreads = `-- name: AnalyticsUsersWithCommentsButNoThreads :many
+const analyticsUsersWithCommentsButNoPosts = `-- name: AnalyticsUsersWithCommentsButNoPosts :many
 SELECT u.id, u.name, COUNT(c.id)::bigint AS comment_count
 FROM users u
 JOIN comments c ON u.id = c.user_id
-LEFT JOIN threads t ON u.id = t.user_id
+LEFT JOIN posts t ON u.id = t.user_id
 WHERE t.id IS NULL
 GROUP BY u.id, u.name
 ORDER BY comment_count DESC, u.id ASC
 `
 
-type AnalyticsUsersWithCommentsButNoThreadsRow struct {
+type AnalyticsUsersWithCommentsButNoPostsRow struct {
 	ID           int32
 	Name         string
 	CommentCount int64
 }
 
-func (q *Queries) AnalyticsUsersWithCommentsButNoThreads(ctx context.Context) ([]AnalyticsUsersWithCommentsButNoThreadsRow, error) {
-	rows, err := q.db.Query(ctx, analyticsUsersWithCommentsButNoThreads)
+func (q *Queries) AnalyticsUsersWithCommentsButNoPosts(ctx context.Context) ([]AnalyticsUsersWithCommentsButNoPostsRow, error) {
+	rows, err := q.db.Query(ctx, analyticsUsersWithCommentsButNoPosts)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []AnalyticsUsersWithCommentsButNoThreadsRow
+	var items []AnalyticsUsersWithCommentsButNoPostsRow
 	for rows.Next() {
-		var i AnalyticsUsersWithCommentsButNoThreadsRow
+		var i AnalyticsUsersWithCommentsButNoPostsRow
 		if err := rows.Scan(&i.ID, &i.Name, &i.CommentCount); err != nil {
 			return nil, err
 		}
@@ -516,30 +516,30 @@ func (q *Queries) AuthUpdatePassword(ctx context.Context, arg AuthUpdatePassword
 }
 
 const commentCreate = `-- name: CommentCreate :one
-INSERT INTO comments (thread_id, user_id, content) VALUES ($1, $2, $3)
-RETURNING id, thread_id, user_id, content, created_at
+INSERT INTO comments (post_id, user_id, content) VALUES ($1, $2, $3)
+RETURNING id, post_id, user_id, content, created_at
 `
 
 type CommentCreateParams struct {
-	ThreadID int32
-	UserID   int32
-	Content  string
+	PostID  int32
+	UserID  int32
+	Content string
 }
 
 type CommentCreateRow struct {
 	ID        int32
-	ThreadID  int32
+	PostID    int32
 	UserID    int32
 	Content   string
 	CreatedAt pgtype.Timestamptz
 }
 
 func (q *Queries) CommentCreate(ctx context.Context, arg CommentCreateParams) (CommentCreateRow, error) {
-	row := q.db.QueryRow(ctx, commentCreate, arg.ThreadID, arg.UserID, arg.Content)
+	row := q.db.QueryRow(ctx, commentCreate, arg.PostID, arg.UserID, arg.Content)
 	var i CommentCreateRow
 	err := row.Scan(
 		&i.ID,
-		&i.ThreadID,
+		&i.PostID,
 		&i.UserID,
 		&i.Content,
 		&i.CreatedAt,
@@ -547,31 +547,31 @@ func (q *Queries) CommentCreate(ctx context.Context, arg CommentCreateParams) (C
 	return i, err
 }
 
-const commentListByThreadId = `-- name: CommentListByThreadId :many
-SELECT id, thread_id, user_id, content, created_at FROM comments
-WHERE thread_id = $1 ORDER BY created_at DESC
+const commentListByPostId = `-- name: CommentListByPostId :many
+SELECT id, post_id, user_id, content, created_at FROM comments
+WHERE post_id = $1 ORDER BY created_at DESC
 `
 
-type CommentListByThreadIdRow struct {
+type CommentListByPostIdRow struct {
 	ID        int32
-	ThreadID  int32
+	PostID    int32
 	UserID    int32
 	Content   string
 	CreatedAt pgtype.Timestamptz
 }
 
-func (q *Queries) CommentListByThreadId(ctx context.Context, threadID int32) ([]CommentListByThreadIdRow, error) {
-	rows, err := q.db.Query(ctx, commentListByThreadId, threadID)
+func (q *Queries) CommentListByPostId(ctx context.Context, postID int32) ([]CommentListByPostIdRow, error) {
+	rows, err := q.db.Query(ctx, commentListByPostId, postID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []CommentListByThreadIdRow
+	var items []CommentListByPostIdRow
 	for rows.Next() {
-		var i CommentListByThreadIdRow
+		var i CommentListByPostIdRow
 		if err := rows.Scan(
 			&i.ID,
-			&i.ThreadID,
+			&i.PostID,
 			&i.UserID,
 			&i.Content,
 			&i.CreatedAt,
@@ -587,90 +587,17 @@ func (q *Queries) CommentListByThreadId(ctx context.Context, threadID int32) ([]
 }
 
 const postCreate = `-- name: PostCreate :one
-INSERT INTO comments (thread_id, user_id, content) VALUES ($1, $2, $3)
-RETURNING id, thread_id, user_id, content, created_at
-`
-
-type PostCreateParams struct {
-	ThreadID int32
-	UserID   int32
-	Content  string
-}
-
-type PostCreateRow struct {
-	ID        int32
-	ThreadID  int32
-	UserID    int32
-	Content   string
-	CreatedAt pgtype.Timestamptz
-}
-
-// deprecated: use CommentCreate instead
-func (q *Queries) PostCreate(ctx context.Context, arg PostCreateParams) (PostCreateRow, error) {
-	row := q.db.QueryRow(ctx, postCreate, arg.ThreadID, arg.UserID, arg.Content)
-	var i PostCreateRow
-	err := row.Scan(
-		&i.ID,
-		&i.ThreadID,
-		&i.UserID,
-		&i.Content,
-		&i.CreatedAt,
-	)
-	return i, err
-}
-
-const postListByThreadId = `-- name: PostListByThreadId :many
-SELECT id, thread_id, user_id, content, created_at FROM comments
-WHERE thread_id = $1 ORDER BY created_at DESC
-`
-
-type PostListByThreadIdRow struct {
-	ID        int32
-	ThreadID  int32
-	UserID    int32
-	Content   string
-	CreatedAt pgtype.Timestamptz
-}
-
-// deprecated: use CommentListByThreadId instead
-func (q *Queries) PostListByThreadId(ctx context.Context, threadID int32) ([]PostListByThreadIdRow, error) {
-	rows, err := q.db.Query(ctx, postListByThreadId, threadID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []PostListByThreadIdRow
-	for rows.Next() {
-		var i PostListByThreadIdRow
-		if err := rows.Scan(
-			&i.ID,
-			&i.ThreadID,
-			&i.UserID,
-			&i.Content,
-			&i.CreatedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
-}
-
-const threadCreate = `-- name: ThreadCreate :one
-INSERT INTO threads (title, content, user_id, comments_count) VALUES ($1, $2, $3, 0)
+INSERT INTO posts (title, content, user_id, comments_count) VALUES ($1, $2, $3, 0)
 RETURNING id, title, content, comments_count, user_id, created_at
 `
 
-type ThreadCreateParams struct {
+type PostCreateParams struct {
 	Title   string
 	Content string
 	UserID  int32
 }
 
-type ThreadCreateRow struct {
+type PostCreateRow struct {
 	ID            int32
 	Title         string
 	Content       string
@@ -679,9 +606,9 @@ type ThreadCreateRow struct {
 	CreatedAt     pgtype.Timestamptz
 }
 
-func (q *Queries) ThreadCreate(ctx context.Context, arg ThreadCreateParams) (ThreadCreateRow, error) {
-	row := q.db.QueryRow(ctx, threadCreate, arg.Title, arg.Content, arg.UserID)
-	var i ThreadCreateRow
+func (q *Queries) PostCreate(ctx context.Context, arg PostCreateParams) (PostCreateRow, error) {
+	row := q.db.QueryRow(ctx, postCreate, arg.Title, arg.Content, arg.UserID)
+	var i PostCreateRow
 	err := row.Scan(
 		&i.ID,
 		&i.Title,
@@ -693,11 +620,11 @@ func (q *Queries) ThreadCreate(ctx context.Context, arg ThreadCreateParams) (Thr
 	return i, err
 }
 
-const threadGetById = `-- name: ThreadGetById :one
-SELECT id, title, content, user_id, comments_count, created_at FROM threads WHERE id = $1
+const postGetById = `-- name: PostGetById :one
+SELECT id, title, content, user_id, comments_count, created_at FROM posts WHERE id = $1
 `
 
-type ThreadGetByIdRow struct {
+type PostGetByIdRow struct {
 	ID            int32
 	Title         string
 	Content       string
@@ -706,9 +633,9 @@ type ThreadGetByIdRow struct {
 	CreatedAt     pgtype.Timestamptz
 }
 
-func (q *Queries) ThreadGetById(ctx context.Context, id int32) (ThreadGetByIdRow, error) {
-	row := q.db.QueryRow(ctx, threadGetById, id)
-	var i ThreadGetByIdRow
+func (q *Queries) PostGetById(ctx context.Context, id int32) (PostGetByIdRow, error) {
+	row := q.db.QueryRow(ctx, postGetById, id)
+	var i PostGetByIdRow
 	err := row.Scan(
 		&i.ID,
 		&i.Title,
@@ -720,18 +647,18 @@ func (q *Queries) ThreadGetById(ctx context.Context, id int32) (ThreadGetByIdRow
 	return i, err
 }
 
-const threadPageByPageID = `-- name: ThreadPageByPageID :many
+const postPageByPageID = `-- name: PostPageByPageID :many
 SELECT id, title, content, user_id, comments_count, created_at
-FROM threads
+FROM posts
 ORDER BY id DESC LIMIT $1 OFFSET $2
 `
 
-type ThreadPageByPageIDParams struct {
+type PostPageByPageIDParams struct {
 	Limit  int32
 	Offset int32
 }
 
-type ThreadPageByPageIDRow struct {
+type PostPageByPageIDRow struct {
 	ID            int32
 	Title         string
 	Content       string
@@ -740,15 +667,15 @@ type ThreadPageByPageIDRow struct {
 	CreatedAt     pgtype.Timestamptz
 }
 
-func (q *Queries) ThreadPageByPageID(ctx context.Context, arg ThreadPageByPageIDParams) ([]ThreadPageByPageIDRow, error) {
-	rows, err := q.db.Query(ctx, threadPageByPageID, arg.Limit, arg.Offset)
+func (q *Queries) PostPageByPageID(ctx context.Context, arg PostPageByPageIDParams) ([]PostPageByPageIDRow, error) {
+	rows, err := q.db.Query(ctx, postPageByPageID, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []ThreadPageByPageIDRow
+	var items []PostPageByPageIDRow
 	for rows.Next() {
-		var i ThreadPageByPageIDRow
+		var i PostPageByPageIDRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Title,
@@ -767,19 +694,19 @@ func (q *Queries) ThreadPageByPageID(ctx context.Context, arg ThreadPageByPageID
 	return items, nil
 }
 
-const threadPagesAfterThreadID = `-- name: ThreadPagesAfterThreadID :many
+const postPagesAfterPostID = `-- name: PostPagesAfterPostID :many
 SELECT id, title, content, user_id, comments_count, created_at
-FROM threads
+FROM posts
 WHERE id > $1
 ORDER BY id DESC LIMIT $2
 `
 
-type ThreadPagesAfterThreadIDParams struct {
+type PostPagesAfterPostIDParams struct {
 	ID    int32
 	Limit int32
 }
 
-type ThreadPagesAfterThreadIDRow struct {
+type PostPagesAfterPostIDRow struct {
 	ID            int32
 	Title         string
 	Content       string
@@ -788,15 +715,15 @@ type ThreadPagesAfterThreadIDRow struct {
 	CreatedAt     pgtype.Timestamptz
 }
 
-func (q *Queries) ThreadPagesAfterThreadID(ctx context.Context, arg ThreadPagesAfterThreadIDParams) ([]ThreadPagesAfterThreadIDRow, error) {
-	rows, err := q.db.Query(ctx, threadPagesAfterThreadID, arg.ID, arg.Limit)
+func (q *Queries) PostPagesAfterPostID(ctx context.Context, arg PostPagesAfterPostIDParams) ([]PostPagesAfterPostIDRow, error) {
+	rows, err := q.db.Query(ctx, postPagesAfterPostID, arg.ID, arg.Limit)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []ThreadPagesAfterThreadIDRow
+	var items []PostPagesAfterPostIDRow
 	for rows.Next() {
-		var i ThreadPagesAfterThreadIDRow
+		var i PostPagesAfterPostIDRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Title,
@@ -815,19 +742,19 @@ func (q *Queries) ThreadPagesAfterThreadID(ctx context.Context, arg ThreadPagesA
 	return items, nil
 }
 
-const threadPagesBeforeThreadID = `-- name: ThreadPagesBeforeThreadID :many
+const postPagesBeforePostID = `-- name: PostPagesBeforePostID :many
 SELECT id, title, content, user_id, comments_count, created_at
-FROM threads
+FROM posts
 WHERE id < $1
 ORDER BY id DESC LIMIT $2
 `
 
-type ThreadPagesBeforeThreadIDParams struct {
+type PostPagesBeforePostIDParams struct {
 	ID    int32
 	Limit int32
 }
 
-type ThreadPagesBeforeThreadIDRow struct {
+type PostPagesBeforePostIDRow struct {
 	ID            int32
 	Title         string
 	Content       string
@@ -836,15 +763,15 @@ type ThreadPagesBeforeThreadIDRow struct {
 	CreatedAt     pgtype.Timestamptz
 }
 
-func (q *Queries) ThreadPagesBeforeThreadID(ctx context.Context, arg ThreadPagesBeforeThreadIDParams) ([]ThreadPagesBeforeThreadIDRow, error) {
-	rows, err := q.db.Query(ctx, threadPagesBeforeThreadID, arg.ID, arg.Limit)
+func (q *Queries) PostPagesBeforePostID(ctx context.Context, arg PostPagesBeforePostIDParams) ([]PostPagesBeforePostIDRow, error) {
+	rows, err := q.db.Query(ctx, postPagesBeforePostID, arg.ID, arg.Limit)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []ThreadPagesBeforeThreadIDRow
+	var items []PostPagesBeforePostIDRow
 	for rows.Next() {
-		var i ThreadPagesBeforeThreadIDRow
+		var i PostPagesBeforePostIDRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Title,
@@ -863,17 +790,17 @@ func (q *Queries) ThreadPagesBeforeThreadID(ctx context.Context, arg ThreadPages
 	return items, nil
 }
 
-const threadTagInsert = `-- name: ThreadTagInsert :exec
-INSERT INTO thread_tags (thread_id, tag) VALUES ($1, $2) ON CONFLICT DO NOTHING
+const postTagInsert = `-- name: PostTagInsert :exec
+INSERT INTO post_tags (post_id, tag) VALUES ($1, $2) ON CONFLICT DO NOTHING
 `
 
-type ThreadTagInsertParams struct {
-	ThreadID int32
-	Tag      string
+type PostTagInsertParams struct {
+	PostID int32
+	Tag    string
 }
 
-func (q *Queries) ThreadTagInsert(ctx context.Context, arg ThreadTagInsertParams) error {
-	_, err := q.db.Exec(ctx, threadTagInsert, arg.ThreadID, arg.Tag)
+func (q *Queries) PostTagInsert(ctx context.Context, arg PostTagInsertParams) error {
+	_, err := q.db.Exec(ctx, postTagInsert, arg.PostID, arg.Tag)
 	return err
 }
 

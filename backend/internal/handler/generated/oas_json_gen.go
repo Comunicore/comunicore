@@ -347,21 +347,21 @@ func (s *AnalyticsMetricsResponse) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.TopThreadWeekly.Set {
-			e.FieldStart("topThreadWeekly")
-			s.TopThreadWeekly.Encode(e)
+		if s.TopPostWeekly.Set {
+			e.FieldStart("topPostWeekly")
+			s.TopPostWeekly.Encode(e)
 		}
 	}
 	{
-		if s.TopThreadMonthly.Set {
-			e.FieldStart("topThreadMonthly")
-			s.TopThreadMonthly.Encode(e)
+		if s.TopPostMonthly.Set {
+			e.FieldStart("topPostMonthly")
+			s.TopPostMonthly.Encode(e)
 		}
 	}
 	{
-		e.FieldStart("topUsersByPosts")
+		e.FieldStart("topUsersByComments")
 		e.ArrStart()
-		for _, elem := range s.TopUsersByPosts {
+		for _, elem := range s.TopUsersByComments {
 			elem.Encode(e)
 		}
 		e.ArrEnd()
@@ -383,9 +383,9 @@ func (s *AnalyticsMetricsResponse) encodeFields(e *jx.Encoder) {
 		e.ArrEnd()
 	}
 	{
-		e.FieldStart("topUsersByThreads")
+		e.FieldStart("topUsersByPosts")
 		e.ArrStart()
-		for _, elem := range s.TopUsersByThreads {
+		for _, elem := range s.TopUsersByPosts {
 			elem.Encode(e)
 		}
 		e.ArrEnd()
@@ -414,12 +414,12 @@ var jsonFieldsNameOfAnalyticsMetricsResponse = [20]string{
 	10: "mobilePctUsers",
 	11: "activityByHourUtc",
 	12: "topTag",
-	13: "topThreadWeekly",
-	14: "topThreadMonthly",
-	15: "topUsersByPosts",
+	13: "topPostWeekly",
+	14: "topPostMonthly",
+	15: "topUsersByComments",
 	16: "popularTags",
 	17: "postsActivityByDay",
-	18: "topUsersByThreads",
+	18: "topUsersByPosts",
 	19: "postOnlyUsers",
 }
 
@@ -592,43 +592,43 @@ func (s *AnalyticsMetricsResponse) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"topTag\"")
 			}
-		case "topThreadWeekly":
+		case "topPostWeekly":
 			if err := func() error {
-				s.TopThreadWeekly.Reset()
-				if err := s.TopThreadWeekly.Decode(d); err != nil {
+				s.TopPostWeekly.Reset()
+				if err := s.TopPostWeekly.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"topThreadWeekly\"")
+				return errors.Wrap(err, "decode field \"topPostWeekly\"")
 			}
-		case "topThreadMonthly":
+		case "topPostMonthly":
 			if err := func() error {
-				s.TopThreadMonthly.Reset()
-				if err := s.TopThreadMonthly.Decode(d); err != nil {
+				s.TopPostMonthly.Reset()
+				if err := s.TopPostMonthly.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"topThreadMonthly\"")
+				return errors.Wrap(err, "decode field \"topPostMonthly\"")
 			}
-		case "topUsersByPosts":
+		case "topUsersByComments":
 			requiredBitSet[1] |= 1 << 7
 			if err := func() error {
-				s.TopUsersByPosts = make([]AnalyticsUserCount, 0)
+				s.TopUsersByComments = make([]AnalyticsUserCount, 0)
 				if err := d.Arr(func(d *jx.Decoder) error {
 					var elem AnalyticsUserCount
 					if err := elem.Decode(d); err != nil {
 						return err
 					}
-					s.TopUsersByPosts = append(s.TopUsersByPosts, elem)
+					s.TopUsersByComments = append(s.TopUsersByComments, elem)
 					return nil
 				}); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"topUsersByPosts\"")
+				return errors.Wrap(err, "decode field \"topUsersByComments\"")
 			}
 		case "popularTags":
 			requiredBitSet[2] |= 1 << 0
@@ -666,23 +666,23 @@ func (s *AnalyticsMetricsResponse) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"postsActivityByDay\"")
 			}
-		case "topUsersByThreads":
+		case "topUsersByPosts":
 			requiredBitSet[2] |= 1 << 2
 			if err := func() error {
-				s.TopUsersByThreads = make([]AnalyticsUserCount, 0)
+				s.TopUsersByPosts = make([]AnalyticsUserCount, 0)
 				if err := d.Arr(func(d *jx.Decoder) error {
 					var elem AnalyticsUserCount
 					if err := elem.Decode(d); err != nil {
 						return err
 					}
-					s.TopUsersByThreads = append(s.TopUsersByThreads, elem)
+					s.TopUsersByPosts = append(s.TopUsersByPosts, elem)
 					return nil
 				}); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"topUsersByThreads\"")
+				return errors.Wrap(err, "decode field \"topUsersByPosts\"")
 			}
 		case "postOnlyUsers":
 			requiredBitSet[2] |= 1 << 3
@@ -774,14 +774,14 @@ func (s *AnalyticsTagCount) encodeFields(e *jx.Encoder) {
 		e.Str(s.Tag)
 	}
 	{
-		e.FieldStart("threadCount")
-		e.Int64(s.ThreadCount)
+		e.FieldStart("postsCount")
+		e.Int64(s.PostsCount)
 	}
 }
 
 var jsonFieldsNameOfAnalyticsTagCount = [2]string{
 	0: "tag",
-	1: "threadCount",
+	1: "postsCount",
 }
 
 // Decode decodes AnalyticsTagCount from json.
@@ -805,17 +805,17 @@ func (s *AnalyticsTagCount) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"tag\"")
 			}
-		case "threadCount":
+		case "postsCount":
 			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
 				v, err := d.Int64()
-				s.ThreadCount = int64(v)
+				s.PostsCount = int64(v)
 				if err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"threadCount\"")
+				return errors.Wrap(err, "decode field \"postsCount\"")
 			}
 		default:
 			return d.Skip()
@@ -869,6 +869,136 @@ func (s *AnalyticsTagCount) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *AnalyticsTagCount) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *AnalyticsTopPost) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *AnalyticsTopPost) encodeFields(e *jx.Encoder) {
+	{
+		e.FieldStart("postId")
+		e.Int(s.PostId)
+	}
+	{
+		e.FieldStart("title")
+		e.Str(s.Title)
+	}
+	{
+		e.FieldStart("repliesInWindow")
+		e.Int64(s.RepliesInWindow)
+	}
+}
+
+var jsonFieldsNameOfAnalyticsTopPost = [3]string{
+	0: "postId",
+	1: "title",
+	2: "repliesInWindow",
+}
+
+// Decode decodes AnalyticsTopPost from json.
+func (s *AnalyticsTopPost) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode AnalyticsTopPost to nil")
+	}
+	var requiredBitSet [1]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "postId":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				v, err := d.Int()
+				s.PostId = int(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"postId\"")
+			}
+		case "title":
+			requiredBitSet[0] |= 1 << 1
+			if err := func() error {
+				v, err := d.Str()
+				s.Title = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"title\"")
+			}
+		case "repliesInWindow":
+			requiredBitSet[0] |= 1 << 2
+			if err := func() error {
+				v, err := d.Int64()
+				s.RepliesInWindow = int64(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"repliesInWindow\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode AnalyticsTopPost")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000111,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfAnalyticsTopPost) {
+					name = jsonFieldsNameOfAnalyticsTopPost[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *AnalyticsTopPost) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *AnalyticsTopPost) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -982,136 +1112,6 @@ func (s *AnalyticsTopTag) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *AnalyticsTopTag) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *AnalyticsTopThread) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *AnalyticsTopThread) encodeFields(e *jx.Encoder) {
-	{
-		e.FieldStart("threadId")
-		e.Int(s.ThreadId)
-	}
-	{
-		e.FieldStart("title")
-		e.Str(s.Title)
-	}
-	{
-		e.FieldStart("repliesInWindow")
-		e.Int64(s.RepliesInWindow)
-	}
-}
-
-var jsonFieldsNameOfAnalyticsTopThread = [3]string{
-	0: "threadId",
-	1: "title",
-	2: "repliesInWindow",
-}
-
-// Decode decodes AnalyticsTopThread from json.
-func (s *AnalyticsTopThread) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode AnalyticsTopThread to nil")
-	}
-	var requiredBitSet [1]uint8
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "threadId":
-			requiredBitSet[0] |= 1 << 0
-			if err := func() error {
-				v, err := d.Int()
-				s.ThreadId = int(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"threadId\"")
-			}
-		case "title":
-			requiredBitSet[0] |= 1 << 1
-			if err := func() error {
-				v, err := d.Str()
-				s.Title = string(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"title\"")
-			}
-		case "repliesInWindow":
-			requiredBitSet[0] |= 1 << 2
-			if err := func() error {
-				v, err := d.Int64()
-				s.RepliesInWindow = int64(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"repliesInWindow\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode AnalyticsTopThread")
-	}
-	// Validate required fields.
-	var failures []validate.FieldError
-	for i, mask := range [1]uint8{
-		0b00000111,
-	} {
-		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
-			// Mask only required fields and check equality to mask using XOR.
-			//
-			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
-			// Bits of fields which would be set are actually bits of missed fields.
-			missed := bits.OnesCount8(result)
-			for bitN := 0; bitN < missed; bitN++ {
-				bitIdx := bits.TrailingZeros8(result)
-				fieldIdx := i*8 + bitIdx
-				var name string
-				if fieldIdx < len(jsonFieldsNameOfAnalyticsTopThread) {
-					name = jsonFieldsNameOfAnalyticsTopThread[fieldIdx]
-				} else {
-					name = strconv.Itoa(fieldIdx)
-				}
-				failures = append(failures, validate.FieldError{
-					Name:  name,
-					Error: validate.ErrFieldRequired,
-				})
-				// Reset bit.
-				result &^= 1 << bitIdx
-			}
-		}
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *AnalyticsTopThread) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *AnalyticsTopThread) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -2264,6 +2264,39 @@ func (s *MediaUploadUnauthorized) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
+// Encode encodes AnalyticsTopPost as json.
+func (o OptAnalyticsTopPost) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes AnalyticsTopPost from json.
+func (o *OptAnalyticsTopPost) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptAnalyticsTopPost to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptAnalyticsTopPost) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptAnalyticsTopPost) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode encodes AnalyticsTopTag as json.
 func (o OptAnalyticsTopTag) Encode(e *jx.Encoder) {
 	if !o.Set {
@@ -2293,39 +2326,6 @@ func (s OptAnalyticsTopTag) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *OptAnalyticsTopTag) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes AnalyticsTopThread as json.
-func (o OptAnalyticsTopThread) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	o.Value.Encode(e)
-}
-
-// Decode decodes AnalyticsTopThread from json.
-func (o *OptAnalyticsTopThread) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptAnalyticsTopThread to nil")
-	}
-	o.Set = true
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptAnalyticsTopThread) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptAnalyticsTopThread) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -2400,17 +2400,17 @@ func (s *OptDateTime) UnmarshalJSON(data []byte) error {
 	return s.Decode(d, json.DecodeDateTime)
 }
 
-// Encode encodes ThreadAddCommentBadRequest as json.
-func (s ThreadAddCommentBadRequest) Encode(e *jx.Encoder) {
+// Encode encodes PostAddCommentBadRequest as json.
+func (s PostAddCommentBadRequest) Encode(e *jx.Encoder) {
 	unwrapped := AnalyticsMetricsGetInternalServerErrorApplicationJSON(s)
 
 	unwrapped.Encode(e)
 }
 
-// Decode decodes ThreadAddCommentBadRequest from json.
-func (s *ThreadAddCommentBadRequest) Decode(d *jx.Decoder) error {
+// Decode decodes PostAddCommentBadRequest from json.
+func (s *PostAddCommentBadRequest) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode ThreadAddCommentBadRequest to nil")
+		return errors.New("invalid: unable to decode PostAddCommentBadRequest to nil")
 	}
 	var unwrapped AnalyticsMetricsGetInternalServerErrorApplicationJSON
 	if err := func() error {
@@ -2421,34 +2421,34 @@ func (s *ThreadAddCommentBadRequest) Decode(d *jx.Decoder) error {
 	}(); err != nil {
 		return errors.Wrap(err, "alias")
 	}
-	*s = ThreadAddCommentBadRequest(unwrapped)
+	*s = PostAddCommentBadRequest(unwrapped)
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s ThreadAddCommentBadRequest) MarshalJSON() ([]byte, error) {
+func (s PostAddCommentBadRequest) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *ThreadAddCommentBadRequest) UnmarshalJSON(data []byte) error {
+func (s *PostAddCommentBadRequest) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
-// Encode encodes ThreadAddCommentInternalServerError as json.
-func (s ThreadAddCommentInternalServerError) Encode(e *jx.Encoder) {
+// Encode encodes PostAddCommentInternalServerError as json.
+func (s PostAddCommentInternalServerError) Encode(e *jx.Encoder) {
 	unwrapped := AnalyticsMetricsGetInternalServerErrorApplicationJSON(s)
 
 	unwrapped.Encode(e)
 }
 
-// Decode decodes ThreadAddCommentInternalServerError from json.
-func (s *ThreadAddCommentInternalServerError) Decode(d *jx.Decoder) error {
+// Decode decodes PostAddCommentInternalServerError from json.
+func (s *PostAddCommentInternalServerError) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode ThreadAddCommentInternalServerError to nil")
+		return errors.New("invalid: unable to decode PostAddCommentInternalServerError to nil")
 	}
 	var unwrapped AnalyticsMetricsGetInternalServerErrorApplicationJSON
 	if err := func() error {
@@ -2459,108 +2459,32 @@ func (s *ThreadAddCommentInternalServerError) Decode(d *jx.Decoder) error {
 	}(); err != nil {
 		return errors.Wrap(err, "alias")
 	}
-	*s = ThreadAddCommentInternalServerError(unwrapped)
+	*s = PostAddCommentInternalServerError(unwrapped)
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s ThreadAddCommentInternalServerError) MarshalJSON() ([]byte, error) {
+func (s PostAddCommentInternalServerError) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *ThreadAddCommentInternalServerError) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes ThreadAddPostBadRequest as json.
-func (s ThreadAddPostBadRequest) Encode(e *jx.Encoder) {
-	unwrapped := AnalyticsMetricsGetInternalServerErrorApplicationJSON(s)
-
-	unwrapped.Encode(e)
-}
-
-// Decode decodes ThreadAddPostBadRequest from json.
-func (s *ThreadAddPostBadRequest) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode ThreadAddPostBadRequest to nil")
-	}
-	var unwrapped AnalyticsMetricsGetInternalServerErrorApplicationJSON
-	if err := func() error {
-		if err := unwrapped.Decode(d); err != nil {
-			return err
-		}
-		return nil
-	}(); err != nil {
-		return errors.Wrap(err, "alias")
-	}
-	*s = ThreadAddPostBadRequest(unwrapped)
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s ThreadAddPostBadRequest) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *ThreadAddPostBadRequest) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes ThreadAddPostInternalServerError as json.
-func (s ThreadAddPostInternalServerError) Encode(e *jx.Encoder) {
-	unwrapped := AnalyticsMetricsGetInternalServerErrorApplicationJSON(s)
-
-	unwrapped.Encode(e)
-}
-
-// Decode decodes ThreadAddPostInternalServerError from json.
-func (s *ThreadAddPostInternalServerError) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode ThreadAddPostInternalServerError to nil")
-	}
-	var unwrapped AnalyticsMetricsGetInternalServerErrorApplicationJSON
-	if err := func() error {
-		if err := unwrapped.Decode(d); err != nil {
-			return err
-		}
-		return nil
-	}(); err != nil {
-		return errors.Wrap(err, "alias")
-	}
-	*s = ThreadAddPostInternalServerError(unwrapped)
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s ThreadAddPostInternalServerError) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *ThreadAddPostInternalServerError) UnmarshalJSON(data []byte) error {
+func (s *PostAddCommentInternalServerError) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
 // Encode implements json.Marshaler.
-func (s *ThreadCommentItem) Encode(e *jx.Encoder) {
+func (s *PostCommentItem) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
 	e.ObjEnd()
 }
 
 // encodeFields encodes fields.
-func (s *ThreadCommentItem) encodeFields(e *jx.Encoder) {
+func (s *PostCommentItem) encodeFields(e *jx.Encoder) {
 	{
 		e.FieldStart("id")
 		e.Int(s.ID)
@@ -2587,7 +2511,7 @@ func (s *ThreadCommentItem) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfThreadCommentItem = [6]string{
+var jsonFieldsNameOfPostCommentItem = [6]string{
 	0: "id",
 	1: "authorId",
 	2: "authorName",
@@ -2596,10 +2520,10 @@ var jsonFieldsNameOfThreadCommentItem = [6]string{
 	5: "createdAt",
 }
 
-// Decode decodes ThreadCommentItem from json.
-func (s *ThreadCommentItem) Decode(d *jx.Decoder) error {
+// Decode decodes PostCommentItem from json.
+func (s *PostCommentItem) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode ThreadCommentItem to nil")
+		return errors.New("invalid: unable to decode PostCommentItem to nil")
 	}
 	var requiredBitSet [1]uint8
 
@@ -2682,7 +2606,7 @@ func (s *ThreadCommentItem) Decode(d *jx.Decoder) error {
 		}
 		return nil
 	}); err != nil {
-		return errors.Wrap(err, "decode ThreadCommentItem")
+		return errors.Wrap(err, "decode PostCommentItem")
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
@@ -2699,8 +2623,8 @@ func (s *ThreadCommentItem) Decode(d *jx.Decoder) error {
 				bitIdx := bits.TrailingZeros8(result)
 				fieldIdx := i*8 + bitIdx
 				var name string
-				if fieldIdx < len(jsonFieldsNameOfThreadCommentItem) {
-					name = jsonFieldsNameOfThreadCommentItem[fieldIdx]
+				if fieldIdx < len(jsonFieldsNameOfPostCommentItem) {
+					name = jsonFieldsNameOfPostCommentItem[fieldIdx]
 				} else {
 					name = strconv.Itoa(fieldIdx)
 				}
@@ -2721,41 +2645,41 @@ func (s *ThreadCommentItem) Decode(d *jx.Decoder) error {
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *ThreadCommentItem) MarshalJSON() ([]byte, error) {
+func (s *PostCommentItem) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *ThreadCommentItem) UnmarshalJSON(data []byte) error {
+func (s *PostCommentItem) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
 // Encode implements json.Marshaler.
-func (s *ThreadCreateCommentRequest) Encode(e *jx.Encoder) {
+func (s *PostCreateCommentRequest) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
 	e.ObjEnd()
 }
 
 // encodeFields encodes fields.
-func (s *ThreadCreateCommentRequest) encodeFields(e *jx.Encoder) {
+func (s *PostCreateCommentRequest) encodeFields(e *jx.Encoder) {
 	{
 		e.FieldStart("content")
 		e.Str(s.Content)
 	}
 }
 
-var jsonFieldsNameOfThreadCreateCommentRequest = [1]string{
+var jsonFieldsNameOfPostCreateCommentRequest = [1]string{
 	0: "content",
 }
 
-// Decode decodes ThreadCreateCommentRequest from json.
-func (s *ThreadCreateCommentRequest) Decode(d *jx.Decoder) error {
+// Decode decodes PostCreateCommentRequest from json.
+func (s *PostCreateCommentRequest) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode ThreadCreateCommentRequest to nil")
+		return errors.New("invalid: unable to decode PostCreateCommentRequest to nil")
 	}
 	var requiredBitSet [1]uint8
 
@@ -2778,7 +2702,7 @@ func (s *ThreadCreateCommentRequest) Decode(d *jx.Decoder) error {
 		}
 		return nil
 	}); err != nil {
-		return errors.Wrap(err, "decode ThreadCreateCommentRequest")
+		return errors.Wrap(err, "decode PostCreateCommentRequest")
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
@@ -2795,8 +2719,8 @@ func (s *ThreadCreateCommentRequest) Decode(d *jx.Decoder) error {
 				bitIdx := bits.TrailingZeros8(result)
 				fieldIdx := i*8 + bitIdx
 				var name string
-				if fieldIdx < len(jsonFieldsNameOfThreadCreateCommentRequest) {
-					name = jsonFieldsNameOfThreadCreateCommentRequest[fieldIdx]
+				if fieldIdx < len(jsonFieldsNameOfPostCreateCommentRequest) {
+					name = jsonFieldsNameOfPostCreateCommentRequest[fieldIdx]
 				} else {
 					name = strconv.Itoa(fieldIdx)
 				}
@@ -2817,29 +2741,29 @@ func (s *ThreadCreateCommentRequest) Decode(d *jx.Decoder) error {
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *ThreadCreateCommentRequest) MarshalJSON() ([]byte, error) {
+func (s *PostCreateCommentRequest) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *ThreadCreateCommentRequest) UnmarshalJSON(data []byte) error {
+func (s *PostCreateCommentRequest) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
-// Encode encodes ThreadCreateInternalServerError as json.
-func (s ThreadCreateInternalServerError) Encode(e *jx.Encoder) {
+// Encode encodes PostCreateInternalServerError as json.
+func (s PostCreateInternalServerError) Encode(e *jx.Encoder) {
 	unwrapped := AnalyticsMetricsGetInternalServerErrorApplicationJSON(s)
 
 	unwrapped.Encode(e)
 }
 
-// Decode decodes ThreadCreateInternalServerError from json.
-func (s *ThreadCreateInternalServerError) Decode(d *jx.Decoder) error {
+// Decode decodes PostCreateInternalServerError from json.
+func (s *PostCreateInternalServerError) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode ThreadCreateInternalServerError to nil")
+		return errors.New("invalid: unable to decode PostCreateInternalServerError to nil")
 	}
 	var unwrapped AnalyticsMetricsGetInternalServerErrorApplicationJSON
 	if err := func() error {
@@ -2850,128 +2774,32 @@ func (s *ThreadCreateInternalServerError) Decode(d *jx.Decoder) error {
 	}(); err != nil {
 		return errors.Wrap(err, "alias")
 	}
-	*s = ThreadCreateInternalServerError(unwrapped)
+	*s = PostCreateInternalServerError(unwrapped)
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s ThreadCreateInternalServerError) MarshalJSON() ([]byte, error) {
+func (s PostCreateInternalServerError) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *ThreadCreateInternalServerError) UnmarshalJSON(data []byte) error {
+func (s *PostCreateInternalServerError) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
 // Encode implements json.Marshaler.
-func (s *ThreadCreatePostRequest) Encode(e *jx.Encoder) {
+func (s *PostCreateRequest) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
 	e.ObjEnd()
 }
 
 // encodeFields encodes fields.
-func (s *ThreadCreatePostRequest) encodeFields(e *jx.Encoder) {
-	{
-		e.FieldStart("content")
-		e.Str(s.Content)
-	}
-}
-
-var jsonFieldsNameOfThreadCreatePostRequest = [1]string{
-	0: "content",
-}
-
-// Decode decodes ThreadCreatePostRequest from json.
-func (s *ThreadCreatePostRequest) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode ThreadCreatePostRequest to nil")
-	}
-	var requiredBitSet [1]uint8
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "content":
-			requiredBitSet[0] |= 1 << 0
-			if err := func() error {
-				v, err := d.Str()
-				s.Content = string(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"content\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode ThreadCreatePostRequest")
-	}
-	// Validate required fields.
-	var failures []validate.FieldError
-	for i, mask := range [1]uint8{
-		0b00000001,
-	} {
-		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
-			// Mask only required fields and check equality to mask using XOR.
-			//
-			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
-			// Bits of fields which would be set are actually bits of missed fields.
-			missed := bits.OnesCount8(result)
-			for bitN := 0; bitN < missed; bitN++ {
-				bitIdx := bits.TrailingZeros8(result)
-				fieldIdx := i*8 + bitIdx
-				var name string
-				if fieldIdx < len(jsonFieldsNameOfThreadCreatePostRequest) {
-					name = jsonFieldsNameOfThreadCreatePostRequest[fieldIdx]
-				} else {
-					name = strconv.Itoa(fieldIdx)
-				}
-				failures = append(failures, validate.FieldError{
-					Name:  name,
-					Error: validate.ErrFieldRequired,
-				})
-				// Reset bit.
-				result &^= 1 << bitIdx
-			}
-		}
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *ThreadCreatePostRequest) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *ThreadCreatePostRequest) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *ThreadCreateRequest) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *ThreadCreateRequest) encodeFields(e *jx.Encoder) {
+func (s *PostCreateRequest) encodeFields(e *jx.Encoder) {
 	{
 		e.FieldStart("title")
 		e.Str(s.Title)
@@ -2992,16 +2820,16 @@ func (s *ThreadCreateRequest) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfThreadCreateRequest = [3]string{
+var jsonFieldsNameOfPostCreateRequest = [3]string{
 	0: "title",
 	1: "content",
 	2: "tags",
 }
 
-// Decode decodes ThreadCreateRequest from json.
-func (s *ThreadCreateRequest) Decode(d *jx.Decoder) error {
+// Decode decodes PostCreateRequest from json.
+func (s *PostCreateRequest) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode ThreadCreateRequest to nil")
+		return errors.New("invalid: unable to decode PostCreateRequest to nil")
 	}
 	var requiredBitSet [1]uint8
 
@@ -3055,7 +2883,7 @@ func (s *ThreadCreateRequest) Decode(d *jx.Decoder) error {
 		}
 		return nil
 	}); err != nil {
-		return errors.Wrap(err, "decode ThreadCreateRequest")
+		return errors.Wrap(err, "decode PostCreateRequest")
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
@@ -3072,8 +2900,8 @@ func (s *ThreadCreateRequest) Decode(d *jx.Decoder) error {
 				bitIdx := bits.TrailingZeros8(result)
 				fieldIdx := i*8 + bitIdx
 				var name string
-				if fieldIdx < len(jsonFieldsNameOfThreadCreateRequest) {
-					name = jsonFieldsNameOfThreadCreateRequest[fieldIdx]
+				if fieldIdx < len(jsonFieldsNameOfPostCreateRequest) {
+					name = jsonFieldsNameOfPostCreateRequest[fieldIdx]
 				} else {
 					name = strconv.Itoa(fieldIdx)
 				}
@@ -3094,29 +2922,29 @@ func (s *ThreadCreateRequest) Decode(d *jx.Decoder) error {
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *ThreadCreateRequest) MarshalJSON() ([]byte, error) {
+func (s *PostCreateRequest) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *ThreadCreateRequest) UnmarshalJSON(data []byte) error {
+func (s *PostCreateRequest) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
-// Encode encodes ThreadCreateUnauthorized as json.
-func (s ThreadCreateUnauthorized) Encode(e *jx.Encoder) {
+// Encode encodes PostCreateUnauthorized as json.
+func (s PostCreateUnauthorized) Encode(e *jx.Encoder) {
 	unwrapped := AnalyticsMetricsGetInternalServerErrorApplicationJSON(s)
 
 	unwrapped.Encode(e)
 }
 
-// Decode decodes ThreadCreateUnauthorized from json.
-func (s *ThreadCreateUnauthorized) Decode(d *jx.Decoder) error {
+// Decode decodes PostCreateUnauthorized from json.
+func (s *PostCreateUnauthorized) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode ThreadCreateUnauthorized to nil")
+		return errors.New("invalid: unable to decode PostCreateUnauthorized to nil")
 	}
 	var unwrapped AnalyticsMetricsGetInternalServerErrorApplicationJSON
 	if err := func() error {
@@ -3127,34 +2955,34 @@ func (s *ThreadCreateUnauthorized) Decode(d *jx.Decoder) error {
 	}(); err != nil {
 		return errors.Wrap(err, "alias")
 	}
-	*s = ThreadCreateUnauthorized(unwrapped)
+	*s = PostCreateUnauthorized(unwrapped)
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s ThreadCreateUnauthorized) MarshalJSON() ([]byte, error) {
+func (s PostCreateUnauthorized) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *ThreadCreateUnauthorized) UnmarshalJSON(data []byte) error {
+func (s *PostCreateUnauthorized) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
-// Encode encodes ThreadGetBadRequest as json.
-func (s ThreadGetBadRequest) Encode(e *jx.Encoder) {
+// Encode encodes PostGetBadRequest as json.
+func (s PostGetBadRequest) Encode(e *jx.Encoder) {
 	unwrapped := AnalyticsMetricsGetInternalServerErrorApplicationJSON(s)
 
 	unwrapped.Encode(e)
 }
 
-// Decode decodes ThreadGetBadRequest from json.
-func (s *ThreadGetBadRequest) Decode(d *jx.Decoder) error {
+// Decode decodes PostGetBadRequest from json.
+func (s *PostGetBadRequest) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode ThreadGetBadRequest to nil")
+		return errors.New("invalid: unable to decode PostGetBadRequest to nil")
 	}
 	var unwrapped AnalyticsMetricsGetInternalServerErrorApplicationJSON
 	if err := func() error {
@@ -3165,34 +2993,34 @@ func (s *ThreadGetBadRequest) Decode(d *jx.Decoder) error {
 	}(); err != nil {
 		return errors.Wrap(err, "alias")
 	}
-	*s = ThreadGetBadRequest(unwrapped)
+	*s = PostGetBadRequest(unwrapped)
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s ThreadGetBadRequest) MarshalJSON() ([]byte, error) {
+func (s PostGetBadRequest) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *ThreadGetBadRequest) UnmarshalJSON(data []byte) error {
+func (s *PostGetBadRequest) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
-// Encode encodes ThreadGetInternalServerError as json.
-func (s ThreadGetInternalServerError) Encode(e *jx.Encoder) {
+// Encode encodes PostGetInternalServerError as json.
+func (s PostGetInternalServerError) Encode(e *jx.Encoder) {
 	unwrapped := AnalyticsMetricsGetInternalServerErrorApplicationJSON(s)
 
 	unwrapped.Encode(e)
 }
 
-// Decode decodes ThreadGetInternalServerError from json.
-func (s *ThreadGetInternalServerError) Decode(d *jx.Decoder) error {
+// Decode decodes PostGetInternalServerError from json.
+func (s *PostGetInternalServerError) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode ThreadGetInternalServerError to nil")
+		return errors.New("invalid: unable to decode PostGetInternalServerError to nil")
 	}
 	var unwrapped AnalyticsMetricsGetInternalServerErrorApplicationJSON
 	if err := func() error {
@@ -3203,32 +3031,32 @@ func (s *ThreadGetInternalServerError) Decode(d *jx.Decoder) error {
 	}(); err != nil {
 		return errors.Wrap(err, "alias")
 	}
-	*s = ThreadGetInternalServerError(unwrapped)
+	*s = PostGetInternalServerError(unwrapped)
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s ThreadGetInternalServerError) MarshalJSON() ([]byte, error) {
+func (s PostGetInternalServerError) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *ThreadGetInternalServerError) UnmarshalJSON(data []byte) error {
+func (s *PostGetInternalServerError) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
 // Encode implements json.Marshaler.
-func (s *ThreadListItem) Encode(e *jx.Encoder) {
+func (s *PostListItem) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
 	e.ObjEnd()
 }
 
 // encodeFields encodes fields.
-func (s *ThreadListItem) encodeFields(e *jx.Encoder) {
+func (s *PostListItem) encodeFields(e *jx.Encoder) {
 	{
 		e.FieldStart("id")
 		e.Int(s.ID)
@@ -3267,7 +3095,7 @@ func (s *ThreadListItem) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfThreadListItem = [9]string{
+var jsonFieldsNameOfPostListItem = [9]string{
 	0: "id",
 	1: "authorId",
 	2: "authorName",
@@ -3279,10 +3107,10 @@ var jsonFieldsNameOfThreadListItem = [9]string{
 	8: "createdAt",
 }
 
-// Decode decodes ThreadListItem from json.
-func (s *ThreadListItem) Decode(d *jx.Decoder) error {
+// Decode decodes PostListItem from json.
+func (s *PostListItem) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode ThreadListItem to nil")
+		return errors.New("invalid: unable to decode PostListItem to nil")
 	}
 	var requiredBitSet [2]uint8
 
@@ -3401,7 +3229,7 @@ func (s *ThreadListItem) Decode(d *jx.Decoder) error {
 		}
 		return nil
 	}); err != nil {
-		return errors.Wrap(err, "decode ThreadListItem")
+		return errors.Wrap(err, "decode PostListItem")
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
@@ -3419,8 +3247,8 @@ func (s *ThreadListItem) Decode(d *jx.Decoder) error {
 				bitIdx := bits.TrailingZeros8(result)
 				fieldIdx := i*8 + bitIdx
 				var name string
-				if fieldIdx < len(jsonFieldsNameOfThreadListItem) {
-					name = jsonFieldsNameOfThreadListItem[fieldIdx]
+				if fieldIdx < len(jsonFieldsNameOfPostListItem) {
+					name = jsonFieldsNameOfPostListItem[fieldIdx]
 				} else {
 					name = strconv.Itoa(fieldIdx)
 				}
@@ -3441,31 +3269,31 @@ func (s *ThreadListItem) Decode(d *jx.Decoder) error {
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *ThreadListItem) MarshalJSON() ([]byte, error) {
+func (s *PostListItem) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *ThreadListItem) UnmarshalJSON(data []byte) error {
+func (s *PostListItem) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
 // Encode implements json.Marshaler.
-func (s *ThreadListResponse) Encode(e *jx.Encoder) {
+func (s *PostListResponse) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
 	e.ObjEnd()
 }
 
 // encodeFields encodes fields.
-func (s *ThreadListResponse) encodeFields(e *jx.Encoder) {
+func (s *PostListResponse) encodeFields(e *jx.Encoder) {
 	{
-		e.FieldStart("threads")
+		e.FieldStart("posts")
 		e.ArrStart()
-		for _, elem := range s.Threads {
+		for _, elem := range s.Posts {
 			elem.Encode(e)
 		}
 		e.ArrEnd()
@@ -3484,39 +3312,39 @@ func (s *ThreadListResponse) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfThreadListResponse = [4]string{
-	0: "threads",
+var jsonFieldsNameOfPostListResponse = [4]string{
+	0: "posts",
 	1: "totalCountEstimated",
 	2: "havePrev",
 	3: "haveNext",
 }
 
-// Decode decodes ThreadListResponse from json.
-func (s *ThreadListResponse) Decode(d *jx.Decoder) error {
+// Decode decodes PostListResponse from json.
+func (s *PostListResponse) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode ThreadListResponse to nil")
+		return errors.New("invalid: unable to decode PostListResponse to nil")
 	}
 	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
-		case "threads":
+		case "posts":
 			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				s.Threads = make([]ThreadListItem, 0)
+				s.Posts = make([]PostListItem, 0)
 				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem ThreadListItem
+					var elem PostListItem
 					if err := elem.Decode(d); err != nil {
 						return err
 					}
-					s.Threads = append(s.Threads, elem)
+					s.Posts = append(s.Posts, elem)
 					return nil
 				}); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"threads\"")
+				return errors.Wrap(err, "decode field \"posts\"")
 			}
 		case "totalCountEstimated":
 			requiredBitSet[0] |= 1 << 1
@@ -3559,7 +3387,7 @@ func (s *ThreadListResponse) Decode(d *jx.Decoder) error {
 		}
 		return nil
 	}); err != nil {
-		return errors.Wrap(err, "decode ThreadListResponse")
+		return errors.Wrap(err, "decode PostListResponse")
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
@@ -3576,8 +3404,8 @@ func (s *ThreadListResponse) Decode(d *jx.Decoder) error {
 				bitIdx := bits.TrailingZeros8(result)
 				fieldIdx := i*8 + bitIdx
 				var name string
-				if fieldIdx < len(jsonFieldsNameOfThreadListResponse) {
-					name = jsonFieldsNameOfThreadListResponse[fieldIdx]
+				if fieldIdx < len(jsonFieldsNameOfPostListResponse) {
+					name = jsonFieldsNameOfPostListResponse[fieldIdx]
 				} else {
 					name = strconv.Itoa(fieldIdx)
 				}
@@ -3598,208 +3426,27 @@ func (s *ThreadListResponse) Decode(d *jx.Decoder) error {
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *ThreadListResponse) MarshalJSON() ([]byte, error) {
+func (s *PostListResponse) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *ThreadListResponse) UnmarshalJSON(data []byte) error {
+func (s *PostListResponse) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
 // Encode implements json.Marshaler.
-func (s *ThreadPostItem) Encode(e *jx.Encoder) {
+func (s *PostWithCommentsListResponse) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
 	e.ObjEnd()
 }
 
 // encodeFields encodes fields.
-func (s *ThreadPostItem) encodeFields(e *jx.Encoder) {
-	{
-		e.FieldStart("id")
-		e.Int(s.ID)
-	}
-	{
-		e.FieldStart("authorId")
-		e.Int(s.AuthorId)
-	}
-	{
-		e.FieldStart("authorName")
-		e.Str(s.AuthorName)
-	}
-	{
-		e.FieldStart("authorAvatarUrl")
-		json.EncodeURI(e, s.AuthorAvatarUrl)
-	}
-	{
-		e.FieldStart("content")
-		e.Str(s.Content)
-	}
-	{
-		e.FieldStart("createdAt")
-		json.EncodeDateTime(e, s.CreatedAt)
-	}
-}
-
-var jsonFieldsNameOfThreadPostItem = [6]string{
-	0: "id",
-	1: "authorId",
-	2: "authorName",
-	3: "authorAvatarUrl",
-	4: "content",
-	5: "createdAt",
-}
-
-// Decode decodes ThreadPostItem from json.
-func (s *ThreadPostItem) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode ThreadPostItem to nil")
-	}
-	var requiredBitSet [1]uint8
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "id":
-			requiredBitSet[0] |= 1 << 0
-			if err := func() error {
-				v, err := d.Int()
-				s.ID = int(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"id\"")
-			}
-		case "authorId":
-			requiredBitSet[0] |= 1 << 1
-			if err := func() error {
-				v, err := d.Int()
-				s.AuthorId = int(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"authorId\"")
-			}
-		case "authorName":
-			requiredBitSet[0] |= 1 << 2
-			if err := func() error {
-				v, err := d.Str()
-				s.AuthorName = string(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"authorName\"")
-			}
-		case "authorAvatarUrl":
-			requiredBitSet[0] |= 1 << 3
-			if err := func() error {
-				v, err := json.DecodeURI(d)
-				s.AuthorAvatarUrl = v
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"authorAvatarUrl\"")
-			}
-		case "content":
-			requiredBitSet[0] |= 1 << 4
-			if err := func() error {
-				v, err := d.Str()
-				s.Content = string(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"content\"")
-			}
-		case "createdAt":
-			requiredBitSet[0] |= 1 << 5
-			if err := func() error {
-				v, err := json.DecodeDateTime(d)
-				s.CreatedAt = v
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"createdAt\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode ThreadPostItem")
-	}
-	// Validate required fields.
-	var failures []validate.FieldError
-	for i, mask := range [1]uint8{
-		0b00111111,
-	} {
-		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
-			// Mask only required fields and check equality to mask using XOR.
-			//
-			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
-			// Bits of fields which would be set are actually bits of missed fields.
-			missed := bits.OnesCount8(result)
-			for bitN := 0; bitN < missed; bitN++ {
-				bitIdx := bits.TrailingZeros8(result)
-				fieldIdx := i*8 + bitIdx
-				var name string
-				if fieldIdx < len(jsonFieldsNameOfThreadPostItem) {
-					name = jsonFieldsNameOfThreadPostItem[fieldIdx]
-				} else {
-					name = strconv.Itoa(fieldIdx)
-				}
-				failures = append(failures, validate.FieldError{
-					Name:  name,
-					Error: validate.ErrFieldRequired,
-				})
-				// Reset bit.
-				result &^= 1 << bitIdx
-			}
-		}
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *ThreadPostItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *ThreadPostItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *ThreadWithPostsListResponse) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *ThreadWithPostsListResponse) encodeFields(e *jx.Encoder) {
+func (s *PostWithCommentsListResponse) encodeFields(e *jx.Encoder) {
 	{
 		e.FieldStart("id")
 		e.Int(s.ID)
@@ -3825,10 +3472,6 @@ func (s *ThreadWithPostsListResponse) encodeFields(e *jx.Encoder) {
 		e.Str(s.Content)
 	}
 	{
-		e.FieldStart("postsCount")
-		e.Int(s.PostsCount)
-	}
-	{
 		e.FieldStart("commentsCount")
 		e.Int(s.CommentsCount)
 	}
@@ -3837,32 +3480,31 @@ func (s *ThreadWithPostsListResponse) encodeFields(e *jx.Encoder) {
 		json.EncodeDateTime(e, s.CreatedAt)
 	}
 	{
-		e.FieldStart("posts")
+		e.FieldStart("comments")
 		e.ArrStart()
-		for _, elem := range s.Posts {
+		for _, elem := range s.Comments {
 			elem.Encode(e)
 		}
 		e.ArrEnd()
 	}
 }
 
-var jsonFieldsNameOfThreadWithPostsListResponse = [10]string{
+var jsonFieldsNameOfPostWithCommentsListResponse = [9]string{
 	0: "id",
 	1: "authorId",
 	2: "authorName",
 	3: "authorAvatarUrl",
 	4: "title",
 	5: "content",
-	6: "postsCount",
-	7: "commentsCount",
-	8: "createdAt",
-	9: "posts",
+	6: "commentsCount",
+	7: "createdAt",
+	8: "comments",
 }
 
-// Decode decodes ThreadWithPostsListResponse from json.
-func (s *ThreadWithPostsListResponse) Decode(d *jx.Decoder) error {
+// Decode decodes PostWithCommentsListResponse from json.
+func (s *PostWithCommentsListResponse) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode ThreadWithPostsListResponse to nil")
+		return errors.New("invalid: unable to decode PostWithCommentsListResponse to nil")
 	}
 	var requiredBitSet [2]uint8
 
@@ -3940,20 +3582,8 @@ func (s *ThreadWithPostsListResponse) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"content\"")
 			}
-		case "postsCount":
-			requiredBitSet[0] |= 1 << 6
-			if err := func() error {
-				v, err := d.Int()
-				s.PostsCount = int(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"postsCount\"")
-			}
 		case "commentsCount":
-			requiredBitSet[0] |= 1 << 7
+			requiredBitSet[0] |= 1 << 6
 			if err := func() error {
 				v, err := d.Int()
 				s.CommentsCount = int(v)
@@ -3965,7 +3595,7 @@ func (s *ThreadWithPostsListResponse) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"commentsCount\"")
 			}
 		case "createdAt":
-			requiredBitSet[1] |= 1 << 0
+			requiredBitSet[0] |= 1 << 7
 			if err := func() error {
 				v, err := json.DecodeDateTime(d)
 				s.CreatedAt = v
@@ -3976,36 +3606,36 @@ func (s *ThreadWithPostsListResponse) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"createdAt\"")
 			}
-		case "posts":
-			requiredBitSet[1] |= 1 << 1
+		case "comments":
+			requiredBitSet[1] |= 1 << 0
 			if err := func() error {
-				s.Posts = make([]ThreadPostItem, 0)
+				s.Comments = make([]PostCommentItem, 0)
 				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem ThreadPostItem
+					var elem PostCommentItem
 					if err := elem.Decode(d); err != nil {
 						return err
 					}
-					s.Posts = append(s.Posts, elem)
+					s.Comments = append(s.Comments, elem)
 					return nil
 				}); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"posts\"")
+				return errors.Wrap(err, "decode field \"comments\"")
 			}
 		default:
 			return d.Skip()
 		}
 		return nil
 	}); err != nil {
-		return errors.Wrap(err, "decode ThreadWithPostsListResponse")
+		return errors.Wrap(err, "decode PostWithCommentsListResponse")
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [2]uint8{
 		0b11111111,
-		0b00000011,
+		0b00000001,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -4017,8 +3647,8 @@ func (s *ThreadWithPostsListResponse) Decode(d *jx.Decoder) error {
 				bitIdx := bits.TrailingZeros8(result)
 				fieldIdx := i*8 + bitIdx
 				var name string
-				if fieldIdx < len(jsonFieldsNameOfThreadWithPostsListResponse) {
-					name = jsonFieldsNameOfThreadWithPostsListResponse[fieldIdx]
+				if fieldIdx < len(jsonFieldsNameOfPostWithCommentsListResponse) {
+					name = jsonFieldsNameOfPostWithCommentsListResponse[fieldIdx]
 				} else {
 					name = strconv.Itoa(fieldIdx)
 				}
@@ -4039,14 +3669,14 @@ func (s *ThreadWithPostsListResponse) Decode(d *jx.Decoder) error {
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *ThreadWithPostsListResponse) MarshalJSON() ([]byte, error) {
+func (s *PostWithCommentsListResponse) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *ThreadWithPostsListResponse) UnmarshalJSON(data []byte) error {
+func (s *PostWithCommentsListResponse) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }

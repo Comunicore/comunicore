@@ -10,15 +10,15 @@ import (
 )
 
 type AnalyticsVisitBatchInsert struct {
-	UserID              *int
-	ClientBatchID       uuid.UUID
-	ActiveDurationMs    int64
-	VisibleDurationMs   int64
-	IsMobile            bool
-	HadComposeActivity  bool
-	HadReadActivity     bool
-	BatchStartAt        time.Time
-	BatchEndAt          time.Time
+	UserID             *int
+	ClientBatchID      uuid.UUID
+	ActiveDurationMs   int64
+	VisibleDurationMs  int64
+	IsMobile           bool
+	HadComposeActivity bool
+	HadReadActivity    bool
+	BatchStartAt       time.Time
+	BatchEndAt         time.Time
 }
 
 type AnalyticsHourShare struct {
@@ -44,8 +44,8 @@ type AnalyticsUserCount struct {
 }
 
 type AnalyticsTagCount struct {
-	Tag         string
-	ThreadCount int64
+	Tag       string
+	PostCount int64
 }
 
 type AnalyticsDayPosts struct {

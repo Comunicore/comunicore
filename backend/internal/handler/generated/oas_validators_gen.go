@@ -176,13 +176,13 @@ func (s *AnalyticsMetricsResponse) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.TopUsersByPosts == nil {
+		if s.TopUsersByComments == nil {
 			return errors.New("nil is invalid value")
 		}
 		return nil
 	}(); err != nil {
 		failures = append(failures, validate.FieldError{
-			Name:  "topUsersByPosts",
+			Name:  "topUsersByComments",
 			Error: err,
 		})
 	}
@@ -209,13 +209,13 @@ func (s *AnalyticsMetricsResponse) Validate() error {
 		})
 	}
 	if err := func() error {
-		if s.TopUsersByThreads == nil {
+		if s.TopUsersByPosts == nil {
 			return errors.New("nil is invalid value")
 		}
 		return nil
 	}(); err != nil {
 		failures = append(failures, validate.FieldError{
-			Name:  "topUsersByThreads",
+			Name:  "topUsersByPosts",
 			Error: err,
 		})
 	}
@@ -445,30 +445,7 @@ func (s *MediaUploadUnauthorized) Validate() error {
 	return nil
 }
 
-func (s *ThreadListResponse) Validate() error {
-	if s == nil {
-		return validate.ErrNilPointer
-	}
-
-	var failures []validate.FieldError
-	if err := func() error {
-		if s.Threads == nil {
-			return errors.New("nil is invalid value")
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "threads",
-			Error: err,
-		})
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-	return nil
-}
-
-func (s *ThreadWithPostsListResponse) Validate() error {
+func (s *PostListResponse) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
 	}
@@ -482,6 +459,29 @@ func (s *ThreadWithPostsListResponse) Validate() error {
 	}(); err != nil {
 		failures = append(failures, validate.FieldError{
 			Name:  "posts",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s *PostWithCommentsListResponse) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if s.Comments == nil {
+			return errors.New("nil is invalid value")
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "comments",
 			Error: err,
 		})
 	}
