@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Montserrat } from 'next/font/google';
+import { Inter, Montserrat } from 'next/font/google';
 
 import Providers from './providers/providers';
 
@@ -9,6 +9,11 @@ import 'highlight.js/styles/base16/solarized-dark.css';
 
 const montserrat = Montserrat({
   variable: '--font-main',
+  subsets: ['latin', 'cyrillic'],
+});
+
+const inter = Inter({
+  variable: '--font-inter',
   subsets: ['latin', 'cyrillic'],
 });
 
@@ -30,7 +35,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='en'>
-      <body className={montserrat.variable}>
+      <body className={`${montserrat.variable} ${inter.variable}`}>
         <Providers>{children}</Providers>
       </body>
     </html>
