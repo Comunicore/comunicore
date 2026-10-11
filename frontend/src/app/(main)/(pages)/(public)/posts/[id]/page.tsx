@@ -34,7 +34,6 @@ export default function PostPage() {
           title={post.title}
           content={post.content}
           category={post.category}
-          author={post.author}
         />
         <PostActions likesCount={post.likesCount} />
         <PostComments

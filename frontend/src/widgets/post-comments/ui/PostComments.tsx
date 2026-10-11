@@ -10,7 +10,6 @@ interface PostCommentsProps {
 export function PostComments({ comments, commentsCount }: PostCommentsProps) {
   return (
     <>
-      {/* TODO: отправка комментария */}
       <form className='flex'>
         <label htmlFor='post-comment' className='sr-only'>
           Комментарий
