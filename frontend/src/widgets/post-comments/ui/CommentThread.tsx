@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+import { LuChevronDown } from 'react-icons/lu';
 import Link from 'next/link';
 
 import { PostComment } from '../model/post-comment.types';
@@ -8,7 +9,6 @@ import { RoleBadge, UserAvatar } from '@/entities/user';
 
 import { AppRouter } from '@/shared/config/app-router';
 import { cn } from '@/shared/lib/classNames';
-import { ChevronDownIcon } from '@/shared/ui';
 
 // ---------------------------------------------------------------------------
 // Линии ветки комментариев.
@@ -68,7 +68,7 @@ function HiddenRepliesButton({ count }: { count: number }) {
       className='hover:text-purple-86 flex h-6 items-center gap-x-2.5 text-xs leading-3 transition-colors'
     >
       {count} ответов
-      <ChevronDownIcon />
+      <LuChevronDown size={24} aria-hidden='true' />
     </button>
   );
 }

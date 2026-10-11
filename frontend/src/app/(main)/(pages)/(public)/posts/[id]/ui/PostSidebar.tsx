@@ -1,3 +1,4 @@
+import { LuEye, LuMessageSquare } from 'react-icons/lu';
 import Link from 'next/link';
 import { format } from 'date-fns';
 
@@ -9,13 +10,7 @@ import { UserCard } from '@/entities/user';
 
 import { AppRouter } from '@/shared/config/app-router';
 import { cn } from '@/shared/lib/classNames';
-import {
-  ArrowRightIcon,
-  CommentsIcon,
-  EyeIcon,
-  Tile,
-  ViewAllLink,
-} from '@/shared/ui';
+import { Tile, ViewAllLink } from '@/shared/ui';
 
 const cardStyles = 'flex flex-col rounded-[0.625rem] px-3.75 py-5';
 
@@ -114,11 +109,19 @@ export default function PostSidebar({
                 </Link>
                 <div className='flex items-center gap-x-2.5 leading-3'>
                   <span className='flex items-center gap-x-1.25'>
-                    <CommentsIcon className='text-light shrink-0' />
+                    <LuMessageSquare
+                      size={16}
+                      className='text-light shrink-0'
+                      aria-hidden='true'
+                    />
                     {commentsCount}
                   </span>
                   <span className='flex items-center gap-x-1.75'>
-                    <EyeIcon className='text-light/95 shrink-0' />
+                    <LuEye
+                      size={15}
+                      className='text-light/95 shrink-0'
+                      aria-hidden='true'
+                    />
                     {views}
                   </span>
                 </div>
@@ -131,9 +134,7 @@ export default function PostSidebar({
           href={AppRouter.posts.root}
           label='Смотреть все треды'
           className='w-fit gap-2.5 text-lg leading-6.25'
-        >
-          <ArrowRightIcon className='shrink-0' />
-        </ViewAllLink>
+        />
       </Tile>
 
       <CommunityRules />
