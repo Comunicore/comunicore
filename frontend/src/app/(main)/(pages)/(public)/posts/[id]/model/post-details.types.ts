@@ -2,16 +2,18 @@ import { PostComment } from '@/widgets/post-comments';
 
 import { UserPreview } from '@/entities/user';
 
+export interface PostCategory {
+  id: string;
+  slug: string;
+  name: string;
+}
+
 export interface PostDetailsData {
   id: string;
   title: string;
   content: string;
-  thread: {
-    id: string;
-    title: string;
-  };
+  category: PostCategory;
   author: UserPreview & { title: string };
-  topic: string;
   likesCount: number;
   repliesCount: number;
   viewsCount: number;

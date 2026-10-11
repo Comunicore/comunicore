@@ -20,7 +20,7 @@ const formatPostDate = (date: string) =>
 type PostSidebarProps = Pick<
   PostDetailsData,
   | 'author'
-  | 'topic'
+  | 'category'
   | 'repliesCount'
   | 'viewsCount'
   | 'createdAt'
@@ -31,7 +31,7 @@ type PostSidebarProps = Pick<
 
 export default function PostSidebar({
   author,
-  topic,
+  category,
   repliesCount,
   viewsCount,
   createdAt,
@@ -47,7 +47,7 @@ export default function PostSidebar({
         </time>
       ),
     },
-    { label: 'Тема', value: topic },
+    { label: 'Тема', value: category.name },
     { label: 'Ответов', value: repliesCount },
     { label: 'Просмотров', value: viewsCount },
     {
@@ -89,10 +89,10 @@ export default function PostSidebar({
         </dl>
       </Tile>
 
-      {/* Другие посты из тредов */}
+      {/* Другие посты из категории */}
       <Tile className={cn(cardStyles, 'gap-y-3.75')}>
         <h2 className='text-xl leading-normal font-medium'>
-          Другие посты из тредов
+          Другие посты из категории
         </h2>
         <ul className='flex flex-col gap-y-5'>
           {relatedPosts.map(({ id, title, position, commentsCount, views }) => (
@@ -132,7 +132,7 @@ export default function PostSidebar({
         </ul>
         <ViewAllLink
           href={AppRouter.posts.root}
-          label='Смотреть все треды'
+          label='Смотреть все посты'
           className='w-fit gap-2.5 text-lg leading-6.25'
         />
       </Tile>

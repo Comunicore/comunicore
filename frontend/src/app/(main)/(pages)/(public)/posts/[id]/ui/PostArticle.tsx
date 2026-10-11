@@ -9,25 +9,19 @@ import { AppRouter } from '@/shared/config/app-router';
 
 type PostArticleProps = Pick<
   PostDetailsData,
-  'title' | 'content' | 'thread' | 'author'
+  'title' | 'content' | 'category' | 'author'
 >;
 
 export default function PostArticle({
   title,
   content,
-  thread,
+  category,
   author,
 }: PostArticleProps) {
   return (
     <article className='flex flex-col gap-y-3'>
       <p className='font-(family-name:--font-inter) text-lg font-bold sm:text-xl'>
-        Пост из треда:{' '}
-        <Link
-          href={AppRouter.posts.getRoute(thread.id)}
-          className='hover:text-purple-86'
-        >
-          {thread.title}
-        </Link>
+        Пост из категории: {category.name}
       </p>
 
       <div className='flex flex-col gap-y-5'>
