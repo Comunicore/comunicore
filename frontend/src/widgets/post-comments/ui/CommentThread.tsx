@@ -13,7 +13,7 @@ import { cn } from '@/shared/lib/classNames';
 // ---------------------------------------------------------------------------
 // Линии ветки комментариев.
 // Вертикальная линия идёт от центра аватара родителя (35px) к центру
-// дочернего элемента. --thread-offset - расстояние от этой линии до ребёнка.
+// дочернего элемента. --branch-offset - расстояние от этой линии до ребёнка.
 // ---------------------------------------------------------------------------
 
 // Линия вниз от аватара родителя до списка ответов
@@ -25,7 +25,7 @@ const parentLineStyles = cn(
 // Изгиб к последнему ребёнку: сверху до его центра
 const lastElbowStyles = cn(
   'before:absolute before:top-0 before:bottom-1/2',
-  'before:left-[calc(-1*var(--thread-offset))] before:w-(--thread-offset)',
+  'before:left-[calc(-1*var(--branch-offset))] before:w-(--branch-offset)',
   'before:rounded-bl-xl before:border-b before:border-l',
   'before:border-gray-9e/30',
 );
@@ -33,7 +33,7 @@ const lastElbowStyles = cn(
 // Ответвление к промежуточному ребёнку (вертикаль рисует rail у li)
 const branchStyles = cn(
   'before:absolute before:bottom-1/2 before:h-3',
-  'before:left-[calc(-1*var(--thread-offset))] before:w-(--thread-offset)',
+  'before:left-[calc(-1*var(--branch-offset))] before:w-(--branch-offset)',
   'before:rounded-bl-xl before:border-b before:border-l',
   'before:border-gray-9e/30',
 );
@@ -41,7 +41,7 @@ const branchStyles = cn(
 // Вертикаль вдоль промежуточного ребёнка и отступа до следующего
 const railStyles = cn(
   'after:absolute after:top-0 after:-bottom-5 after:w-px',
-  'after:left-[calc(-1*var(--thread-offset))] after:bg-gray-9e/30',
+  'after:left-[calc(-1*var(--branch-offset))] after:bg-gray-9e/30',
 );
 
 interface ThreadNodeProps {
@@ -121,7 +121,7 @@ function CommentReplies({ comment }: CommentProps) {
   // Ответы ещё не загружены: только кнопка под комментарием
   if (!replies.length) {
     return (
-      <ul className='mt-1 pl-17.5 [--thread-offset:2.1875rem]'>
+      <ul className='mt-1 pl-17.5 [--branch-offset:2.1875rem]'>
         <ThreadNode isLast>
           <HiddenRepliesButton count={hiddenCount} />
         </ThreadNode>
@@ -133,8 +133,8 @@ function CommentReplies({ comment }: CommentProps) {
     <ul
       className={cn(
         'mt-5 flex flex-col gap-y-5',
-        'pl-[calc(var(--thread-offset)+2.1875rem)]',
-        '[--thread-offset:1.3125rem] sm:[--thread-offset:4.4375rem]',
+        'pl-[calc(var(--branch-offset)+2.1875rem)]',
+        '[--branch-offset:1.3125rem] sm:[--branch-offset:4.4375rem]',
       )}
     >
       {replies.map((reply, index) => (
