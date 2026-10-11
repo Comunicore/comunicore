@@ -4,16 +4,17 @@ import Image from 'next/image';
 import notfoundresp from '@/shared/assets/images/not-found-resp.png';
 import { AppRouter } from '@/shared/config/app-router';
 import { cn } from '@/shared/lib/classNames';
-import { Button } from '@/shared/ui';
+import { Button, Tile } from '@/shared/ui';
 
-export function NotFoundResp(props: HTMLAttributes<HTMLDivElement>) {
+export function NotFoundResp(
+  props: Omit<HTMLAttributes<HTMLDivElement>, 'color'>,
+) {
   const { className, ...restAttrs } = props;
   return (
-    <div
-      className={cn(
-        'bg-dark-1b/50 border-gray-9e/10 relative flex h-100 flex-col gap-y-5 rounded-[1.25rem] border px-3.75 py-5',
-        className,
-      )}
+    <Tile
+      color='bordered'
+      size='compact'
+      className={cn('relative flex h-100 flex-col gap-y-5', className)}
       {...restAttrs}
     >
       <Image
@@ -32,6 +33,6 @@ export function NotFoundResp(props: HTMLAttributes<HTMLDivElement>) {
       >
         Создать новый пост
       </Button>
-    </div>
+    </Tile>
   );
 }

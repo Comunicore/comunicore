@@ -9,10 +9,7 @@ import { CommunityRules } from '@/widgets/community-rules';
 import { UserCard } from '@/entities/user';
 
 import { AppRouter } from '@/shared/config/app-router';
-import { cn } from '@/shared/lib/classNames';
 import { Tile, ViewAllLink } from '@/shared/ui';
-
-const cardStyles = 'flex flex-col rounded-[0.625rem] px-3.75 py-5';
 
 const formatPostDate = (date: string) =>
   format(new Date(date), "dd.MM.yyyy 'в' HH:mm");
@@ -63,7 +60,7 @@ export default function PostSidebar({
   return (
     <aside className='flex flex-col gap-y-2.5' aria-label='Информация о посте'>
       {/* Об авторе */}
-      <Tile className={cn(cardStyles, 'gap-y-3')}>
+      <Tile radius='md' size='compact' className='flex flex-col gap-y-3'>
         <h2 className='text-xl leading-normal font-medium'>Об авторе</h2>
         <UserCard user={author} />
         <Link
@@ -75,7 +72,7 @@ export default function PostSidebar({
       </Tile>
 
       {/* Информация о посте */}
-      <Tile className={cn(cardStyles, 'gap-y-4')}>
+      <Tile radius='md' size='compact' className='flex flex-col gap-y-4'>
         <h2 className='text-xl leading-normal font-medium'>
           Информация о посте
         </h2>
@@ -90,7 +87,7 @@ export default function PostSidebar({
       </Tile>
 
       {/* Другие посты из категории */}
-      <Tile className={cn(cardStyles, 'gap-y-3.75')}>
+      <Tile radius='md' size='compact' className='flex flex-col gap-y-3.75'>
         <h2 className='text-xl leading-normal font-medium'>
           Другие посты из категории
         </h2>
