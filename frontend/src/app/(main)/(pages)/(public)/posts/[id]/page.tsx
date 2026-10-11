@@ -33,7 +33,7 @@ export default function PostPage() {
         <PostArticle
           title={post.title}
           content={post.content}
-          thread={post.thread}
+          category={post.category}
           author={post.author}
         />
         <PostActions likesCount={post.likesCount} />
@@ -45,7 +45,7 @@ export default function PostPage() {
 
       <PostSidebar
         author={post.author}
-        topic={post.topic}
+        category={post.category}
         repliesCount={post.repliesCount}
         viewsCount={post.viewsCount}
         createdAt={post.createdAt}
