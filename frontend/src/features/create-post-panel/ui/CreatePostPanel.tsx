@@ -79,11 +79,7 @@ export function CreatePostPanel(props: CreatePostPanelProps) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className='max-2xl:order-last'>
-      <Tile
-        className='flex flex-col gap-y-13.5 max-md:p-5'
-        size='xl'
-        color='ghost'
-      >
+      <Tile className='flex flex-col gap-y-13.5' size='xl' color='ghost'>
         {isPreview ? (
           <PostPreview />
         ) : (

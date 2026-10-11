@@ -320,7 +320,7 @@ export default function Home() {
                 Последние обсуждения
               </h2>
               <Link
-                href={AppRouter.questions}
+                href={AppRouter.posts.root}
                 className='text-purple-67 hover:text-purple-86 flex items-center gap-2 font-bold transition-colors'
               >
                 Перейти на форум
