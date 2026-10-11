@@ -42,9 +42,8 @@ export default function PostArticle({
                   >
                     {author.name}
                   </Link>
-                  <RoleBadge role={author.role} />
                 </div>
-                <p className='leading-normal'>ранг: {author.title}</p>
+                <RoleBadge role={author.role} />
               </div>
             </div>
           }
