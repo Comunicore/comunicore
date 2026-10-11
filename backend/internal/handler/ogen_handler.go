@@ -146,7 +146,7 @@ func (h *securityHandler) HandleCookieAuth(
 
 type errorHandler struct{}
 
-func sendErrorStringMessage(w http.ResponseWriter, httpCode int, err error, errMessage string) {
+func sendErrorStringMessage(w http.ResponseWriter, httpCode int, errMessage string) {
 	e := api.ErrorStringMessage{
 		Code:    api.ErrorStringMessageCodeErrorStringMessage,
 		Message: errMessage,
@@ -154,6 +154,8 @@ func sendErrorStringMessage(w http.ResponseWriter, httpCode int, err error, errM
 	w.Header().Set("Content-Type", "application/json")
 	data, err := e.MarshalJSON()
 	if err != nil {
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
 	}
 	w.WriteHeader(httpCode)
 	_, _ = w.Write(data)
@@ -174,14 +176,13 @@ func (h *errorHandler) handler(
 		sendErrorStringMessage(
 			w,
 			http.StatusUnauthorized,
-			err,
 			"incorrect login or password or login not exists",
 		)
 		return
 	}
 	if decodeRequestError, ok := errors.AsType[*ogenerrors.DecodeRequestError](err); ok {
 		log.Printf("DecodeRequestError: %v\n", decodeRequestError)
-		sendErrorStringMessage(w, http.StatusBadRequest, err, decodeRequestError.Error())
+		sendErrorStringMessage(w, http.StatusBadRequest, decodeRequestError.Error())
 		return
 	}
 	if securityError, ok := errors.AsType[*ogenerrors.SecurityError](err); ok {
@@ -191,7 +192,6 @@ func (h *errorHandler) handler(
 		sendErrorStringMessage(
 			w,
 			http.StatusUnauthorized,
-			securityError,
 			"failed to read security credentials",
 		)
 		return

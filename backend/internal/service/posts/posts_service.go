@@ -11,18 +11,18 @@ import (
 
 type PostsRepo interface {
 	Create(ctx context.Context, post model.PostCreate) (model.PostRepoInfo, error)
-	Get(ctx context.Context, postId int) (*model.PostRepoInfo, error)
+	Get(ctx context.Context, postID int) (*model.PostRepoInfo, error)
 	PageByPageID(ctx context.Context, page, limit int) (model.PostListRepo, error)
-	PageByOffset(ctx context.Context, postId, limit int, before bool) (model.PostListRepo, error)
-	InsertPostTags(ctx context.Context, postId int, tags []string) error
+	PageByOffset(ctx context.Context, postID, limit int, before bool) (model.PostListRepo, error)
+	InsertPostTags(ctx context.Context, postID int, tags []string) error
 }
 type CommentsRepo interface {
 	Create(ctx context.Context, comment model.CommentCreate) (model.Comment, error)
-	List(ctx context.Context, postId int) ([]model.Comment, error)
+	List(ctx context.Context, postID int) ([]model.Comment, error)
 }
 type UserRepo interface {
-	GetNameById(ctx context.Context, userId int) (string, error)
-	Get(ctx context.Context, userId int) (model.User, error)
+	GetNameByID(ctx context.Context, userID int) (string, error)
+	Get(ctx context.Context, userID int) (model.User, error)
 }
 
 type PostsService struct {
@@ -47,7 +47,7 @@ func (s *PostsService) AddComment(
 	if err != nil {
 		return model.CommentInfo{}, err
 	}
-	userName, err := s.userRepo.GetNameById(ctx, createdComment.UserID)
+	userName, err := s.userRepo.GetNameByID(ctx, createdComment.UserID)
 	if err != nil {
 		return model.CommentInfo{}, err
 	}
@@ -71,7 +71,7 @@ func (s *PostsService) Create(ctx context.Context, post model.PostCreate) (model
 			return model.PostInfo{}, err
 		}
 	}
-	userName, err := s.userRepo.GetNameById(ctx, createdPost.UserID)
+	userName, err := s.userRepo.GetNameByID(ctx, createdPost.UserID)
 	if err != nil {
 		return model.PostInfo{}, err
 	}
@@ -88,13 +88,13 @@ func (s *PostsService) Create(ctx context.Context, post model.PostCreate) (model
 
 func (s *PostsService) GetPostWithComments(
 	ctx context.Context,
-	postId int,
+	postID int,
 ) (model.PostWithComments, error) {
-	postInfo, err := s.postsRepo.Get(ctx, postId)
+	postInfo, err := s.postsRepo.Get(ctx, postID)
 	if err != nil {
 		return model.PostWithComments{}, err
 	}
-	comments, err := s.commentsRepo.List(ctx, postId)
+	comments, err := s.commentsRepo.List(ctx, postID)
 	if err != nil {
 		return model.PostWithComments{}, err
 	}
@@ -108,7 +108,7 @@ func (s *PostsService) GetPostWithComments(
 			ID:              comment.ID,
 			UserID:          comment.UserID,
 			UserName:        userInfo.Name,
-			AuthorAvatarUrl: userInfo.AvatarURL,
+			AuthorAvatarURL: userInfo.AvatarURL,
 			Content:         comment.Content,
 			CreatedAt:       comment.CreatedAt,
 		})
@@ -121,7 +121,7 @@ func (s *PostsService) GetPostWithComments(
 		ID:              postInfo.ID,
 		AuthorID:        postInfo.UserID,
 		AuthorName:      userInfo.Name,
-		AuthorAvatarUrl: userInfo.AvatarURL,
+		AuthorAvatarURL: userInfo.AvatarURL,
 		Title:           postInfo.Title,
 		Content:         postInfo.Content,
 		CommentsCount:   postInfo.CommentsCount,
@@ -143,10 +143,10 @@ func (s *PostsService) GetPostListByPage(
 
 func (s *PostsService) GetPostListByOffset(
 	ctx context.Context,
-	postId, limit int,
+	postID, limit int,
 	before bool,
 ) (model.PostListResponse, error) {
-	postListRepo, err := s.postsRepo.PageByOffset(ctx, postId, limit, before)
+	postListRepo, err := s.postsRepo.PageByOffset(ctx, postID, limit, before)
 	if err != nil {
 		return model.PostListResponse{}, err
 	}
@@ -168,7 +168,7 @@ func (s *PostsService) convertPostListRepoToResponse(
 			Content:         post.Content,
 			AuthorID:        post.UserID,
 			AuthorName:      userInfo.Name,
-			AuthorAvatarUrl: userInfo.AvatarURL,
+			AuthorAvatarURL: userInfo.AvatarURL,
 			CommentsCount:   post.CommentsCount,
 			CreatedAt:       post.CreatedAt,
 		})

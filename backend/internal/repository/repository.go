@@ -5,7 +5,6 @@ package repository
 
 import (
 	"context"
-	"log"
 	"sync/atomic"
 	"time"
 
@@ -31,7 +30,9 @@ func PgPool(dsn string) (*pgxpool.Pool, error) {
 	err = pool.Ping(pingCtx)
 	if err != nil {
 		pool.Close()
-		log.Fatal("failed db connect: ", err)
+		// log.Fatal("failed db connect: ", err)
+		// WARN: do not fatal db connection pool, instead need to add counter for connection
+		// then we can give fatal.
 		return nil, err
 	}
 

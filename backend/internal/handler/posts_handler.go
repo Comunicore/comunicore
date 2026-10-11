@@ -102,15 +102,15 @@ func (h *PostsHandler) PostGet(
 	}
 	var comments []api.PostCommentItem
 	for _, post := range postWithComments.Comments {
-		avatarUrl, err := url.Parse(post.AuthorAvatarUrl)
+		avatarURL, err := url.Parse(post.AuthorAvatarURL)
 		if err != nil {
-			avatarUrl = nil
+			avatarURL = nil
 		}
 		comments = append(comments, api.PostCommentItem{
 			ID:              post.ID,
 			AuthorId:        post.UserID,
 			AuthorName:      post.UserName,
-			AuthorAvatarUrl: *avatarUrl,
+			AuthorAvatarUrl: *avatarURL,
 			Content:         post.Content,
 			CreatedAt:       post.CreatedAt,
 		})
@@ -137,7 +137,7 @@ func (h *PostsHandler) PostsList(
 	}
 	var err error
 	var postsList model.PostListResponse
-	var postId int
+	var postID int
 	page, ok := params.Page.Get()
 	if ok {
 		postsList, err = h.postsService.GetPostListByPage(ctx, page, limit)
@@ -146,17 +146,17 @@ func (h *PostsHandler) PostsList(
 		}
 		goto GOT_POST_ID
 	}
-	postId, ok = params.Before.Get()
+	postID, ok = params.Before.Get()
 	if ok {
-		postsList, err = h.postsService.GetPostListByOffset(ctx, postId, limit, true)
+		postsList, err = h.postsService.GetPostListByOffset(ctx, postID, limit, true)
 		if err != nil {
 			return nil, err
 		}
 		goto GOT_POST_ID
 	}
-	postId, ok = params.After.Get()
+	postID, ok = params.After.Get()
 	if ok {
-		postsList, err = h.postsService.GetPostListByOffset(ctx, postId, limit, false)
+		postsList, err = h.postsService.GetPostListByOffset(ctx, postID, limit, false)
 		if err != nil {
 			return nil, err
 		}
@@ -175,7 +175,6 @@ GOT_POST_ID:
 			Content:       post.Content,
 			AuthorId:      post.AuthorID,
 			AuthorName:    post.AuthorName,
-			PostsCount:    post.CommentsCount,
 			CommentsCount: post.CommentsCount,
 			CreatedAt:     post.CreatedAt,
 		}

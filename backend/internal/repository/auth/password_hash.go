@@ -68,11 +68,17 @@ func parseArgon2Hash(encodedHash string) (*argon2Config, error) {
 	}
 
 	var version int
-	fmt.Sscanf(components[2], "v=%d", &version)
+	_, err := fmt.Sscanf(components[2], "v=%d", &version)
+	if err != nil {
+		return nil, fmt.Errorf("failed to scan version component: %w", err)
+	}
 
 	config := argon2Config{}
-	fmt.Sscanf(components[3], "m=%d,t=%d,p=%d",
+	_, err = fmt.Sscanf(components[3], "m=%d,t=%d,p=%d",
 		&config.MemoryCost, &config.TimeCost, &config.Threads)
+	if err != nil {
+		return nil, fmt.Errorf("failed to scan components: %w", err)
+	}
 
 	salt, err := base64.RawStdEncoding.DecodeString(components[4])
 	if err != nil {

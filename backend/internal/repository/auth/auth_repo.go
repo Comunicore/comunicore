@@ -29,12 +29,12 @@ func NewAuthRepo(dsn string) (*AuthRepo, error) {
 	}, nil
 }
 
-func (r *AuthRepo) AuthCreate(ctx context.Context, user_id int64, login, password string) error {
+func (r *AuthRepo) AuthCreate(ctx context.Context, userID int64, login, password string) error {
 	passwordHash := hashPassword(password)
 	fmt.Printf("password hash %s\n", passwordHash)
 
 	err := r.queries.AuthCreate(ctx, authDb.AuthCreateParams{
-		UserID:       int32(user_id),
+		UserID:       int32(userID),
 		Login:        login,
 		PasswordHash: passwordHash,
 	})
@@ -44,13 +44,13 @@ func (r *AuthRepo) AuthCreate(ctx context.Context, user_id int64, login, passwor
 	return err
 }
 
-func (r *AuthRepo) AuthUpdatePassword(ctx context.Context, user_id int64, password string) error {
+func (r *AuthRepo) AuthUpdatePassword(ctx context.Context, userID int64, password string) error {
 	passwordHash := hashPassword(password)
 	fmt.Printf("password hash \"%s\"\n", passwordHash)
 	// TODO: make upsert query
 
 	err := r.queries.AuthUpdatePassword(ctx, authDb.AuthUpdatePasswordParams{
-		UserID:       int32(user_id),
+		UserID:       int32(userID),
 		PasswordHash: passwordHash,
 	})
 	if err != nil {
@@ -99,8 +99,12 @@ func (r *AuthRepo) GetUserIDBySessionID(ctx context.Context, sessionUUID uuid.UU
 	return int(userID), nil
 }
 
-func (r *AuthRepo) createSession() (sessionUUID uuid.UUID, err error) {
+func (r *AuthRepo) createSession() (uuid.UUID, error) {
 	uuidValue, err := uuid.NewV7()
+	if err != nil {
+		return uuid.Nil, fmt.Errorf("failed to generate session uuid: %w", err)
+	}
+
 	return uuidValue, nil
 }
 

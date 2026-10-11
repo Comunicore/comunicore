@@ -26,8 +26,8 @@ func NewUserRepo(dsn string) (*UserRepo, error) {
 	return &UserRepo{queries: userDb.New(pool)}, nil
 }
 
-func (r *UserRepo) Get(ctx context.Context, userId int) (model.User, error) {
-	row, err := r.queries.UserGet(ctx, int32(userId))
+func (r *UserRepo) Get(ctx context.Context, userID int) (model.User, error) {
+	row, err := r.queries.UserGet(ctx, int32(userID))
 	if err != nil {
 		err = apperror.PgErrorToAppError(err)
 	}
@@ -40,9 +40,9 @@ func (r *UserRepo) Get(ctx context.Context, userId int) (model.User, error) {
 	}, err
 }
 
-func (r *UserRepo) GetNameById(ctx context.Context, userId int) (string, error) {
+func (r *UserRepo) GetNameByID(ctx context.Context, userID int) (string, error) {
 	// TODO: optimize with cache
-	return r.queries.UserGetNameById(ctx, int32(userId))
+	return r.queries.UserGetNameById(ctx, int32(userID))
 }
 
 func (r *UserRepo) Create(ctx context.Context, name, email string) (model.User, error) {
@@ -119,10 +119,10 @@ func (r *UserRepo) Create(ctx context.Context, name, email string) (model.User, 
 	)
 }
 
-func (r *UserRepo) Update(ctx context.Context, userId int, name, email string) (model.User, error) {
+func (r *UserRepo) Update(ctx context.Context, userID int, name, email string) (model.User, error) {
 	row, err := r.queries.UserUpdate(
 		ctx,
-		userDb.UserUpdateParams{ID: int32(userId), Name: name, Email: email},
+		userDb.UserUpdateParams{ID: int32(userID), Name: name, Email: email},
 	)
 	return model.User{
 		ID:        int(row.ID),

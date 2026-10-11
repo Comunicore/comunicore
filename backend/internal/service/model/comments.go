@@ -24,7 +24,7 @@ type CommentListItem struct {
 	ID              int
 	UserID          int
 	UserName        string
-	AuthorAvatarUrl string
+	AuthorAvatarURL string
 	Content         string
 	CreatedAt       time.Time
 }

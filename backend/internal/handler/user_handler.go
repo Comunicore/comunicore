@@ -15,10 +15,10 @@ import (
 )
 
 type UserHandler struct {
-	userService *userService.UserService
+	userService *userService.Service
 }
 
-func NewUserHandler(userService *userService.UserService) *UserHandler {
+func NewUserHandler(userService *userService.Service) *UserHandler {
 	return &UserHandler{userService: userService}
 }
 
@@ -26,22 +26,22 @@ func (u *UserHandler) UserGet(
 	ctx context.Context,
 	params api.UserGetParams,
 ) (api.UserGetRes, error) {
-	res, err := u.userGetById(ctx, params.UserId)
+	res, err := u.userGetByID(ctx, params.UserId)
 	if err != nil {
 		return &api.UserGetInternalServerError{}, err
 	}
 	return res, err
 }
 
-func (u *UserHandler) userGetById(
+func (u *UserHandler) userGetByID(
 	ctx context.Context,
-	userId int,
+	userID int,
 ) (*api.UserCreateResponse, error) {
-	user, err := u.userService.Get(ctx, userId)
+	user, err := u.userService.Get(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
-	avatarUrl, err := url.Parse(user.AvatarURL)
+	avatarURL, err := url.Parse(user.AvatarURL)
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +49,7 @@ func (u *UserHandler) userGetById(
 		ID:        user.ID,
 		Name:      user.Name,
 		Email:     user.Email,
-		AvatarUrl: *avatarUrl,
+		AvatarUrl: *avatarURL,
 		CreatedAt: api.NewOptDateTime(user.CreatedAt),
 	}, nil
 }
@@ -60,7 +60,7 @@ func (u *UserHandler) UserMe(ctx context.Context) (api.UserMeRes, error) {
 		log.Printf("global context %p, %+v\n", globalCtx, globalCtx)
 		return nil, errors.New("handler UserMe invalid UserID")
 	}
-	return u.userGetById(ctx, globalCtx.UserID)
+	return u.userGetByID(ctx, globalCtx.UserID)
 }
 
 func (u *UserHandler) UserCreate(
@@ -69,7 +69,7 @@ func (u *UserHandler) UserCreate(
 ) (api.UserCreateRes, error) {
 	user, err := u.userService.Create(ctx, req.Name, req.Email, req.Password)
 	if err == nil {
-		avatarUrl, err := url.Parse(user.AvatarURL)
+		avatarURL, err := url.Parse(user.AvatarURL)
 		if err != nil {
 			return nil, err
 		}
@@ -77,7 +77,7 @@ func (u *UserHandler) UserCreate(
 			ID:        user.ID,
 			Name:      user.Name,
 			Email:     user.Email,
-			AvatarUrl: *avatarUrl,
+			AvatarUrl: *avatarURL,
 			CreatedAt: api.NewOptDateTime(user.CreatedAt),
 		}, nil
 	}
@@ -120,7 +120,7 @@ func (u *UserHandler) UserUpdate(
 	if err != nil {
 		return nil, err
 	}
-	avatarUrl, err := url.Parse(user.AvatarURL)
+	avatarURL, err := url.Parse(user.AvatarURL)
 	if err != nil {
 		return nil, err
 	}
@@ -128,6 +128,6 @@ func (u *UserHandler) UserUpdate(
 		ID:        user.ID,
 		Name:      user.Name,
 		Email:     user.Email,
-		AvatarUrl: *avatarUrl,
+		AvatarUrl: *avatarURL,
 	}, nil
 }

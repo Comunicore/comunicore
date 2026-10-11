@@ -10,27 +10,27 @@ import (
 )
 
 type UserRepo interface {
-	Get(ctx context.Context, userId int) (model.User, error)
+	Get(ctx context.Context, userID int) (model.User, error)
 	Create(ctx context.Context, name, email string) (model.User, error)
-	Update(ctx context.Context, userId int, name, email string) (model.User, error)
+	Update(ctx context.Context, userID int, name, email string) (model.User, error)
 }
 
 type AuthRepo interface {
-	AuthCreate(ctx context.Context, user_id int64, login, password string) error
-	AuthUpdatePassword(ctx context.Context, user_id int64, password string) error
+	AuthCreate(ctx context.Context, userID int64, login, password string) error
+	AuthUpdatePassword(ctx context.Context, userID int64, password string) error
 }
 
-type UserService struct {
+type Service struct {
 	userRepo UserRepo
 	authRepo AuthRepo
 }
 
-func NewUserService(userRepo UserRepo, authRepo AuthRepo) *UserService {
-	return &UserService{userRepo: userRepo, authRepo: authRepo}
+func NewUserService(userRepo UserRepo, authRepo AuthRepo) *Service {
+	return &Service{userRepo: userRepo, authRepo: authRepo}
 }
 
-func (r *UserService) Get(ctx context.Context, userId int) (model.User, error) {
-	user, err := r.userRepo.Get(ctx, userId)
+func (r *Service) Get(ctx context.Context, userID int) (model.User, error) {
+	user, err := r.userRepo.Get(ctx, userID)
 	if err != nil {
 		return model.User{}, err
 	}
@@ -38,7 +38,7 @@ func (r *UserService) Get(ctx context.Context, userId int) (model.User, error) {
 	return user, nil
 }
 
-func (r *UserService) Create(
+func (r *Service) Create(
 	ctx context.Context,
 	name, email, password string,
 ) (model.User, error) {
@@ -54,12 +54,12 @@ func (r *UserService) Create(
 	return user, nil
 }
 
-func (r *UserService) Update(
+func (r *Service) Update(
 	ctx context.Context,
-	userId int,
+	userID int,
 	name, email string,
 ) (model.User, error) {
-	user, err := r.userRepo.Update(ctx, userId, name, email)
+	user, err := r.userRepo.Update(ctx, userID, name, email)
 	if err != nil {
 		return model.User{}, err
 	}

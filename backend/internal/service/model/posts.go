@@ -9,7 +9,7 @@ type PostWithComments struct {
 	ID              int
 	AuthorID        int
 	AuthorName      string
-	AuthorAvatarUrl string
+	AuthorAvatarURL string
 	Title           string
 	Content         string
 	CommentsCount   int
@@ -44,7 +44,7 @@ type PostInfoResponse struct {
 	Content         string
 	AuthorID        int
 	AuthorName      string
-	AuthorAvatarUrl string
+	AuthorAvatarURL string
 	CommentsCount   int
 	CreatedAt       time.Time
 }

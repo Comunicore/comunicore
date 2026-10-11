@@ -17,7 +17,7 @@ type AuthRepo interface {
 	Logout(ctx context.Context, sessionUUID uuid.UUID) error
 }
 type UserRepo interface {
-	Get(ctx context.Context, userId int) (model.User, error)
+	Get(ctx context.Context, userID int) (model.User, error)
 }
 
 type AuthService struct {

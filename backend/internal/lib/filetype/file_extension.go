@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-var prefferedExtensions map[string]string = map[string]string{
+var prefferedExtensions = map[string]string{
 	"image/jpeg": ".jpeg",
 	"image/png":  ".png",
 	"image/gif":  ".gif",

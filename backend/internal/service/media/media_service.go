@@ -13,11 +13,11 @@ type MediaRepo interface {
 
 type MediaService struct {
 	mediaRepo    MediaRepo
-	mediaBaseUrl string
+	mediaBaseURL string
 }
 
-func NewMediaService(mediaBaseUrl string, mediaRepo MediaRepo) *MediaService {
-	return &MediaService{mediaRepo: mediaRepo, mediaBaseUrl: mediaBaseUrl}
+func NewMediaService(mediaBaseURL string, mediaRepo MediaRepo) *MediaService {
+	return &MediaService{mediaRepo: mediaRepo, mediaBaseURL: mediaBaseURL}
 }
 
 func (r *MediaService) MediaUpload(ctx context.Context, reader io.Reader) (url.URL, error) {
@@ -25,7 +25,7 @@ func (r *MediaService) MediaUpload(ctx context.Context, reader io.Reader) (url.U
 	if err != nil {
 		return url.URL{}, errors.New("failed to upload media")
 	}
-	fileURLstring, err := url.JoinPath(r.mediaBaseUrl, "storage/media", fileHash)
+	fileURLstring, err := url.JoinPath(r.mediaBaseURL, "storage/media", fileHash)
 	if err != nil {
 		return url.URL{}, errors.New("failed to construct media URL")
 	}

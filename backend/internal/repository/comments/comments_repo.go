@@ -43,8 +43,8 @@ func (r *CommentsRepo) Create(
 }
 
 // list comments by post id
-func (r *CommentsRepo) List(ctx context.Context, postId int) ([]model.Comment, error) {
-	rows, err := r.queries.CommentListByPostId(ctx, int32(postId))
+func (r *CommentsRepo) List(ctx context.Context, postID int) ([]model.Comment, error) {
+	rows, err := r.queries.CommentListByPostId(ctx, int32(postID))
 
 	var comments []model.Comment
 	for _, data := range rows {

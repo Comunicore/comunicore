@@ -104,13 +104,13 @@ func (r *PostsRepo) PageByPageID(ctx context.Context, page, limit int) (model.Po
 // list posts page by page id, with next and prev page info
 func (r *PostsRepo) PageByOffset(
 	ctx context.Context,
-	postId, limit int,
+	postID, limit int,
 	before bool,
 ) (model.PostListRepo, error) {
 	posts := make([]model.PostRepoInfo, 0, limit)
 	if before {
 		rows, err := r.queries.PostPagesBeforePostID(ctx, postdDb.PostPagesBeforePostIDParams{
-			ID:    int32(postId),
+			ID:    int32(postID),
 			Limit: int32(limit),
 		})
 		if err != nil {
@@ -128,7 +128,7 @@ func (r *PostsRepo) PageByOffset(
 		}
 	} else {
 		rows, err := r.queries.PostPagesBeforePostID(ctx, postdDb.PostPagesBeforePostIDParams{
-			ID:    int32(postId),
+			ID:    int32(postID),
 			Limit: int32(limit),
 		})
 		if err != nil {
@@ -157,7 +157,7 @@ func (r *PostsRepo) PageByOffset(
 
 func (r *PostsRepo) postListInfo(
 	ctx context.Context,
-	minId, maxId int,
+	minID, maxID int,
 ) (model.PostListRepo, error) {
 	row := r.dbpool.QueryRow(ctx,
 		`SELECT COUNT(*) FROM posts`)
@@ -170,9 +170,9 @@ func (r *PostsRepo) postListInfo(
 		TotalCountEstimated: count,
 	}
 	row = r.dbpool.QueryRow(ctx,
-		`SELECT id FROM posts WHERE id < $1 LIMIT 1`, minId)
-	var prevId int
-	if err := row.Scan(&prevId); err != nil {
+		`SELECT id FROM posts WHERE id < $1 LIMIT 1`, minID)
+	var prevID int
+	if err := row.Scan(&prevID); err != nil {
 		if err.Error() == "no rows in result set" { // FIXME: this is not a good way to check for no rows, but pgx does not export the error type
 			res.HaveNext = false
 		} else {
@@ -183,9 +183,9 @@ func (r *PostsRepo) postListInfo(
 	}
 
 	row = r.dbpool.QueryRow(ctx,
-		`SELECT id FROM posts WHERE id > $1 LIMIT 1`, maxId)
-	var nextId int
-	if err := row.Scan(&nextId); err != nil {
+		`SELECT id FROM posts WHERE id > $1 LIMIT 1`, maxID)
+	var nextID int
+	if err := row.Scan(&nextID); err != nil {
 		if err.Error() == "no rows in result set" { // FIXME: this is not a good way to check for no rows, but pgx does not export the error type
 			res.HavePrev = false
 		} else {
@@ -198,8 +198,8 @@ func (r *PostsRepo) postListInfo(
 	return res, nil
 }
 
-func (r *PostsRepo) Get(ctx context.Context, postId int) (*model.PostRepoInfo, error) {
-	row, err := r.queries.PostGetById(ctx, int32(postId))
+func (r *PostsRepo) Get(ctx context.Context, postID int) (*model.PostRepoInfo, error) {
+	row, err := r.queries.PostGetById(ctx, int32(postID))
 	return &model.PostRepoInfo{
 		ID:            int(row.ID),
 		UserID:        int(row.UserID),
