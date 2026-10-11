@@ -10,12 +10,6 @@ import { RoleBadge, UserAvatar } from '@/entities/user';
 import { AppRouter } from '@/shared/config/app-router';
 import { cn } from '@/shared/lib/classNames';
 
-// ---------------------------------------------------------------------------
-// Линии ветки комментариев.
-// Вертикальная линия идёт от центра аватара родителя (35px) к центру
-// дочернего элемента. --branch-offset - расстояние от этой линии до ребёнка.
-// ---------------------------------------------------------------------------
-
 // Линия вниз от аватара родителя до списка ответов
 const parentLineStyles = cn(
   'after:absolute after:top-[calc(50%+2.1875rem)] after:left-8.75 after:w-px',
@@ -118,7 +112,6 @@ function CommentReplies({ comment }: CommentProps) {
     return null;
   }
 
-  // Ответы ещё не загружены: только кнопка под комментарием
   if (!replies.length) {
     return (
       <ul className='mt-1 pl-17.5 [--branch-offset:2.1875rem]'>
