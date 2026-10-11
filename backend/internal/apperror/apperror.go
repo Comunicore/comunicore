@@ -28,7 +28,8 @@ func appErrorStringChain(err appError) string {
 		return ""
 	}
 	var res strings.Builder
-	res.WriteString(err.ErrorString() + "\n")
+	res.WriteString(err.ErrorString())
+	res.WriteString("\n")
 
 	var processedError error = err
 	for {
@@ -38,9 +39,13 @@ func appErrorStringChain(err appError) string {
 				break
 			}
 			if appErr, ok := cause.(interface{ ErrorString() string }); ok {
-				res.WriteString("caused by: " + appErr.ErrorString() + "\n")
+				res.WriteString("caused by: ")
+				res.WriteString(appErr.ErrorString())
+				res.WriteString("\n")
 			} else {
-				res.WriteString("caused by: " + cause.Error() + "\n")
+				res.WriteString("caused by: ")
+				res.WriteString(cause.Error())
+				res.WriteString("\n")
 			}
 			processedError = cause
 		} else {
