@@ -10,10 +10,9 @@ interface CommunityRulesProps {
 export function CommunityRules({ className }: CommunityRulesProps) {
   return (
     <Tile
-      className={cn(
-        'flex flex-col gap-y-3.75 rounded-[0.625rem] px-3.75 py-5',
-        className,
-      )}
+      radius='md'
+      size='compact'
+      className={cn('flex flex-col gap-y-3.75', className)}
     >
       <h2 className='text-lg leading-normal font-bold'>Правила сообщества</h2>
       <ul className='text-light/95 flex flex-col gap-y-3 font-(family-name:--font-inter) text-lg leading-5 tracking-[0.01em]'>
