@@ -15,9 +15,10 @@ const bonkeyMonkey: UserPreview = {
 export const mockPost: PostDetailsData = {
   id: '1',
   title: 'Java или C# в 2026: Что выбрать новичку?',
-  thread: {
+  category: {
     id: '1',
-    title: 'Какой язык программирования учить в 2026?',
+    slug: 'programming',
+    name: 'Программирование',
   },
   author: {
     id: 'code-master',
@@ -25,7 +26,6 @@ export const mockPost: PostDetailsData = {
     role: 'superAdmin',
     title: 'Волендеморт',
   },
-  topic: 'Программирование',
   likesCount: 126,
   repliesCount: 133,
   viewsCount: 2331,
@@ -132,6 +132,5 @@ export const mockRelatedPosts: RelatedPost[] = [
 
 export const mockPostIds = [
   mockPost.id,
-  mockPost.thread.id,
   ...mockRelatedPosts.map(({ id }) => id),
 ];
