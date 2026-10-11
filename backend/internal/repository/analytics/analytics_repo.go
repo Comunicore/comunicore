@@ -36,7 +36,10 @@ func pgTimestamptz(t time.Time) pgtype.Timestamptz {
 	return pgtype.Timestamptz{Time: t, Valid: true}
 }
 
-func (r *AnalyticsRepo) InsertVisitBatch(ctx context.Context, batch model.AnalyticsVisitBatchInsert) error {
+func (r *AnalyticsRepo) InsertVisitBatch(
+	ctx context.Context,
+	batch model.AnalyticsVisitBatchInsert,
+) error {
 	uid := pgtype.Int4{Valid: false}
 	if batch.UserID != nil {
 		uid = pgtype.Int4{Int32: int32(*batch.UserID), Valid: true}
@@ -54,7 +57,10 @@ func (r *AnalyticsRepo) InsertVisitBatch(ctx context.Context, batch model.Analyt
 	})
 }
 
-func (r *AnalyticsRepo) GetMetrics(ctx context.Context, dropoffN, dropoffInactiveDays int) (model.AnalyticsMetricsRepo, error) {
+func (r *AnalyticsRepo) GetMetrics(
+	ctx context.Context,
+	dropoffN, dropoffInactiveDays int,
+) (model.AnalyticsMetricsRepo, error) {
 	var out model.AnalyticsMetricsRepo
 
 	dur, err := r.queries.AnalyticsAvgDurations(ctx)
@@ -70,10 +76,13 @@ func (r *AnalyticsRepo) GetMetrics(ctx context.Context, dropoffN, dropoffInactiv
 		return out, err
 	}
 
-	out.DropoffChurnPercent, err = r.queries.AnalyticsDropoffPercent(ctx, analyticsDb.AnalyticsDropoffPercentParams{
-		ThresholdN:   int32(dropoffN),
-		InactiveDays: int32(dropoffInactiveDays),
-	})
+	out.DropoffChurnPercent, err = r.queries.AnalyticsDropoffPercent(
+		ctx,
+		analyticsDb.AnalyticsDropoffPercentParams{
+			ThresholdN:   int32(dropoffN),
+			InactiveDays: int32(dropoffInactiveDays),
+		},
+	)
 	if err != nil {
 		return out, err
 	}
@@ -121,10 +130,13 @@ func (r *AnalyticsRepo) GetMetrics(ctx context.Context, dropoffN, dropoffInactiv
 	weekStart := now.AddDate(0, 0, -7)
 	monthStart := now.AddDate(0, -1, 0)
 
-	weekRow, err := r.queries.AnalyticsTopPostInRange(ctx, analyticsDb.AnalyticsTopPostInRangeParams{
-		StartAt: pgTimestamptz(weekStart),
-		EndAt:   pgTimestamptz(now),
-	})
+	weekRow, err := r.queries.AnalyticsTopPostInRange(
+		ctx,
+		analyticsDb.AnalyticsTopPostInRangeParams{
+			StartAt: pgTimestamptz(weekStart),
+			EndAt:   pgTimestamptz(now),
+		},
+	)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			out.TopThreadWeekly = nil
@@ -139,10 +151,13 @@ func (r *AnalyticsRepo) GetMetrics(ctx context.Context, dropoffN, dropoffInactiv
 		}
 	}
 
-	monthRow, err := r.queries.AnalyticsTopPostInRange(ctx, analyticsDb.AnalyticsTopPostInRangeParams{
-		StartAt: pgTimestamptz(monthStart),
-		EndAt:   pgTimestamptz(now),
-	})
+	monthRow, err := r.queries.AnalyticsTopPostInRange(
+		ctx,
+		analyticsDb.AnalyticsTopPostInRangeParams{
+			StartAt: pgTimestamptz(monthStart),
+			EndAt:   pgTimestamptz(now),
+		},
+	)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			out.TopThreadMonthly = nil

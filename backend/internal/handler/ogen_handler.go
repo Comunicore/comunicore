@@ -53,7 +53,6 @@ func NewOgenHandler(
 	mediaHandler *MediaHandler,
 	analyticsHandler *AnalyticsHandler,
 ) *OgenHandler {
-
 	return &OgenHandler{
 		postsHandler:     postsHandler,
 		userHandler:      userHandler,
@@ -110,8 +109,8 @@ func NewSecurityHandler(authRepo *authRepo.AuthRepo) *securityHandler {
 }
 
 func (h *securityHandler) HandleCookieAuth(
-	ctx context.Context, operationName api.OperationName, t api.CookieAuth) (context.Context, error) {
-
+	ctx context.Context, operationName api.OperationName, t api.CookieAuth,
+) (context.Context, error) {
 	op := "securityHandler.HandleCookieAuth"
 	fmt.Printf("Cookie Auth with operation name %s\n", operationName)
 	global := GlobalContextFromContext(ctx)
@@ -159,16 +158,25 @@ func sendErrorStringMessage(w http.ResponseWriter, httpCode int, err error, errM
 	w.WriteHeader(httpCode)
 	_, _ = w.Write(data)
 }
-func (h *errorHandler) handler(ctx context.Context, w http.ResponseWriter, r *http.Request, err error) {
+
+func (h *errorHandler) handler(
+	ctx context.Context,
+	w http.ResponseWriter,
+	r *http.Request,
+	err error,
+) {
 	fmt.Printf("in ogen error handler\n")
-	var (
-		code = http.StatusInternalServerError
-	)
+	code := http.StatusInternalServerError
 	// !!! errors handling order here is VERY important, because some errors can be wrapped in other errors,
 	// so we need to check for more specific errors first
 	if authenticationError, ok := errors.AsType[*apperror.AuthenticationError](err); ok {
 		log.Printf("AuthenticationError: %v\n", authenticationError)
-		sendErrorStringMessage(w, http.StatusUnauthorized, err, "incorrect login or password or login not exists")
+		sendErrorStringMessage(
+			w,
+			http.StatusUnauthorized,
+			err,
+			"incorrect login or password or login not exists",
+		)
 		return
 	}
 	if decodeRequestError, ok := errors.AsType[*ogenerrors.DecodeRequestError](err); ok {
@@ -180,12 +188,18 @@ func (h *errorHandler) handler(ctx context.Context, w http.ResponseWriter, r *ht
 		// security error means request did not reach JWT or Cookie auth handlers (they returns apperror),
 		// so we can return 401
 		log.Printf("SecurityError: %v\n", securityError)
-		sendErrorStringMessage(w, http.StatusUnauthorized, securityError, "failed to read security credentials")
+		sendErrorStringMessage(
+			w,
+			http.StatusUnauthorized,
+			securityError,
+			"failed to read security credentials",
+		)
 		return
 	}
 	fmt.Printf("error handler called with error: %T %+v\n", err, err.Error())
 	_, _ = io.WriteString(w, http.StatusText(code))
 }
+
 func RegisterOgenRoutes(mux *http.ServeMux, cfg *config.AppConfig) {
 	mediaR, err := mediaRepo.NewMediaRepo(cfg.Server.UploadDir)
 	if err != nil {
@@ -256,26 +270,38 @@ func RegisterOgenRoutes(mux *http.ServeMux, cfg *config.AppConfig) {
 // Post handlers
 func (h *OgenHandler) PostAddComment(
 	ctx context.Context, req *api.PostCreateCommentRequest, params api.PostAddCommentParams) (
-	api.PostAddCommentRes, error) {
-
+	api.PostAddCommentRes, error,
+) {
 	return h.postsHandler.PostAddComment(ctx, req, params)
 }
 
-func (h *OgenHandler) PostCreate(ctx context.Context, req *api.PostCreateRequest) (api.PostCreateRes, error) {
+func (h *OgenHandler) PostCreate(
+	ctx context.Context,
+	req *api.PostCreateRequest,
+) (api.PostCreateRes, error) {
 	return h.postsHandler.PostCreate(ctx, req)
 }
 
-func (h *OgenHandler) PostGet(ctx context.Context, params api.PostGetParams) (api.PostGetRes, error) {
+func (h *OgenHandler) PostGet(
+	ctx context.Context,
+	params api.PostGetParams,
+) (api.PostGetRes, error) {
 	return h.postsHandler.PostGet(ctx, params)
 }
 
-func (h *OgenHandler) PostsList(ctx context.Context, params api.PostsListParams) (api.PostsListRes, error) {
+func (h *OgenHandler) PostsList(
+	ctx context.Context,
+	params api.PostsListParams,
+) (api.PostsListRes, error) {
 	return h.postsHandler.PostsList(ctx, params)
 }
 
 // User handlers
 
-func (h *OgenHandler) UserGet(ctx context.Context, params api.UserGetParams) (api.UserGetRes, error) {
+func (h *OgenHandler) UserGet(
+	ctx context.Context,
+	params api.UserGetParams,
+) (api.UserGetRes, error) {
 	return h.userHandler.UserGet(ctx, params)
 }
 
@@ -283,30 +309,51 @@ func (h *OgenHandler) UserMe(ctx context.Context) (api.UserMeRes, error) {
 	return h.userHandler.UserMe(ctx)
 }
 
-func (h *OgenHandler) UserCreate(ctx context.Context, req *api.UserCreateRequest) (api.UserCreateRes, error) {
+func (h *OgenHandler) UserCreate(
+	ctx context.Context,
+	req *api.UserCreateRequest,
+) (api.UserCreateRes, error) {
 	return h.userHandler.UserCreate(ctx, req)
 }
 
-func (h *OgenHandler) UserUpdate(ctx context.Context, req *api.UserUpdateRequest, params api.UserUpdateParams) (*api.UserCreateResponse, error) {
+func (h *OgenHandler) UserUpdate(
+	ctx context.Context,
+	req *api.UserUpdateRequest,
+	params api.UserUpdateParams,
+) (*api.UserCreateResponse, error) {
 	return h.userHandler.UserUpdate(ctx, req, params)
 }
 
 // Auth handlers
 
-func (h *OgenHandler) AuthLogin(ctx context.Context, req *api.AuthLoginRequest) (api.AuthLoginRes, error) {
+func (h *OgenHandler) AuthLogin(
+	ctx context.Context,
+	req *api.AuthLoginRequest,
+) (api.AuthLoginRes, error) {
 	return h.authHandler.AuthLogin(ctx, req)
 }
+
 func (h *OgenHandler) AuthLogout(ctx context.Context) error {
 	return h.authHandler.AuthLogout(ctx)
 }
-func (h *OgenHandler) MediaUpload(ctx context.Context, req *api.MediaUploadRequestMultipart) (api.MediaUploadRes, error) {
+
+func (h *OgenHandler) MediaUpload(
+	ctx context.Context,
+	req *api.MediaUploadRequestMultipart,
+) (api.MediaUploadRes, error) {
 	return h.mediaHandler.MediaUpload(ctx, req)
 }
 
-func (h *OgenHandler) AnalyticsVisitBatchSubmit(ctx context.Context, req *api.AnalyticsVisitBatchRequest) (api.AnalyticsVisitBatchSubmitRes, error) {
+func (h *OgenHandler) AnalyticsVisitBatchSubmit(
+	ctx context.Context,
+	req *api.AnalyticsVisitBatchRequest,
+) (api.AnalyticsVisitBatchSubmitRes, error) {
 	return h.analyticsHandler.AnalyticsVisitBatchSubmit(ctx, req)
 }
 
-func (h *OgenHandler) AnalyticsMetricsGet(ctx context.Context, params api.AnalyticsMetricsGetParams) (api.AnalyticsMetricsGetRes, error) {
+func (h *OgenHandler) AnalyticsMetricsGet(
+	ctx context.Context,
+	params api.AnalyticsMetricsGetParams,
+) (api.AnalyticsMetricsGetRes, error) {
 	return h.analyticsHandler.AnalyticsMetricsGet(ctx, params)
 }

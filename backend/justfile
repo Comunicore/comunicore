@@ -45,3 +45,6 @@ e2e_tests_verbose:
 e2e_tests_specific +TEST_NAME:
     @echo "Starting API e2e tests..."
     @go test ./internal/tests/e2e/... -v -run {{TEST_NAME}}
+
+lint:
+    golangci-lint run ./...

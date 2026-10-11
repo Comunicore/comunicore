@@ -4,8 +4,8 @@
 package e2e
 
 import (
-	"fmt"
 	"net/http"
+	"strconv"
 	"testing"
 
 	"github.com/comunicore/comunicore/backend/internal/tests"
@@ -47,6 +47,7 @@ func testUserCreateOk(t *testing.T, baseURL string) ForumUser {
 	})
 	return user
 }
+
 func testUserCreateAgainFailure(t *testing.T, baseURL string, user ForumUser) {
 	testsCases := []struct {
 		name         string
@@ -151,7 +152,7 @@ func TestUserCreateBad(t *testing.T) {
 func testUserUpdateOk(t *testing.T, baseURL string, cookie *http.Cookie, userID int) ForumUser {
 	user := ForumUser{}
 	t.Run("Test UserUpdate OK", func(t *testing.T) {
-		userIdStr := fmt.Sprintf("%d", userID)
+		userIdStr := strconv.Itoa(userID)
 		exp := expectCreate(t, baseURL)
 		auth := exp.Builder(func(req *httpexpect.Request) {
 			req.WithCookie(sessionCookieName, cookie.Value)
@@ -175,6 +176,7 @@ func testUserUpdateOk(t *testing.T, baseURL string, cookie *http.Cookie, userID 
 
 	return user
 }
+
 func testUserMeOk(t *testing.T, baseURL string, cookie *http.Cookie) ForumUser {
 	var user ForumUser
 	t.Run("Test UserMe OK", func(t *testing.T) {
@@ -201,7 +203,7 @@ func testUserMeOk(t *testing.T, baseURL string, cookie *http.Cookie) ForumUser {
 func testUserGetOk(t *testing.T, baseURL string, cookie *http.Cookie, userID int) ForumUser {
 	var user ForumUser
 	t.Run("Test UserGet OK", func(t *testing.T) {
-		userIdStr := fmt.Sprintf("%d", userID)
+		userIdStr := strconv.Itoa(userID)
 		exp := expectCreate(t, baseURL)
 		auth := exp.Builder(func(req *httpexpect.Request) {
 			req.WithCookie(sessionCookieName, cookie.Value)

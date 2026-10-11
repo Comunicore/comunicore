@@ -102,7 +102,11 @@ func (r *PostsRepo) PageByPageID(ctx context.Context, page, limit int) (model.Po
 }
 
 // list posts page by page id, with next and prev page info
-func (r *PostsRepo) PageByOffset(ctx context.Context, postId, limit int, before bool) (model.PostListRepo, error) {
+func (r *PostsRepo) PageByOffset(
+	ctx context.Context,
+	postId, limit int,
+	before bool,
+) (model.PostListRepo, error) {
 	posts := make([]model.PostRepoInfo, 0, limit)
 	if before {
 		rows, err := r.queries.PostPagesBeforePostID(ctx, postdDb.PostPagesBeforePostIDParams{
@@ -151,7 +155,10 @@ func (r *PostsRepo) PageByOffset(ctx context.Context, postId, limit int, before 
 	return res, nil
 }
 
-func (r *PostsRepo) postListInfo(ctx context.Context, minId, maxId int) (model.PostListRepo, error) {
+func (r *PostsRepo) postListInfo(
+	ctx context.Context,
+	minId, maxId int,
+) (model.PostListRepo, error) {
 	row := r.dbpool.QueryRow(ctx,
 		`SELECT COUNT(*) FROM posts`)
 

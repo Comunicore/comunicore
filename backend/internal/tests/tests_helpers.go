@@ -8,8 +8,9 @@ import (
 	"time"
 )
 
-var seededRand *rand.Rand = rand.New(
-	rand.NewSource(time.Now().UnixNano()))
+var seededRand = rand.New(
+	rand.NewSource(time.Now().UnixNano()),
+)
 
 // generate random string of given length started from letter
 func RandomString(length int) string {

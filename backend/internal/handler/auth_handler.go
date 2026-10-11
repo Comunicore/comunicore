@@ -32,7 +32,10 @@ func NewAuthHandler(
 	}
 }
 
-func (u *AuthHandler) AuthLogin(ctx context.Context, req *api.AuthLoginRequest) (api.AuthLoginRes, error) {
+func (u *AuthHandler) AuthLogin(
+	ctx context.Context,
+	req *api.AuthLoginRequest,
+) (api.AuthLoginRes, error) {
 	user, sessionUUID, err := u.authService.Login(ctx, req.Login, req.Password)
 	if err != nil {
 		return nil, err
@@ -40,7 +43,11 @@ func (u *AuthHandler) AuthLogin(ctx context.Context, req *api.AuthLoginRequest) 
 
 	globalCtx := GlobalContextFromContext(ctx)
 	sessionID := urlencode.Encode(sessionUUID[:])
-	u.setSessionCookie(globalCtx.ResponseWriter, sessionID, time.Now().Add(65*24*time.Hour-time.Minute))
+	u.setSessionCookie(
+		globalCtx.ResponseWriter,
+		sessionID,
+		time.Now().Add(65*24*time.Hour-time.Minute),
+	)
 
 	return &api.UserCreateResponse{
 		ID:    user.ID,
@@ -48,6 +55,7 @@ func (u *AuthHandler) AuthLogin(ctx context.Context, req *api.AuthLoginRequest) 
 		Email: user.Email,
 	}, nil
 }
+
 func (u *AuthHandler) AuthLogout(ctx context.Context) error {
 	globalCtx := GlobalContextFromContext(ctx)
 	sessionUUID := globalCtx.SessionID
@@ -64,6 +72,7 @@ func (u *AuthHandler) AuthLogout(ctx context.Context) error {
 
 	return nil
 }
+
 func (u *AuthHandler) setSessionCookie(w http.ResponseWriter, sessionID string, expires time.Time) {
 	cookie := &http.Cookie{
 		Name:     "sid",

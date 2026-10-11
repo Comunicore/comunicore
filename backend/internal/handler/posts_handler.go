@@ -24,12 +24,18 @@ func NewPostsHandler(postsService *postsService.PostsService) *PostsHandler {
 func (h *PostsHandler) PostAddComment(
 	ctx context.Context,
 	req *api.PostCreateCommentRequest,
-	params api.PostAddCommentParams) (api.PostAddCommentRes, error) {
-
+	params api.PostAddCommentParams,
+) (api.PostAddCommentRes, error) {
 	globalCtx := GlobalContextFromContext(ctx)
-	if globalCtx == nil || globalCtx.UserIDIsSet == false {
-		res := api.PostAddCommentInternalServerError("in handler.PostAddComment() user ID is not set")
-		return &res, apperror.NewAuthenticationError("handler.PostAddComment()", nil, "user ID is not set")
+	if globalCtx == nil || !globalCtx.UserIDIsSet {
+		res := api.PostAddCommentInternalServerError(
+			"in handler.PostAddComment() user ID is not set",
+		)
+		return &res, apperror.NewAuthenticationError(
+			"handler.PostAddComment()",
+			nil,
+			"user ID is not set",
+		)
 	}
 	postCreate := model.CommentCreate{
 		PostID:  params.PostId,
@@ -52,12 +58,16 @@ func (h *PostsHandler) PostAddComment(
 }
 
 func (h *PostsHandler) PostCreate(
-	ctx context.Context, req *api.PostCreateRequest) (api.PostCreateRes, error) {
-
+	ctx context.Context, req *api.PostCreateRequest,
+) (api.PostCreateRes, error) {
 	globalCtx := GlobalContextFromContext(ctx)
-	if globalCtx == nil || globalCtx.UserIDIsSet == false {
+	if globalCtx == nil || !globalCtx.UserIDIsSet {
 		res := api.PostCreateInternalServerError("in handler.PostCreate() user ID is not set")
-		return &res, apperror.NewAuthenticationError("handler.PostCreate()", nil, "user ID is not set")
+		return &res, apperror.NewAuthenticationError(
+			"handler.PostCreate()",
+			nil,
+			"user ID is not set",
+		)
 	}
 	modelPostCreate := model.PostCreate{
 		Title:   req.Title,
@@ -82,7 +92,10 @@ func (h *PostsHandler) PostCreate(
 }
 
 // get post with all comments
-func (h *PostsHandler) PostGet(ctx context.Context, params api.PostGetParams) (api.PostGetRes, error) {
+func (h *PostsHandler) PostGet(
+	ctx context.Context,
+	params api.PostGetParams,
+) (api.PostGetRes, error) {
 	postWithComments, err := h.postsService.GetPostWithComments(ctx, params.PostId)
 	if err != nil {
 		return nil, err
@@ -114,8 +127,11 @@ func (h *PostsHandler) PostGet(ctx context.Context, params api.PostGetParams) (a
 	}, nil
 }
 
-func (h *PostsHandler) PostsList(ctx context.Context, params api.PostsListParams) (api.PostsListRes, error) {
-	var limit = 20
+func (h *PostsHandler) PostsList(
+	ctx context.Context,
+	params api.PostsListParams,
+) (api.PostsListRes, error) {
+	limit := 20
 	if params.Limit.IsSet() {
 		limit = params.Limit.Value
 	}

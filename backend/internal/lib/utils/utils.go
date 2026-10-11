@@ -17,7 +17,8 @@ func RandomBytes(count int) []byte {
 }
 
 var seededRand *mathRand.Rand = mathRand.New(
-	mathRand.NewSource(time.Now().UnixNano()))
+	mathRand.NewSource(time.Now().UnixNano()),
+)
 
 // generate random string of given length started from letter
 func RandomString(length int) string {

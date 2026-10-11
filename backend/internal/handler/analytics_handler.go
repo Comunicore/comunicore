@@ -16,7 +16,10 @@ func NewAnalyticsHandler(svc *analyticsService.AnalyticsService) *AnalyticsHandl
 	return &AnalyticsHandler{svc: svc}
 }
 
-func (h *AnalyticsHandler) AnalyticsVisitBatchSubmit(ctx context.Context, req *api.AnalyticsVisitBatchRequest) (api.AnalyticsVisitBatchSubmitRes, error) {
+func (h *AnalyticsHandler) AnalyticsVisitBatchSubmit(
+	ctx context.Context,
+	req *api.AnalyticsVisitBatchRequest,
+) (api.AnalyticsVisitBatchSubmitRes, error) {
 	globalCtx := GlobalContextFromContext(ctx)
 	var uid *int
 	if globalCtx != nil && globalCtx.UserIDIsSet {
@@ -49,7 +52,10 @@ func (h *AnalyticsHandler) AnalyticsVisitBatchSubmit(ctx context.Context, req *a
 	return &api.AnalyticsVisitBatchSubmitNoContent{}, nil
 }
 
-func (h *AnalyticsHandler) AnalyticsMetricsGet(ctx context.Context, params api.AnalyticsMetricsGetParams) (api.AnalyticsMetricsGetRes, error) {
+func (h *AnalyticsHandler) AnalyticsMetricsGet(
+	ctx context.Context,
+	params api.AnalyticsMetricsGetParams,
+) (api.AnalyticsMetricsGetRes, error) {
 	dropN := 5
 	if params.DropoffAfterMessages.IsSet() {
 		dropN = params.DropoffAfterMessages.Value

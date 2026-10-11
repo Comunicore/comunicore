@@ -22,20 +22,18 @@ type globalAppConfig struct {
 	DbPassword string
 }
 
-var (
-	globalConfig = globalAppConfig{
-		URL: "",
-		// server params to override config file values
-		ConfigPath: "../../../config/server-config.toml",
+var globalConfig = globalAppConfig{
+	URL: "",
+	// server params to override config file values
+	ConfigPath: "../../../config/server-config.toml",
 
-		DbHost:     "",
-		DbPort:     0,
-		DbName:     "test",
-		DbUser:     "test",
-		DbPassword: "password",
-		// server params end
-	}
-)
+	DbHost:     "",
+	DbPort:     0,
+	DbName:     "test",
+	DbUser:     "test",
+	DbPassword: "password",
+	// server params end
+}
 
 const (
 	userCreatePath   = "/api/user"

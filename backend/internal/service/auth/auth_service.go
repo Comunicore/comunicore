@@ -29,7 +29,10 @@ func NewAuthService(authRepo AuthRepo, userRepo UserRepo) *AuthService {
 	return &AuthService{authRepo: authRepo, userRepo: userRepo}
 }
 
-func (r *AuthService) Login(ctx context.Context, login, password string) (model.User, uuid.UUID, error) {
+func (r *AuthService) Login(
+	ctx context.Context,
+	login, password string,
+) (model.User, uuid.UUID, error) {
 	userID, sessionUUID, err := r.authRepo.Login(ctx, login, password)
 	if err != nil {
 		return model.User{}, uuid.UUID{}, err
@@ -42,6 +45,7 @@ func (r *AuthService) Login(ctx context.Context, login, password string) (model.
 
 	return user, sessionUUID, nil
 }
+
 func (r *AuthService) Logout(ctx context.Context, sessionUUID uuid.UUID) error {
 	return r.authRepo.Logout(ctx, sessionUUID)
 }

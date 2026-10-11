@@ -4,6 +4,7 @@
 package config
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"log"
@@ -45,9 +46,15 @@ func CmdParse() *CmdConfig {
 	serverBaseURL := flag.String("server-baseurl", "",
 		"http server base URL (e.g. \"https://site.com\", \"http://site.com:8080\")")
 	serverPermittedOrigin := flag.String(
-		"server-permitted-origin", "",
-		"http server permitted extra single origin (e.g. \"http://localhost:3000\" or \"http://site.com\")")
-	serverWorkDir := flag.String("server-work-dir", "", "http server work directory (default current dir)")
+		"server-permitted-origin",
+		"",
+		"http server permitted extra single origin (e.g. \"http://localhost:3000\" or \"http://site.com\")",
+	)
+	serverWorkDir := flag.String(
+		"server-work-dir",
+		"",
+		"http server work directory (default current dir)",
+	)
 	serverUploadDir := flag.String("server-upload-dir", "",
 		"http server upload directory (default work dir + /upload)")
 
@@ -80,26 +87,36 @@ type DatabaseConfig struct {
 }
 
 func (db *DatabaseConfig) check(cmd *CmdConfig) error {
-	db.Host = mergeCmdEnvCurrentDefaultString(cmd.DatabaseHost, "FORUM_DATABASE_HOST", db.Host, "localhost")
+	db.Host = mergeCmdEnvCurrentDefaultString(
+		cmd.DatabaseHost,
+		"FORUM_DATABASE_HOST",
+		db.Host,
+		"localhost",
+	)
 	db.Port = mergeCmdEnvCurrentDefaultInt(cmd.DatabasePort, "FORUM_DATABASE_PORT", db.Port, 5432)
 	db.User = mergeCmdEnvCurrentDefaultString(cmd.DatabaseUser, "FORUM_DATABASE_USER", db.User, "")
-	db.Password = mergeCmdEnvCurrentDefaultString(cmd.DatabasePassword, "FORUM_DATABASE_PASSWORD", db.Password, "")
+	db.Password = mergeCmdEnvCurrentDefaultString(
+		cmd.DatabasePassword,
+		"FORUM_DATABASE_PASSWORD",
+		db.Password,
+		"",
+	)
 	db.Name = mergeCmdEnvCurrentDefaultString(cmd.DatabaseName, "FORUM_DATABASE_NAME", db.Name, "")
 
 	if db.Host == "" {
-		return fmt.Errorf("database host is empty")
+		return errors.New("database host is empty")
 	}
 	if db.Port <= 0 {
-		return fmt.Errorf("database port is zero or negative")
+		return errors.New("database port is zero or negative")
 	}
 	if db.User == "" {
-		return fmt.Errorf("database user is empty")
+		return errors.New("database user is empty")
 	}
 	if db.Password == "" {
-		return fmt.Errorf("database password is empty")
+		return errors.New("database password is empty")
 	}
 	if db.Name == "" {
-		return fmt.Errorf("database name is empty")
+		return errors.New("database name is empty")
 	}
 	return nil
 }
@@ -122,16 +139,19 @@ func (srv *ServerConfig) check(cmd *CmdConfig) error {
 	srv.Host = mergeCmdEnvCurrentDefaultString(cmd.ServerHost, "FORUM_SERVER_HOST", srv.Host, "::1")
 	srv.Port = mergeCmdEnvCurrentDefaultInt(cmd.ServerPort, "FORUM_SERVER_PORT", srv.Port, 8080)
 	srv.BaseURL = mergeCmdEnvCurrentDefaultString(
-		cmd.ServerBaseURL, "FORUM_SERVER_BASEURL", srv.BaseURL, "http://localhost:8080")
+		cmd.ServerBaseURL, "FORUM_SERVER_BASEURL", srv.BaseURL, "http://localhost:8080",
+	)
 	srv.PermittedOrigin = mergeCmdEnvCurrentDefaultString(
-		cmd.ServerPermittedOrigin, "FORUM_SERVER_PERMITTED_ORIGIN", srv.PermittedOrigin, "")
+		cmd.ServerPermittedOrigin, "FORUM_SERVER_PERMITTED_ORIGIN", srv.PermittedOrigin, "",
+	)
 
 	defaultWorkDir, err := os.Getwd()
 	if err != nil {
 		return fmt.Errorf("failed get current working directory: %v", err)
 	}
 	srv.WorkDir = mergeCmdEnvCurrentDefaultString(
-		cmd.ServerWorkDir, "FORUM_SERVER_WORK_DIR", srv.WorkDir, defaultWorkDir)
+		cmd.ServerWorkDir, "FORUM_SERVER_WORK_DIR", srv.WorkDir, defaultWorkDir,
+	)
 	fmt.Printf("%s - cwd\n%s - future work dir \n", defaultWorkDir, srv.WorkDir)
 	if !path.IsAbs(srv.WorkDir) {
 		absoluteWorkDir := path.Join(defaultWorkDir, srv.WorkDir)
@@ -141,17 +161,18 @@ func (srv *ServerConfig) check(cmd *CmdConfig) error {
 	}
 
 	srv.UploadDir = mergeCmdEnvCurrentDefaultString(
-		cmd.ServerUploadDir, "FORUM_SERVER_UPLOAD_DIR", srv.UploadDir, "upload")
+		cmd.ServerUploadDir, "FORUM_SERVER_UPLOAD_DIR", srv.UploadDir, "upload",
+	)
 	fmt.Printf("upload dir %s\n", srv.UploadDir)
 
 	if srv.Port <= 0 {
-		return fmt.Errorf("server port is zero or negative")
+		return errors.New("server port is zero or negative")
 	}
 	if srv.Port > 65535 {
-		return fmt.Errorf("server port is greater than 65535")
+		return errors.New("server port is greater than 65535")
 	}
 	if len(srv.BaseURL) == 0 { // TODO: check valid URL format
-		return fmt.Errorf("server base URL is empty")
+		return errors.New("server base URL is empty")
 	}
 	return nil
 }
@@ -179,12 +200,20 @@ func MustReadAppConfig(cmdConfig *CmdConfig) *AppConfig {
 
 	err = appConfig.Database.check(cmdConfig)
 	if err != nil {
-		log.Fatalf("invalid db config from file \"%s\", environment or command-line: %v", cfgPath, err)
+		log.Fatalf(
+			"invalid db config from file \"%s\", environment or command-line: %v",
+			cfgPath,
+			err,
+		)
 	}
 
 	err = appConfig.Server.check(cmdConfig)
 	if err != nil {
-		log.Fatalf("invalid server config from file \"%s\", environment or command-line: %v", cfgPath, err)
+		log.Fatalf(
+			"invalid server config from file \"%s\", environment or command-line: %v",
+			cfgPath,
+			err,
+		)
 	}
 
 	return &appConfig
@@ -196,7 +225,7 @@ func configPath(cmdConfig *CmdConfig) string {
 }
 
 // mergeCmdEnvDefault merges command-line argument (most prioritive), environment and default
-func mergeCmdEnvDefault(cmd *string, envName string, def string) string {
+func mergeCmdEnvDefault(cmd *string, envName, def string) string {
 	var res string
 
 	if cmd != nil && len(*cmd) > 0 {
@@ -212,7 +241,7 @@ func mergeCmdEnvDefault(cmd *string, envName string, def string) string {
 }
 
 // return first non empty value from command-line argument, environment variable, current or default value
-func mergeCmdEnvCurrentDefaultString(cmd *string, envName string, current string, def string) string {
+func mergeCmdEnvCurrentDefaultString(cmd *string, envName, current, def string) string {
 	if cmd != nil && len(*cmd) > 0 {
 		return *cmd
 	}
@@ -227,7 +256,7 @@ func mergeCmdEnvCurrentDefaultString(cmd *string, envName string, current string
 }
 
 // return first non zero value from command-line argument, environment variable, current or default value
-func mergeCmdEnvCurrentDefaultInt(cmd *int, envName string, current int, def int) int {
+func mergeCmdEnvCurrentDefaultInt(cmd *int, envName string, current, def int) int {
 	if cmd != nil && *cmd != 0 {
 		return *cmd
 	}

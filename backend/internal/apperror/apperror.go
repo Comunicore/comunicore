@@ -68,48 +68,49 @@ type AuthenticationError struct {
 
 func NewErrNotFound(op string, cause error, typeName, name string) error {
 	return &NotFoundError{
-		BaseError: BaseError{
-			opName: op,
-			cause:  cause,
-		},
-		Type: typeName,
-		Name: name,
+		opName: op,
+		cause:  cause,
+		Type:   typeName,
+		Name:   name,
 	}
 }
+
 func (e *NotFoundError) ErrorString() string {
 	return fmt.Sprintf("Op: %s\n%s with name %s not found", e.opName, e.Type, e.Name)
 }
+
 func (e *NotFoundError) Error() string {
 	return appErrorStringChain(e)
 }
 
 func NewErrValidation(op string, cause error, msg string) error {
 	return &ValidationError{
-		BaseError: BaseError{
-			opName: op,
-			cause:  cause,
-		},
+		opName:  op,
+		cause:   cause,
 		Message: msg,
 	}
 }
+
 func (e *ValidationError) ErrorString() string {
 	return fmt.Sprintf("Op: %s\nvalidation error: %s", e.opName, e.Message)
 }
+
 func (e *ValidationError) Error() string {
 	return appErrorStringChain(e)
 }
+
 func NewAuthenticationError(op string, cause error, msg string) error {
 	return &AuthenticationError{
-		BaseError: BaseError{
-			opName: op,
-			cause:  cause,
-		},
+		opName:  op,
+		cause:   cause,
 		Message: msg,
 	}
 }
+
 func (e *AuthenticationError) ErrorString() string {
 	return fmt.Sprintf("Op: %s\nauth error: %s", e.opName, e.Message)
 }
+
 func (e *AuthenticationError) Error() string {
 	return appErrorStringChain(e)
 }

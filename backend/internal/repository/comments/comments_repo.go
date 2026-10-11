@@ -24,7 +24,10 @@ func NewCommentsRepo(dsn string) (*CommentsRepo, error) {
 }
 
 // create comment in post
-func (r *CommentsRepo) Create(ctx context.Context, comment model.CommentCreate) (model.Comment, error) {
+func (r *CommentsRepo) Create(
+	ctx context.Context,
+	comment model.CommentCreate,
+) (model.Comment, error) {
 	row, err := r.queries.CommentCreate(ctx, commentsDb.CommentCreateParams{
 		PostID:  int32(comment.PostID),
 		UserID:  int32(comment.UserID),

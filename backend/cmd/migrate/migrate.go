@@ -35,7 +35,8 @@ func main() {
 		appConfig.Database.Password,
 		appConfig.Database.Host,
 		appConfig.Database.Port,
-		appConfig.Database.Name)
+		appConfig.Database.Name,
+	)
 
 	m, err := migrate.New(
 		"file://migrations",

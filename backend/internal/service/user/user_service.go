@@ -37,7 +37,11 @@ func (r *UserService) Get(ctx context.Context, userId int) (model.User, error) {
 
 	return user, nil
 }
-func (r *UserService) Create(ctx context.Context, name, email, password string) (model.User, error) {
+
+func (r *UserService) Create(
+	ctx context.Context,
+	name, email, password string,
+) (model.User, error) {
 	user, err := r.userRepo.Create(ctx, name, email)
 	if err != nil {
 		return model.User{}, err
@@ -49,7 +53,12 @@ func (r *UserService) Create(ctx context.Context, name, email, password string) 
 
 	return user, nil
 }
-func (r *UserService) Update(ctx context.Context, userId int, name, email string) (model.User, error) {
+
+func (r *UserService) Update(
+	ctx context.Context,
+	userId int,
+	name, email string,
+) (model.User, error) {
 	user, err := r.userRepo.Update(ctx, userId, name, email)
 	if err != nil {
 		return model.User{}, err

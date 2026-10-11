@@ -71,7 +71,12 @@ func testPostCreateOk(t *testing.T, baseURL string, cookie *http.Cookie) PostIte
 	return post
 }
 
-func testPostCommentCreateOk(t *testing.T, baseURL string, cookie *http.Cookie, postId int) PostCommentItem {
+func testPostCommentCreateOk(
+	t *testing.T,
+	baseURL string,
+	cookie *http.Cookie,
+	postId int,
+) PostCommentItem {
 	var comment PostCommentItem
 	t.Run("Test PostCommentCreate OK", func(t *testing.T) {
 		exp := expectCreate(t, baseURL)
@@ -88,7 +93,8 @@ func testPostCommentCreateOk(t *testing.T, baseURL string, cookie *http.Cookie, 
 			Expect().
 			Status(http.StatusCreated).JSON().Object()
 
-		res.Keys().ContainsOnly("id", "authorId", "authorName", "authorAvatarUrl", "content", "createdAt")
+		res.Keys().
+			ContainsOnly("id", "authorId", "authorName", "authorAvatarUrl", "content", "createdAt")
 		res.Value("id").Number().Gt(0)
 		res.Value("authorId").Number().Gt(0)
 		res.Value("authorName").String().NotEmpty()
@@ -123,8 +129,8 @@ type PostWithComments struct {
 }
 
 func testPostGet(t *testing.T, baseURL string,
-	cookie *http.Cookie, expectedPost PostItem, expectedComment PostCommentItem) {
-
+	cookie *http.Cookie, expectedPost PostItem, expectedComment PostCommentItem,
+) {
 	t.Run("Test PostGet OK", func(t *testing.T) {
 		exp := expectCreate(t, baseURL)
 		auth := exp.Builder(func(req *httpexpect.Request) {
@@ -137,7 +143,8 @@ func testPostGet(t *testing.T, baseURL string,
 
 		res.Keys().ContainsOnly(
 			"id", "authorId", "authorName", "authorAvatarUrl", "title", "content",
-			"commentsCount", "createdAt", "comments")
+			"commentsCount", "createdAt", "comments",
+		)
 		res.Value("id").Number().IsEqual(expectedPost.ID)
 		res.Value("authorId").Number().IsEqual(expectedPost.AuthorID)
 		res.Value("authorName").String().IsEqual(expectedPost.AuthorName)
@@ -152,7 +159,8 @@ func testPostGet(t *testing.T, baseURL string,
 		comments.Length().IsEqual(1)
 
 		firstComment := comments.Value(0).Object()
-		firstComment.Keys().ContainsOnly("id", "authorId", "authorName", "authorAvatarUrl", "content", "createdAt")
+		firstComment.Keys().
+			ContainsOnly("id", "authorId", "authorName", "authorAvatarUrl", "content", "createdAt")
 		firstComment.Value("id").Number().IsEqual(expectedComment.ID)
 		firstComment.Value("authorId").Number().IsEqual(expectedComment.AuthorID)
 		firstComment.Value("authorName").String().IsEqual(expectedComment.AuthorName)

@@ -6,7 +6,6 @@ package handler
 import (
 	"context"
 	"errors"
-	"fmt"
 	"log"
 	"net/url"
 
@@ -23,14 +22,21 @@ func NewUserHandler(userService *userService.UserService) *UserHandler {
 	return &UserHandler{userService: userService}
 }
 
-func (u *UserHandler) UserGet(ctx context.Context, params api.UserGetParams) (api.UserGetRes, error) {
+func (u *UserHandler) UserGet(
+	ctx context.Context,
+	params api.UserGetParams,
+) (api.UserGetRes, error) {
 	res, err := u.userGetById(ctx, params.UserId)
 	if err != nil {
 		return &api.UserGetInternalServerError{}, err
 	}
 	return res, err
 }
-func (u *UserHandler) userGetById(ctx context.Context, userId int) (*api.UserCreateResponse, error) {
+
+func (u *UserHandler) userGetById(
+	ctx context.Context,
+	userId int,
+) (*api.UserCreateResponse, error) {
 	user, err := u.userService.Get(ctx, userId)
 	if err != nil {
 		return nil, err
@@ -47,15 +53,20 @@ func (u *UserHandler) userGetById(ctx context.Context, userId int) (*api.UserCre
 		CreatedAt: api.NewOptDateTime(user.CreatedAt),
 	}, nil
 }
+
 func (u *UserHandler) UserMe(ctx context.Context) (api.UserMeRes, error) {
 	globalCtx := GlobalContextFromContext(ctx)
-	if globalCtx == nil || globalCtx.UserIDIsSet == false || globalCtx.UserID <= 0 {
+	if globalCtx == nil || !globalCtx.UserIDIsSet || globalCtx.UserID <= 0 {
 		log.Printf("global context %p, %+v\n", globalCtx, globalCtx)
-		return nil, fmt.Errorf("handler UserMe invalid UserID")
+		return nil, errors.New("handler UserMe invalid UserID")
 	}
 	return u.userGetById(ctx, globalCtx.UserID)
 }
-func (u *UserHandler) UserCreate(ctx context.Context, req *api.UserCreateRequest) (api.UserCreateRes, error) {
+
+func (u *UserHandler) UserCreate(
+	ctx context.Context,
+	req *api.UserCreateRequest,
+) (api.UserCreateRes, error) {
 	user, err := u.userService.Create(ctx, req.Name, req.Email, req.Password)
 	if err == nil {
 		avatarUrl, err := url.Parse(user.AvatarURL)
@@ -86,19 +97,25 @@ func (u *UserHandler) UserCreate(ctx context.Context, req *api.UserCreateRequest
 			api.ErrorNotUnique{
 				Code: api.ErrorNotUniqueCode(api.ErrorNotUniqueCodeErrorNotUnique),
 				Data: nonUniqueFields,
-			})
+			},
+		)
 		return &res, nil
 	} else {
 		res := api.NewErrorStringMessageUserCreateBadRequest(
 			api.ErrorStringMessage{
 				Code:    api.ErrorStringMessageCodeErrorStringMessage,
 				Message: "Unknown UserCreate error",
-			})
+			},
+		)
 		return &res, nil
 	}
 }
 
-func (u *UserHandler) UserUpdate(ctx context.Context, req *api.UserUpdateRequest, params api.UserUpdateParams) (*api.UserCreateResponse, error) {
+func (u *UserHandler) UserUpdate(
+	ctx context.Context,
+	req *api.UserUpdateRequest,
+	params api.UserUpdateParams,
+) (*api.UserCreateResponse, error) {
 	user, err := u.userService.Update(ctx, params.UserId, req.Name, req.Email)
 	if err != nil {
 		return nil, err

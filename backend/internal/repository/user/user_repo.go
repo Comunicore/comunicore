@@ -39,6 +39,7 @@ func (r *UserRepo) Get(ctx context.Context, userId int) (model.User, error) {
 		CreatedAt: row.CreatedAt.Time,
 	}, err
 }
+
 func (r *UserRepo) GetNameById(ctx context.Context, userId int) (string, error) {
 	// TODO: optimize with cache
 	return r.queries.UserGetNameById(ctx, int32(userId))
@@ -66,13 +67,19 @@ func (r *UserRepo) Create(ctx context.Context, name, email string) (model.User, 
 	var nameNotUniqueError error
 	var emailNotUniqueError error
 
-	rows, err := r.queries.UserGetByNameOrEmail(ctx, userDb.UserGetByNameOrEmailParams{Name: name, Email: email})
+	rows, err := r.queries.UserGetByNameOrEmail(
+		ctx,
+		userDb.UserGetByNameOrEmailParams{Name: name, Email: email},
+	)
 	if err == nil {
 		if len(rows) == 0 {
 			// this should not happen, because we got unique constraint violation, but just in case
 			return model.User{},
-				fmt.Errorf("UserRepo error: unique constraint violation but no user found with given name %s or email %s",
-					name, email)
+				fmt.Errorf(
+					"UserRepo error: unique constraint violation but no user found with given name %s or email %s",
+					name,
+					email,
+				)
 		}
 		for _, row := range rows {
 			if row.Name == name {
@@ -86,19 +93,37 @@ func (r *UserRepo) Create(ctx context.Context, name, email string) (model.User, 
 			return model.User{}, fmt.Errorf("UserRepo error: %w %w %w",
 				nameNotUniqueError, emailNotUniqueError, notUniqueError)
 		} else if nameNotUniqueError != nil {
-			return model.User{}, fmt.Errorf("UserRepo error: %w %w", nameNotUniqueError, notUniqueError)
+			return model.User{}, fmt.Errorf(
+				"UserRepo error: %w %w",
+				nameNotUniqueError,
+				notUniqueError,
+			)
 		} else if emailNotUniqueError != nil {
-			return model.User{}, fmt.Errorf("UserRepo error: %w %w", emailNotUniqueError, notUniqueError)
+			return model.User{}, fmt.Errorf(
+				"UserRepo error: %w %w",
+				emailNotUniqueError,
+				notUniqueError,
+			)
 		}
 	} else {
-		return model.User{}, fmt.Errorf("UserRepo error: error checking unique constraints: %w %w", err, notUniqueError)
+		return model.User{}, fmt.Errorf(
+			"UserRepo error: error checking unique constraints: %w %w",
+			err,
+			notUniqueError,
+		)
 	}
 
-	return model.User{}, fmt.Errorf("UserRepo error: unique constraint violation but failed to check what exactly not unique: %w", notUniqueError)
+	return model.User{}, fmt.Errorf(
+		"UserRepo error: unique constraint violation but failed to check what exactly not unique: %w",
+		notUniqueError,
+	)
 }
 
 func (r *UserRepo) Update(ctx context.Context, userId int, name, email string) (model.User, error) {
-	row, err := r.queries.UserUpdate(ctx, userDb.UserUpdateParams{ID: int32(userId), Name: name, Email: email})
+	row, err := r.queries.UserUpdate(
+		ctx,
+		userDb.UserUpdateParams{ID: int32(userId), Name: name, Email: email},
+	)
 	return model.User{
 		ID:        int(row.ID),
 		Name:      row.Name,

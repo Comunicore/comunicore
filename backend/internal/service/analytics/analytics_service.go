@@ -8,7 +8,10 @@ import (
 
 type AnalyticsRepo interface {
 	InsertVisitBatch(ctx context.Context, batch model.AnalyticsVisitBatchInsert) error
-	GetMetrics(ctx context.Context, dropoffN, dropoffInactiveDays int) (model.AnalyticsMetricsRepo, error)
+	GetMetrics(
+		ctx context.Context,
+		dropoffN, dropoffInactiveDays int,
+	) (model.AnalyticsMetricsRepo, error)
 }
 
 type AnalyticsService struct {
@@ -19,11 +22,17 @@ func NewAnalyticsService(repo AnalyticsRepo) *AnalyticsService {
 	return &AnalyticsService{repo: repo}
 }
 
-func (s *AnalyticsService) RecordVisitBatch(ctx context.Context, batch model.AnalyticsVisitBatchInsert) error {
+func (s *AnalyticsService) RecordVisitBatch(
+	ctx context.Context,
+	batch model.AnalyticsVisitBatchInsert,
+) error {
 	return s.repo.InsertVisitBatch(ctx, batch)
 }
 
-func (s *AnalyticsService) Metrics(ctx context.Context, dropoffN, dropoffInactiveDays int) (model.AnalyticsMetricsRepo, error) {
+func (s *AnalyticsService) Metrics(
+	ctx context.Context,
+	dropoffN, dropoffInactiveDays int,
+) (model.AnalyticsMetricsRepo, error) {
 	if dropoffN < 1 {
 		dropoffN = 1
 	}

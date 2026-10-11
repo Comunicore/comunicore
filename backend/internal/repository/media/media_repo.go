@@ -7,6 +7,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -24,13 +25,13 @@ func NewMediaRepo(uploadDir string) (*MediaRepo, error) {
 	info, err := os.Stat(uploadDir)
 	if os.IsNotExist(err) {
 		// Try to create the directory if it doesn't exist
-		if err := os.MkdirAll(uploadDir, 0755); err != nil {
+		if err := os.MkdirAll(uploadDir, 0o755); err != nil {
 			return nil, fmt.Errorf("failed to create upload directory: %w", err)
 		}
 	} else if err != nil {
 		return nil, fmt.Errorf("failed to stat upload directory: %w", err)
 	} else if !info.IsDir() {
-		return nil, fmt.Errorf("upload path exists but is not a directory")
+		return nil, errors.New("upload path exists but is not a directory")
 	}
 	return &MediaRepo{
 		uploadDir: uploadDir,
@@ -60,7 +61,7 @@ func (r *MediaRepo) MediaUpload(ctx context.Context, reader io.Reader) (string, 
 	dstFile, err := os.CreateTemp(r.uploadDir, "tmp-*")
 	if err != nil {
 		if os.IsNotExist(err) {
-			if err := os.MkdirAll(r.uploadDir, 0755); err != nil {
+			if err := os.MkdirAll(r.uploadDir, 0o755); err != nil {
 				return "", fmt.Errorf("upload dir not exists and can't be created: %w", err)
 			}
 		}
@@ -95,12 +96,12 @@ func (r *MediaRepo) MediaUpload(ctx context.Context, reader io.Reader) (string, 
 
 	newFileName := path.Join(r.uploadDir, fileName)
 	if err := os.Rename(dstFile.Name(), newFileName); err != nil {
-		return "", fmt.Errorf("failed to rename uploaded file")
+		return "", errors.New("failed to rename uploaded file")
 	}
 	fileRenamed = true
-	err = os.Chmod(newFileName, 0644)
+	err = os.Chmod(newFileName, 0o644)
 	if err != nil {
-		return "", fmt.Errorf("failed to change file permissions")
+		return "", errors.New("failed to change file permissions")
 	}
 
 	return fileName, nil

@@ -22,6 +22,7 @@ func TestAuthLoginOk(t *testing.T) {
 	sessionCookie2 := testAuthLoginOk(t, globalConfig.URL, user)
 	require.NotEqual(t, sessionCookie1.Value, sessionCookie2.Value)
 }
+
 func TestAuthLoginFailure(t *testing.T) {
 	baseURL := globalConfig.URL
 	user := testUserCreateOk(t, baseURL)
@@ -62,6 +63,7 @@ func TestAuthLoginFailure(t *testing.T) {
 		})
 	}
 }
+
 func testAuthLoginOk(t *testing.T, baseURL string, user ForumUser) *http.Cookie {
 	var httpCookie *http.Cookie
 	t.Run("Test AuthLogin OK", func(t *testing.T) {
@@ -87,6 +89,7 @@ func testAuthLoginOk(t *testing.T, baseURL string, user ForumUser) *http.Cookie 
 
 	return httpCookie
 }
+
 func testAuthLogoutOk(t *testing.T, baseURL string, sessionCookie *http.Cookie) {
 	t.Run("Test Auth Logout OK", func(t *testing.T) {
 		exp := expectCreate(t, baseURL)

@@ -28,13 +28,11 @@ type argon2Config struct {
 	KeyLength uint32
 }
 
-var (
-	defaultParams = argon2Params{
-		TimeCost:   1,
-		MemoryCost: 64 * 1024,
-		Threads:    4,
-	}
-)
+var defaultParams = argon2Params{
+	TimeCost:   1,
+	MemoryCost: 64 * 1024,
+	Threads:    4,
+}
 
 const (
 	DefaultKeyLength uint32 = 32

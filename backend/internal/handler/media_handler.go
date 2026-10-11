@@ -17,9 +17,10 @@ type MediaHandler struct {
 func NewMediaHandler(mediaService *mediaService.MediaService) *MediaHandler {
 	return &MediaHandler{mediaService: mediaService}
 }
-func (m *MediaHandler) MediaUpload(
-	ctx context.Context, req *api.MediaUploadRequestMultipart) (r api.MediaUploadRes, _ error) {
 
+func (m *MediaHandler) MediaUpload(
+	ctx context.Context, req *api.MediaUploadRequestMultipart,
+) (r api.MediaUploadRes, _ error) {
 	file := req.Content.File
 	fileURL, err := m.mediaService.MediaUpload(ctx, file)
 	if err != nil {
@@ -27,5 +28,6 @@ func (m *MediaHandler) MediaUpload(
 	}
 	return &api.MediaUploadResponse{
 		FileName: req.Content.Name,
-		URL:      fileURL}, nil
+		URL:      fileURL,
+	}, nil
 }

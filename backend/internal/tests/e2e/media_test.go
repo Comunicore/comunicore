@@ -2,7 +2,8 @@ package e2e
 
 import (
 	// "net/http"
-	"fmt"
+
+	"log"
 	"net/http"
 	"os"
 	"testing"
@@ -26,7 +27,7 @@ func testMediaUploadOk(t *testing.T, baseURL string, sessionCookie *http.Cookie)
 		if err != nil {
 			t.Fatalf("failed to get current working directory: %v", err)
 		}
-		fmt.Printf("cwd %s\n", cwd)
+		log.Printf("cwd %s\n", cwd)
 		res := auth.POST("/api/media").WithMultipart().
 			WithFile("content", "./img/cat_and_snake.png").
 			Expect().

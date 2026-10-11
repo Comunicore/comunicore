@@ -29,19 +29,19 @@ func postgresStart(ctx context.Context) (stop func()) {
 	)
 	if err != nil {
 		log.Printf("failed to start container: %s", err)
-		return
+		return stop
 	}
 
 	globalConfig.DbHost, err = postgresContainer.Host(ctx)
 	if err != nil {
 		log.Printf("failed to get host: %s", err)
-		return
+		return stop
 	}
 	log.Printf("PostgreSQL container is running on host: %s", globalConfig.DbHost)
 	port, err := postgresContainer.MappedPort(ctx, "5432")
 	if err != nil {
 		log.Printf("failed to get mapped port: %s", err)
-		return
+		return stop
 	}
 	globalConfig.DbPort = int(port.Num())
 	log.Printf("PostgreSQL container is mapped to port: %d", globalConfig.DbPort)
@@ -52,6 +52,7 @@ func postgresStart(ctx context.Context) (stop func()) {
 		}
 	}
 }
+
 func testServerStart() *httptest.Server {
 	cmdConfig := config.CmdParse()
 	cmdConfig.Config = &globalConfig.ConfigPath // fix config path for tests
@@ -68,6 +69,7 @@ func testServerStart() *httptest.Server {
 
 	return httptest.NewServer(mux)
 }
+
 func expectCreate(t *testing.T, serverBaseUrl string) *httpexpect.Expect {
 	exp := httpexpect.WithConfig(httpexpect.Config{
 		BaseURL:  serverBaseUrl,
