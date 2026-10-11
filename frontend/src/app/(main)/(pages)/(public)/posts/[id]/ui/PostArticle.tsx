@@ -1,22 +1,15 @@
-import Link from 'next/link';
-
 import { PostDetailsData } from '../model/post-details.types';
 
 import { PostContent } from '@/entities/post';
-import { RoleBadge, UserAvatar } from '@/entities/user';
 
-import { AppRouter } from '@/shared/config/app-router';
+import { Tile } from '@/shared/ui';
 
-type PostArticleProps = Pick<
-  PostDetailsData,
-  'title' | 'content' | 'category' | 'author'
->;
+type PostArticleProps = Pick<PostDetailsData, 'title' | 'content' | 'category'>;
 
 export default function PostArticle({
   title,
   content,
   category,
-  author,
 }: PostArticleProps) {
   return (
     <article className='flex flex-col gap-y-3'>
@@ -29,25 +22,9 @@ export default function PostArticle({
           {title}
         </h1>
 
-        <PostContent
-          content={content}
-          header={
-            <div className='flex items-center gap-x-3'>
-              <UserAvatar user={author} size='lg' />
-              <div className='flex min-w-0 flex-col gap-y-2.5'>
-                <div className='flex flex-wrap items-start gap-1.5'>
-                  <Link
-                    href={AppRouter.user.getRoute(author.id)}
-                    className='hover:text-purple-86 text-2xl leading-normal font-semibold'
-                  >
-                    {author.name}
-                  </Link>
-                </div>
-                <RoleBadge role={author.role} />
-              </div>
-            </div>
-          }
-        />
+        <Tile color='solid' radius='md' size='xs'>
+          <PostContent content={content} />
+        </Tile>
       </div>
     </article>
   );
