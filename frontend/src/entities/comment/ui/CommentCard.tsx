@@ -4,7 +4,6 @@ import { cn } from '@/shared/lib/classNames';
 
 interface CommentCardProps {
   avatar: ReactNode;
-  // Имя автора и его бейдж
   author: ReactNode;
   text: string;
   className?: string;
