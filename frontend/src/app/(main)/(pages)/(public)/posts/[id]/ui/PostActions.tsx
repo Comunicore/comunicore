@@ -1,7 +1,12 @@
-import { ComponentType, SVGProps } from 'react';
+import { IconType } from 'react-icons';
+import {
+  LuBookmark,
+  LuOctagonAlert,
+  LuShare2,
+  LuThumbsUp,
+} from 'react-icons/lu';
 
 import { formatInt } from '@/shared/lib/helpers/formatInt';
-import { BookmarkIcon, LikeIcon, ReportIcon, ShareIcon } from '@/shared/ui';
 
 interface PostActionsProps {
   likesCount: number;
@@ -10,7 +15,7 @@ interface PostActionsProps {
 interface PostAction {
   id: string;
   label: string;
-  Icon: ComponentType<SVGProps<SVGSVGElement>>;
+  Icon: IconType;
   ariaLabel?: string;
 }
 
@@ -21,11 +26,11 @@ export default function PostActions({ likesCount }: PostActionsProps) {
       id: 'like',
       label: formatInt(likesCount),
       ariaLabel: `Нравится: ${likesCount}`,
-      Icon: LikeIcon,
+      Icon: LuThumbsUp,
     },
-    { id: 'save', label: 'Сохранить', Icon: BookmarkIcon },
-    { id: 'share', label: 'Поделиться', Icon: ShareIcon },
-    { id: 'report', label: 'Пожаловаться', Icon: ReportIcon },
+    { id: 'save', label: 'Сохранить', Icon: LuBookmark },
+    { id: 'share', label: 'Поделиться', Icon: LuShare2 },
+    { id: 'report', label: 'Пожаловаться', Icon: LuOctagonAlert },
   ];
 
   return (
@@ -37,7 +42,7 @@ export default function PostActions({ likesCount }: PostActionsProps) {
             aria-label={ariaLabel}
             className='bg-light/5 text-gray-9e hover:text-light flex items-center gap-x-1.25 rounded-[0.625rem] px-2.5 py-1.25 text-lg leading-normal transition-colors'
           >
-            <Icon className='shrink-0' />
+            <Icon size={24} className='shrink-0' aria-hidden='true' />
             {label}
           </button>
         </li>

@@ -5,7 +5,6 @@ export { Container, containerClassName } from './Container';
 export { ErrorMessage } from './ErrorMessage';
 export { FilePlaceholder } from './FilePlaceholder';
 export { FormField } from './FormField';
-export * from './icons';
 export { ImageModal } from './ImageModal';
 export { Input } from './Input';
 export { Label } from './Label';

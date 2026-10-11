@@ -1,7 +1,7 @@
 import { AppRouter } from '@/shared/config/app-router';
 import { communityRules } from '@/shared/config/community-rules';
 import { cn } from '@/shared/lib/classNames';
-import { ArrowRightIcon, Tile, ViewAllLink } from '@/shared/ui';
+import { Tile, ViewAllLink } from '@/shared/ui';
 
 interface CommunityRulesProps {
   className?: string;
@@ -30,9 +30,7 @@ export function CommunityRules({ className }: CommunityRulesProps) {
         href={AppRouter.rules.community}
         label='Читать правила полностью'
         className='w-fit gap-2.5 text-lg leading-6.25'
-      >
-        <ArrowRightIcon className='shrink-0' />
-      </ViewAllLink>
+      />
     </Tile>
   );
 }
