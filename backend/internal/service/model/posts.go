@@ -7,6 +7,7 @@ import "time"
 
 type PostWithComments struct {
 	ID              int
+	Category        string
 	AuthorID        int
 	AuthorName      string
 	AuthorAvatarUrl string
@@ -18,13 +19,15 @@ type PostWithComments struct {
 }
 
 type PostCreate struct {
-	Title   string
-	Content string
-	UserID  int
-	Tags    []string
+	CategoryID int
+	Title      string
+	Content    string
+	UserID     int
+	Tags       []string
 }
 type PostRepoInfo struct {
 	ID            int
+	CategoryID    int
 	Title         string
 	Content       string
 	UserID        int
@@ -40,6 +43,7 @@ type PostListRepo struct {
 }
 type PostInfoResponse struct {
 	ID              int
+	Category        string
 	Title           string
 	Content         string
 	AuthorID        int
@@ -59,6 +63,7 @@ type PostListResponse struct {
 
 type PostInfo struct {
 	ID            int
+	Category      string
 	Title         string
 	Content       string
 	UserID        int

@@ -586,19 +586,45 @@ func (q *Queries) CommentListByPostId(ctx context.Context, postID int32) ([]Comm
 	return items, nil
 }
 
+const getCategoriesByIDList = `-- name: GetCategoriesByIDList :many
+SELECT id, name FROM categories WHERE id = ANY($1::bigint[])
+`
+
+func (q *Queries) GetCategoriesByIDList(ctx context.Context, dollar_1 []int64) ([]Category, error) {
+	rows, err := q.db.Query(ctx, getCategoriesByIDList, dollar_1)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Category
+	for rows.Next() {
+		var i Category
+		if err := rows.Scan(&i.ID, &i.Name); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const postCreate = `-- name: PostCreate :one
-INSERT INTO posts (title, content, user_id, comments_count) VALUES ($1, $2, $3, 0)
-RETURNING id, title, content, comments_count, user_id, created_at
+INSERT INTO posts (category_id, title, content, user_id, comments_count) VALUES ($1, $2, $3, $4, 0)
+RETURNING id, category_id, title, content, comments_count, user_id, created_at
 `
 
 type PostCreateParams struct {
-	Title   string
-	Content string
-	UserID  int32
+	CategoryID int32
+	Title      string
+	Content    string
+	UserID     int32
 }
 
 type PostCreateRow struct {
 	ID            int32
+	CategoryID    int32
 	Title         string
 	Content       string
 	CommentsCount int32
@@ -607,10 +633,16 @@ type PostCreateRow struct {
 }
 
 func (q *Queries) PostCreate(ctx context.Context, arg PostCreateParams) (PostCreateRow, error) {
-	row := q.db.QueryRow(ctx, postCreate, arg.Title, arg.Content, arg.UserID)
+	row := q.db.QueryRow(ctx, postCreate,
+		arg.CategoryID,
+		arg.Title,
+		arg.Content,
+		arg.UserID,
+	)
 	var i PostCreateRow
 	err := row.Scan(
 		&i.ID,
+		&i.CategoryID,
 		&i.Title,
 		&i.Content,
 		&i.CommentsCount,
@@ -621,11 +653,12 @@ func (q *Queries) PostCreate(ctx context.Context, arg PostCreateParams) (PostCre
 }
 
 const postGetById = `-- name: PostGetById :one
-SELECT id, title, content, user_id, comments_count, created_at FROM posts WHERE id = $1
+SELECT id, category_id, title, content, user_id, comments_count, created_at FROM posts WHERE id = $1
 `
 
 type PostGetByIdRow struct {
 	ID            int32
+	CategoryID    int32
 	Title         string
 	Content       string
 	UserID        int32
@@ -638,6 +671,7 @@ func (q *Queries) PostGetById(ctx context.Context, id int32) (PostGetByIdRow, er
 	var i PostGetByIdRow
 	err := row.Scan(
 		&i.ID,
+		&i.CategoryID,
 		&i.Title,
 		&i.Content,
 		&i.UserID,
@@ -648,7 +682,7 @@ func (q *Queries) PostGetById(ctx context.Context, id int32) (PostGetByIdRow, er
 }
 
 const postPageByPageID = `-- name: PostPageByPageID :many
-SELECT id, title, content, user_id, comments_count, created_at
+SELECT id, category_id, title, content, user_id, comments_count, created_at
 FROM posts
 ORDER BY id DESC LIMIT $1 OFFSET $2
 `
@@ -660,6 +694,7 @@ type PostPageByPageIDParams struct {
 
 type PostPageByPageIDRow struct {
 	ID            int32
+	CategoryID    int32
 	Title         string
 	Content       string
 	UserID        int32
@@ -678,6 +713,7 @@ func (q *Queries) PostPageByPageID(ctx context.Context, arg PostPageByPageIDPara
 		var i PostPageByPageIDRow
 		if err := rows.Scan(
 			&i.ID,
+			&i.CategoryID,
 			&i.Title,
 			&i.Content,
 			&i.UserID,
@@ -695,7 +731,7 @@ func (q *Queries) PostPageByPageID(ctx context.Context, arg PostPageByPageIDPara
 }
 
 const postPagesAfterPostID = `-- name: PostPagesAfterPostID :many
-SELECT id, title, content, user_id, comments_count, created_at
+SELECT id, category_id, title, content, user_id, comments_count, created_at
 FROM posts
 WHERE id > $1
 ORDER BY id DESC LIMIT $2
@@ -708,6 +744,7 @@ type PostPagesAfterPostIDParams struct {
 
 type PostPagesAfterPostIDRow struct {
 	ID            int32
+	CategoryID    int32
 	Title         string
 	Content       string
 	UserID        int32
@@ -726,6 +763,7 @@ func (q *Queries) PostPagesAfterPostID(ctx context.Context, arg PostPagesAfterPo
 		var i PostPagesAfterPostIDRow
 		if err := rows.Scan(
 			&i.ID,
+			&i.CategoryID,
 			&i.Title,
 			&i.Content,
 			&i.UserID,
@@ -743,7 +781,7 @@ func (q *Queries) PostPagesAfterPostID(ctx context.Context, arg PostPagesAfterPo
 }
 
 const postPagesBeforePostID = `-- name: PostPagesBeforePostID :many
-SELECT id, title, content, user_id, comments_count, created_at
+SELECT id, category_id, title, content, user_id, comments_count, created_at
 FROM posts
 WHERE id < $1
 ORDER BY id DESC LIMIT $2
@@ -756,6 +794,7 @@ type PostPagesBeforePostIDParams struct {
 
 type PostPagesBeforePostIDRow struct {
 	ID            int32
+	CategoryID    int32
 	Title         string
 	Content       string
 	UserID        int32
@@ -774,6 +813,7 @@ func (q *Queries) PostPagesBeforePostID(ctx context.Context, arg PostPagesBefore
 		var i PostPagesBeforePostIDRow
 		if err := rows.Scan(
 			&i.ID,
+			&i.CategoryID,
 			&i.Title,
 			&i.Content,
 			&i.UserID,

@@ -1190,6 +1190,7 @@ type PostListItem struct {
 	AuthorId        int     `json:"authorId"`
 	AuthorName      string  `json:"authorName"`
 	AuthorAvatarUrl url.URL `json:"authorAvatarUrl"`
+	Category        string  `json:"category"`
 	Title           string  `json:"title"`
 	Content         string  `json:"content"`
 	// Number of reply posts (rows in posts). The opening message lives in title/content only and is not
@@ -1221,6 +1222,11 @@ func (s *PostListItem) GetAuthorName() string {
 // GetAuthorAvatarUrl returns the value of AuthorAvatarUrl.
 func (s *PostListItem) GetAuthorAvatarUrl() url.URL {
 	return s.AuthorAvatarUrl
+}
+
+// GetCategory returns the value of Category.
+func (s *PostListItem) GetCategory() string {
+	return s.Category
 }
 
 // GetTitle returns the value of Title.
@@ -1266,6 +1272,11 @@ func (s *PostListItem) SetAuthorName(val string) {
 // SetAuthorAvatarUrl sets the value of AuthorAvatarUrl.
 func (s *PostListItem) SetAuthorAvatarUrl(val url.URL) {
 	s.AuthorAvatarUrl = val
+}
+
+// SetCategory sets the value of Category.
+func (s *PostListItem) SetCategory(val string) {
+	s.Category = val
 }
 
 // SetTitle sets the value of Title.

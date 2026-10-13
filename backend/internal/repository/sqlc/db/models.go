@@ -28,6 +28,11 @@ type AuthPassword struct {
 	PasswordHash string
 }
 
+type Category struct {
+	ID   int32
+	Name string
+}
+
 type Comment struct {
 	ID        int32
 	PostID    int32
@@ -39,6 +44,7 @@ type Comment struct {
 
 type Post struct {
 	ID            int32
+	CategoryID    int32
 	Title         string
 	Content       string
 	UserID        int32

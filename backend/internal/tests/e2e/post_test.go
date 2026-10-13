@@ -53,9 +53,10 @@ func testPostCreateOk(t *testing.T, baseURL string, cookie *http.Cookie) PostIte
 			Expect().
 			Status(http.StatusCreated).JSON().Object()
 
-		res.Keys().ContainsOnly("id", "authorId", "authorName", "authorAvatarUrl", "title",
+		res.Keys().ContainsOnly("id", "category", "authorId", "authorName", "authorAvatarUrl", "title",
 			"content", "postsCount", "commentsCount", "createdAt")
 		res.Value("id").Number().Gt(0)
+		res.Value("category").String().NotEmpty()
 		res.Value("authorId").Number().Gt(0)
 		res.Value("authorName").String().NotEmpty()
 		// res.Value("authorAvatarUrl").String().NotEmpty()
