@@ -590,6 +590,8 @@ components:
         authorAvatarUrl:
           type: string
           format: uri
+        category:
+          type: string
         title:
           type: string
         content:
@@ -609,6 +611,7 @@ components:
         - authorId
         - authorName
         - authorAvatarUrl
+        - category
         - title
         - content
         - postsCount
@@ -618,6 +621,7 @@ components:
         id: 1
         title: "First post"
         content: "This is the content of the first post."
+        category: "Программирование"
         authorId: 42
         authorName: "Petr Semenov"
         authorAvatarUrl: "https://comunicore.mooo.com/storage/media/avatar1.png"
@@ -629,6 +633,8 @@ components:
       properties:
         id:
           type: integer
+        category:
+          type: string
         authorId:
           type: integer
         authorName  :
@@ -653,6 +659,7 @@ components:
             $ref: '#/components/schemas/PostCommentItem'
       required:
         - id
+        - category
         - authorId
         - authorName
         - authorAvatarUrl
@@ -663,6 +670,7 @@ components:
         - comments
       example:
         id: 1
+        category: "Программирование"
         title: "First post"
         content: "This is the content of the first post."
         authorId: 42

@@ -29,12 +29,14 @@ func NewPostsRepo(dsn string) (*PostsRepo, error) {
 // create post
 func (r *PostsRepo) Create(ctx context.Context, post model.PostCreate) (model.PostRepoInfo, error) {
 	row, err := r.queries.PostCreate(ctx, postdDb.PostCreateParams{
-		Title:   post.Title,
-		Content: post.Content,
-		UserID:  int32(post.UserID),
+		CategoryID: int32(post.CategoryID),
+		Title:      post.Title,
+		Content:    post.Content,
+		UserID:     int32(post.UserID),
 	})
 	return model.PostRepoInfo{
 		ID:            int(row.ID),
+		CategoryID:    int(row.CategoryID),
 		UserID:        int(row.UserID),
 		Title:         row.Title,
 		Content:       row.Content,
@@ -196,6 +198,7 @@ func (r *PostsRepo) Get(ctx context.Context, postId int) (*model.PostRepoInfo, e
 	return &model.PostRepoInfo{
 		ID:            int(row.ID),
 		UserID:        int(row.UserID),
+		CategoryID:    int(row.CategoryID),
 		Title:         row.Title,
 		Content:       row.Content,
 		CommentsCount: int(row.CommentsCount),

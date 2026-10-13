@@ -47,24 +47,27 @@ SELECT id, post_id, user_id, content, created_at FROM comments
 WHERE post_id = $1 ORDER BY created_at DESC;
 
 -- name: PostCreate :one
-INSERT INTO posts (title, content, user_id, comments_count) VALUES ($1, $2, $3, 0)
-RETURNING id, title, content, comments_count, user_id, created_at;
+INSERT INTO posts (category_id, title, content, user_id, comments_count) VALUES ($1, $2, $3, $4, 0)
+RETURNING id, category_id, title, content, comments_count, user_id, created_at;
 -- name: PostGetById :one
-SELECT id, title, content, user_id, comments_count, created_at FROM posts WHERE id = $1;
+SELECT id, category_id, title, content, user_id, comments_count, created_at FROM posts WHERE id = $1;
 -- name: PostPageByPageID :many
-SELECT id, title, content, user_id, comments_count, created_at
+SELECT id, category_id, title, content, user_id, comments_count, created_at
 FROM posts
 ORDER BY id DESC LIMIT $1 OFFSET $2;
 -- name: PostPagesBeforePostID :many
-SELECT id, title, content, user_id, comments_count, created_at
+SELECT id, category_id, title, content, user_id, comments_count, created_at
 FROM posts
 WHERE id < $1
 ORDER BY id DESC LIMIT $2;
 -- name: PostPagesAfterPostID :many
-SELECT id, title, content, user_id, comments_count, created_at
+SELECT id, category_id, title, content, user_id, comments_count, created_at
 FROM posts
 WHERE id > $1
 ORDER BY id DESC LIMIT $2;
+
+-- name: GetCategoriesByIDList :many
+SELECT id, name FROM categories WHERE id = ANY($1::bigint[]);
 
 -- name: PostTagInsert :exec
 INSERT INTO post_tags (post_id, tag) VALUES ($1, $2) ON CONFLICT DO NOTHING;

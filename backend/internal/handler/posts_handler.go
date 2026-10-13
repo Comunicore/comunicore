@@ -72,6 +72,7 @@ func (h *PostsHandler) PostCreate(
 	}
 	return &api.PostListItem{
 		ID:            post.ID,
+		Category:      post.Category,
 		Title:         post.Title,
 		Content:       post.Content,
 		AuthorId:      post.UserID,
@@ -155,6 +156,7 @@ GOT_POST_ID:
 	for i, post := range postsList.Posts {
 		resPosts[i] = api.PostListItem{
 			ID:            post.ID,
+			Category:      post.Category,
 			Title:         post.Title,
 			Content:       post.Content,
 			AuthorId:      post.AuthorID,

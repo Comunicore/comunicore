@@ -24,6 +24,7 @@ import (
 
 	analyticsRepo "github.com/comunicore/comunicore/backend/internal/repository/analytics"
 	authRepo "github.com/comunicore/comunicore/backend/internal/repository/auth"
+	categoryRepo "github.com/comunicore/comunicore/backend/internal/repository/category"
 	commentsRepo "github.com/comunicore/comunicore/backend/internal/repository/comments"
 	mediaRepo "github.com/comunicore/comunicore/backend/internal/repository/media"
 	postsRepo "github.com/comunicore/comunicore/backend/internal/repository/posts"
@@ -202,6 +203,10 @@ func RegisterOgenRoutes(mux *http.ServeMux, cfg *config.AppConfig) {
 		fmt.Printf("Failed to create storage: %v\n", err)
 		return
 	}
+	categoryR, err := categoryRepo.NewCategoryRepo(cfg.Database.DSN())
+	if err != nil {
+		panic(err)
+	}
 	commentR, err := commentsRepo.NewCommentsRepo(cfg.Database.DSN())
 	if err != nil {
 		panic(err)
@@ -219,7 +224,7 @@ func RegisterOgenRoutes(mux *http.ServeMux, cfg *config.AppConfig) {
 	userS := userService.NewUserService(userR, authR)
 	mediaS := mediaService.NewMediaService(cfg.Server.BaseURL, mediaR)
 
-	postsS := postsService.NewPostsService(postsR, commentR, userR)
+	postsS := postsService.NewPostsService(categoryR, postsR, commentR, userR)
 	analyticsS := analyticsService.NewAnalyticsService(analyticsR)
 
 	secure, sameSite := config.SessionCookieOpts(cfg.Server.BaseURL)
