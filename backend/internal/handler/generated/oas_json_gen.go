@@ -2509,15 +2509,22 @@ func (s *PostCommentItem) encodeFields(e *jx.Encoder) {
 		e.FieldStart("createdAt")
 		json.EncodeDateTime(e, s.CreatedAt)
 	}
+	{
+		if s.UpdatedAt.Set {
+			e.FieldStart("updatedAt")
+			s.UpdatedAt.Encode(e, json.EncodeDateTime)
+		}
+	}
 }
 
-var jsonFieldsNameOfPostCommentItem = [6]string{
+var jsonFieldsNameOfPostCommentItem = [7]string{
 	0: "id",
 	1: "authorId",
 	2: "authorName",
 	3: "authorAvatarUrl",
 	4: "contentMd",
 	5: "createdAt",
+	6: "updatedAt",
 }
 
 // Decode decodes PostCommentItem from json.
@@ -2600,6 +2607,16 @@ func (s *PostCommentItem) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"createdAt\"")
+			}
+		case "updatedAt":
+			if err := func() error {
+				s.UpdatedAt.Reset()
+				if err := s.UpdatedAt.Decode(d, json.DecodeDateTime); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"updatedAt\"")
 			}
 		default:
 			return d.Skip()
@@ -3110,9 +3127,15 @@ func (s *PostItem) encodeFields(e *jx.Encoder) {
 		e.FieldStart("createdAt")
 		json.EncodeDateTime(e, s.CreatedAt)
 	}
+	{
+		if s.UpdatedAt.Set {
+			e.FieldStart("updatedAt")
+			s.UpdatedAt.Encode(e, json.EncodeDateTime)
+		}
+	}
 }
 
-var jsonFieldsNameOfPostItem = [9]string{
+var jsonFieldsNameOfPostItem = [10]string{
 	0: "id",
 	1: "authorId",
 	2: "authorName",
@@ -3122,6 +3145,7 @@ var jsonFieldsNameOfPostItem = [9]string{
 	6: "contentMd",
 	7: "commentsCount",
 	8: "createdAt",
+	9: "updatedAt",
 }
 
 // Decode decodes PostItem from json.
@@ -3241,6 +3265,16 @@ func (s *PostItem) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"createdAt\"")
 			}
+		case "updatedAt":
+			if err := func() error {
+				s.UpdatedAt.Reset()
+				if err := s.UpdatedAt.Decode(d, json.DecodeDateTime); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"updatedAt\"")
+			}
 		default:
 			return d.Skip()
 		}
@@ -3339,9 +3373,15 @@ func (s *PostListItem) encodeFields(e *jx.Encoder) {
 		e.FieldStart("createdAt")
 		json.EncodeDateTime(e, s.CreatedAt)
 	}
+	{
+		if s.UpdatedAt.Set {
+			e.FieldStart("updatedAt")
+			s.UpdatedAt.Encode(e, json.EncodeDateTime)
+		}
+	}
 }
 
-var jsonFieldsNameOfPostListItem = [8]string{
+var jsonFieldsNameOfPostListItem = [9]string{
 	0: "id",
 	1: "authorId",
 	2: "authorName",
@@ -3350,6 +3390,7 @@ var jsonFieldsNameOfPostListItem = [8]string{
 	5: "title",
 	6: "commentsCount",
 	7: "createdAt",
+	8: "updatedAt",
 }
 
 // Decode decodes PostListItem from json.
@@ -3357,7 +3398,7 @@ func (s *PostListItem) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode PostListItem to nil")
 	}
-	var requiredBitSet [1]uint8
+	var requiredBitSet [2]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -3457,6 +3498,16 @@ func (s *PostListItem) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"createdAt\"")
 			}
+		case "updatedAt":
+			if err := func() error {
+				s.UpdatedAt.Reset()
+				if err := s.UpdatedAt.Decode(d, json.DecodeDateTime); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"updatedAt\"")
+			}
 		default:
 			return d.Skip()
 		}
@@ -3466,8 +3517,9 @@ func (s *PostListItem) Decode(d *jx.Decoder) error {
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
-	for i, mask := range [1]uint8{
+	for i, mask := range [2]uint8{
 		0b11111111,
+		0b00000000,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -3716,6 +3768,12 @@ func (s *PostWithCommentsListResponse) encodeFields(e *jx.Encoder) {
 		json.EncodeDateTime(e, s.CreatedAt)
 	}
 	{
+		if s.UpdatedAt.Set {
+			e.FieldStart("updatedAt")
+			s.UpdatedAt.Encode(e, json.EncodeDateTime)
+		}
+	}
+	{
 		e.FieldStart("comments")
 		e.ArrStart()
 		for _, elem := range s.Comments {
@@ -3725,17 +3783,18 @@ func (s *PostWithCommentsListResponse) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfPostWithCommentsListResponse = [10]string{
-	0: "id",
-	1: "category",
-	2: "authorId",
-	3: "authorName",
-	4: "authorAvatarUrl",
-	5: "title",
-	6: "contentMd",
-	7: "commentsCount",
-	8: "createdAt",
-	9: "comments",
+var jsonFieldsNameOfPostWithCommentsListResponse = [11]string{
+	0:  "id",
+	1:  "category",
+	2:  "authorId",
+	3:  "authorName",
+	4:  "authorAvatarUrl",
+	5:  "title",
+	6:  "contentMd",
+	7:  "commentsCount",
+	8:  "createdAt",
+	9:  "updatedAt",
+	10: "comments",
 }
 
 // Decode decodes PostWithCommentsListResponse from json.
@@ -3855,8 +3914,18 @@ func (s *PostWithCommentsListResponse) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"createdAt\"")
 			}
+		case "updatedAt":
+			if err := func() error {
+				s.UpdatedAt.Reset()
+				if err := s.UpdatedAt.Decode(d, json.DecodeDateTime); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"updatedAt\"")
+			}
 		case "comments":
-			requiredBitSet[1] |= 1 << 1
+			requiredBitSet[1] |= 1 << 2
 			if err := func() error {
 				s.Comments = make([]PostCommentItem, 0)
 				if err := d.Arr(func(d *jx.Decoder) error {
@@ -3884,7 +3953,7 @@ func (s *PostWithCommentsListResponse) Decode(d *jx.Decoder) error {
 	var failures []validate.FieldError
 	for i, mask := range [2]uint8{
 		0b11111111,
-		0b00000011,
+		0b00000101,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.

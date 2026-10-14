@@ -18,7 +18,7 @@ type CategoryRepo interface {
 }
 type PostsRepo interface {
 	Create(ctx context.Context, post model.PostCreateRepo) (model.PostRepoInfo, error)
-	Get(ctx context.Context, postId int) (*model.PostRepoInfo, error)
+	Get(ctx context.Context, postId int) (model.PostRepoInfo, error)
 	PageByPageID(ctx context.Context, page, limit int) (model.PostListRepo, error)
 	PageByOffset(ctx context.Context, postId, limit int, before bool) (model.PostListRepo, error)
 	InsertPostTags(ctx context.Context, postId int, tags []string) error
@@ -62,14 +62,16 @@ func (s *PostsService) AddComment(ctx context.Context, comment model.CommentCrea
 	if err != nil {
 		return model.CommentInfo{}, err
 	}
-	return model.CommentInfo{
+	commentInfo := model.CommentInfo{
 		ID:        createdComment.ID,
 		PostID:    createdComment.PostID,
 		UserID:    createdComment.UserID,
 		UserName:  userName,
 		Content:   createdComment.Content,
 		CreatedAt: createdComment.CreatedAt,
-	}, nil
+		UpdatedAt: createdComment.UpdatedAt,
+	}
+	return commentInfo, nil
 }
 func (s *PostsService) Create(ctx context.Context, post model.PostCreateService) (model.PostInfo, error) {
 	category, err := s.categoryRepo.GetCategoryByName(ctx, post.Category)
@@ -105,6 +107,7 @@ func (s *PostsService) Create(ctx context.Context, post model.PostCreateService)
 		UserName:      userName,
 		CommentsCount: createdPost.CommentsCount,
 		CreatedAt:     createdPost.CreatedAt,
+		UpdatedAt:     createdPost.UpdatedAt,
 	}
 	return postInfo, nil
 }
@@ -131,6 +134,7 @@ func (s *PostsService) GetPostWithComments(ctx context.Context, postId int) (mod
 			AuthorAvatarUrl: userInfo.AvatarURL,
 			Content:         comment.Content,
 			CreatedAt:       comment.CreatedAt,
+			UpdatedAt:       comment.UpdatedAt,
 		})
 	}
 	userInfo, err := s.userRepo.Get(ctx, postInfo.UserID)
@@ -151,6 +155,7 @@ func (s *PostsService) GetPostWithComments(ctx context.Context, postId int) (mod
 		Content:         postInfo.Content,
 		CommentsCount:   postInfo.CommentsCount,
 		CreatedAt:       postInfo.CreatedAt,
+		UpdatedAt:       postInfo.UpdatedAt,
 		Comments:        commentListItems,
 	}
 	if category.ID == 0 {
@@ -201,6 +206,7 @@ func (s *PostsService) convertPostListRepoToResponse(
 			AuthorAvatarUrl: userInfo.AvatarURL,
 			CommentsCount:   post.CommentsCount,
 			CreatedAt:       post.CreatedAt,
+			UpdatedAt:       post.UpdatedAt,
 		}
 		_, exists := categories[post.CategoryID]
 		if !exists {

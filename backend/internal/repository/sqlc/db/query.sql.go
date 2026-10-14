@@ -517,7 +517,7 @@ func (q *Queries) AuthUpdatePassword(ctx context.Context, arg AuthUpdatePassword
 
 const commentCreate = `-- name: CommentCreate :one
 INSERT INTO comments (post_id, user_id, content) VALUES ($1, $2, $3)
-RETURNING id, post_id, user_id, content, created_at
+RETURNING id, post_id, user_id, content, created_at, updated_at
 `
 
 type CommentCreateParams struct {
@@ -526,55 +526,41 @@ type CommentCreateParams struct {
 	Content string
 }
 
-type CommentCreateRow struct {
-	ID        int32
-	PostID    int32
-	UserID    int32
-	Content   string
-	CreatedAt pgtype.Timestamptz
-}
-
-func (q *Queries) CommentCreate(ctx context.Context, arg CommentCreateParams) (CommentCreateRow, error) {
+func (q *Queries) CommentCreate(ctx context.Context, arg CommentCreateParams) (Comment, error) {
 	row := q.db.QueryRow(ctx, commentCreate, arg.PostID, arg.UserID, arg.Content)
-	var i CommentCreateRow
+	var i Comment
 	err := row.Scan(
 		&i.ID,
 		&i.PostID,
 		&i.UserID,
 		&i.Content,
 		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
 
 const commentListByPostId = `-- name: CommentListByPostId :many
-SELECT id, post_id, user_id, content, created_at FROM comments
+SELECT id, post_id, user_id, content, created_at, updated_at FROM comments
 WHERE post_id = $1 ORDER BY created_at DESC
 `
 
-type CommentListByPostIdRow struct {
-	ID        int32
-	PostID    int32
-	UserID    int32
-	Content   string
-	CreatedAt pgtype.Timestamptz
-}
-
-func (q *Queries) CommentListByPostId(ctx context.Context, postID int32) ([]CommentListByPostIdRow, error) {
+func (q *Queries) CommentListByPostId(ctx context.Context, postID int32) ([]Comment, error) {
 	rows, err := q.db.Query(ctx, commentListByPostId, postID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []CommentListByPostIdRow
+	var items []Comment
 	for rows.Next() {
-		var i CommentListByPostIdRow
+		var i Comment
 		if err := rows.Scan(
 			&i.ID,
 			&i.PostID,
 			&i.UserID,
 			&i.Content,
 			&i.CreatedAt,
+			&i.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -634,7 +620,7 @@ func (q *Queries) GetCategoryByName(ctx context.Context, name string) (Category,
 
 const postCreate = `-- name: PostCreate :one
 INSERT INTO posts (category_id, title, content, user_id, comments_count) VALUES ($1, $2, $3, $4, 0)
-RETURNING id, category_id, title, content, comments_count, user_id, created_at
+RETURNING id, category_id, title, content, comments_count, user_id, created_at, updated_at
 `
 
 type PostCreateParams struct {
@@ -652,6 +638,7 @@ type PostCreateRow struct {
 	CommentsCount int32
 	UserID        int32
 	CreatedAt     pgtype.Timestamptz
+	UpdatedAt     pgtype.Timestamptz
 }
 
 func (q *Queries) PostCreate(ctx context.Context, arg PostCreateParams) (PostCreateRow, error) {
@@ -670,27 +657,20 @@ func (q *Queries) PostCreate(ctx context.Context, arg PostCreateParams) (PostCre
 		&i.CommentsCount,
 		&i.UserID,
 		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
 
 const postGetById = `-- name: PostGetById :one
-SELECT id, category_id, title, content, user_id, comments_count, created_at FROM posts WHERE id = $1
+SELECT id, category_id, title, content, user_id, comments_count, created_at, updated_at
+FROM posts
+WHERE id = $1
 `
 
-type PostGetByIdRow struct {
-	ID            int32
-	CategoryID    int32
-	Title         string
-	Content       string
-	UserID        int32
-	CommentsCount int32
-	CreatedAt     pgtype.Timestamptz
-}
-
-func (q *Queries) PostGetById(ctx context.Context, id int32) (PostGetByIdRow, error) {
+func (q *Queries) PostGetById(ctx context.Context, id int32) (Post, error) {
 	row := q.db.QueryRow(ctx, postGetById, id)
-	var i PostGetByIdRow
+	var i Post
 	err := row.Scan(
 		&i.ID,
 		&i.CategoryID,
@@ -699,12 +679,13 @@ func (q *Queries) PostGetById(ctx context.Context, id int32) (PostGetByIdRow, er
 		&i.UserID,
 		&i.CommentsCount,
 		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
 
 const postPageByPageID = `-- name: PostPageByPageID :many
-SELECT id, category_id, title, content, user_id, comments_count, created_at
+SELECT id, category_id, title, content, user_id, comments_count, created_at, updated_at
 FROM posts
 ORDER BY id DESC LIMIT $1 OFFSET $2
 `
@@ -714,25 +695,15 @@ type PostPageByPageIDParams struct {
 	Offset int32
 }
 
-type PostPageByPageIDRow struct {
-	ID            int32
-	CategoryID    int32
-	Title         string
-	Content       string
-	UserID        int32
-	CommentsCount int32
-	CreatedAt     pgtype.Timestamptz
-}
-
-func (q *Queries) PostPageByPageID(ctx context.Context, arg PostPageByPageIDParams) ([]PostPageByPageIDRow, error) {
+func (q *Queries) PostPageByPageID(ctx context.Context, arg PostPageByPageIDParams) ([]Post, error) {
 	rows, err := q.db.Query(ctx, postPageByPageID, arg.Limit, arg.Offset)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []PostPageByPageIDRow
+	var items []Post
 	for rows.Next() {
-		var i PostPageByPageIDRow
+		var i Post
 		if err := rows.Scan(
 			&i.ID,
 			&i.CategoryID,
@@ -741,6 +712,7 @@ func (q *Queries) PostPageByPageID(ctx context.Context, arg PostPageByPageIDPara
 			&i.UserID,
 			&i.CommentsCount,
 			&i.CreatedAt,
+			&i.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -753,7 +725,7 @@ func (q *Queries) PostPageByPageID(ctx context.Context, arg PostPageByPageIDPara
 }
 
 const postPagesAfterPostID = `-- name: PostPagesAfterPostID :many
-SELECT id, category_id, title, content, user_id, comments_count, created_at
+SELECT id, category_id, title, content, user_id, comments_count, created_at, updated_at
 FROM posts
 WHERE id > $1
 ORDER BY id DESC LIMIT $2
@@ -764,25 +736,15 @@ type PostPagesAfterPostIDParams struct {
 	Limit int32
 }
 
-type PostPagesAfterPostIDRow struct {
-	ID            int32
-	CategoryID    int32
-	Title         string
-	Content       string
-	UserID        int32
-	CommentsCount int32
-	CreatedAt     pgtype.Timestamptz
-}
-
-func (q *Queries) PostPagesAfterPostID(ctx context.Context, arg PostPagesAfterPostIDParams) ([]PostPagesAfterPostIDRow, error) {
+func (q *Queries) PostPagesAfterPostID(ctx context.Context, arg PostPagesAfterPostIDParams) ([]Post, error) {
 	rows, err := q.db.Query(ctx, postPagesAfterPostID, arg.ID, arg.Limit)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []PostPagesAfterPostIDRow
+	var items []Post
 	for rows.Next() {
-		var i PostPagesAfterPostIDRow
+		var i Post
 		if err := rows.Scan(
 			&i.ID,
 			&i.CategoryID,
@@ -791,6 +753,7 @@ func (q *Queries) PostPagesAfterPostID(ctx context.Context, arg PostPagesAfterPo
 			&i.UserID,
 			&i.CommentsCount,
 			&i.CreatedAt,
+			&i.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}
@@ -803,7 +766,7 @@ func (q *Queries) PostPagesAfterPostID(ctx context.Context, arg PostPagesAfterPo
 }
 
 const postPagesBeforePostID = `-- name: PostPagesBeforePostID :many
-SELECT id, category_id, title, content, user_id, comments_count, created_at
+SELECT id, category_id, title, content, user_id, comments_count, created_at, updated_at
 FROM posts
 WHERE id < $1
 ORDER BY id DESC LIMIT $2
@@ -814,25 +777,15 @@ type PostPagesBeforePostIDParams struct {
 	Limit int32
 }
 
-type PostPagesBeforePostIDRow struct {
-	ID            int32
-	CategoryID    int32
-	Title         string
-	Content       string
-	UserID        int32
-	CommentsCount int32
-	CreatedAt     pgtype.Timestamptz
-}
-
-func (q *Queries) PostPagesBeforePostID(ctx context.Context, arg PostPagesBeforePostIDParams) ([]PostPagesBeforePostIDRow, error) {
+func (q *Queries) PostPagesBeforePostID(ctx context.Context, arg PostPagesBeforePostIDParams) ([]Post, error) {
 	rows, err := q.db.Query(ctx, postPagesBeforePostID, arg.ID, arg.Limit)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []PostPagesBeforePostIDRow
+	var items []Post
 	for rows.Next() {
-		var i PostPagesBeforePostIDRow
+		var i Post
 		if err := rows.Scan(
 			&i.ID,
 			&i.CategoryID,
@@ -841,6 +794,7 @@ func (q *Queries) PostPagesBeforePostID(ctx context.Context, arg PostPagesBefore
 			&i.UserID,
 			&i.CommentsCount,
 			&i.CreatedAt,
+			&i.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}
