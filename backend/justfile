@@ -45,3 +45,5 @@ test_e2e_verbose:
 test_e2e_specific +TEST_NAME:
     @echo "Starting API e2e tests..."
     @go test ./internal/tests/e2e/... -v -run {{TEST_NAME}}
+test_e2e_list:
+    @go test ./internal/tests/e2e/... -list .
