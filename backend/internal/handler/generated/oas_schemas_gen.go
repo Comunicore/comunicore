@@ -1136,10 +1136,16 @@ func (*PostCreateInternalServerError) postCreateRes() {}
 
 // Ref: #/components/schemas/PostCreateRequest
 type PostCreateRequest struct {
-	Title   string `json:"title"`
-	Content string `json:"content"`
+	Category string `json:"category"`
+	Title    string `json:"title"`
+	Content  string `json:"content"`
 	// Optional tags for analytics (normalized to lowercase on server).
 	Tags []string `json:"tags"`
+}
+
+// GetCategory returns the value of Category.
+func (s *PostCreateRequest) GetCategory() string {
+	return s.Category
 }
 
 // GetTitle returns the value of Title.
@@ -1155,6 +1161,11 @@ func (s *PostCreateRequest) GetContent() string {
 // GetTags returns the value of Tags.
 func (s *PostCreateRequest) GetTags() []string {
 	return s.Tags
+}
+
+// SetCategory sets the value of Category.
+func (s *PostCreateRequest) SetCategory(val string) {
+	s.Category = val
 }
 
 // SetTitle sets the value of Title.
@@ -1359,6 +1370,7 @@ func (*PostListResponse) postsListRes() {}
 // Ref: #/components/schemas/PostWithCommentsListResponse
 type PostWithCommentsListResponse struct {
 	ID              int     `json:"id"`
+	Category        string  `json:"category"`
 	AuthorId        int     `json:"authorId"`
 	AuthorName      string  `json:"authorName"`
 	AuthorAvatarUrl url.URL `json:"authorAvatarUrl"`
@@ -1374,6 +1386,11 @@ type PostWithCommentsListResponse struct {
 // GetID returns the value of ID.
 func (s *PostWithCommentsListResponse) GetID() int {
 	return s.ID
+}
+
+// GetCategory returns the value of Category.
+func (s *PostWithCommentsListResponse) GetCategory() string {
+	return s.Category
 }
 
 // GetAuthorId returns the value of AuthorId.
@@ -1419,6 +1436,11 @@ func (s *PostWithCommentsListResponse) GetComments() []PostCommentItem {
 // SetID sets the value of ID.
 func (s *PostWithCommentsListResponse) SetID(val int) {
 	s.ID = val
+}
+
+// SetCategory sets the value of Category.
+func (s *PostWithCommentsListResponse) SetCategory(val string) {
+	s.Category = val
 }
 
 // SetAuthorId sets the value of AuthorId.

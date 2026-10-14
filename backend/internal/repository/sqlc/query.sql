@@ -68,6 +68,10 @@ ORDER BY id DESC LIMIT $2;
 
 -- name: GetCategoriesByIDList :many
 SELECT id, name FROM categories WHERE id = ANY($1::bigint[]);
+-- name: GetCategoryByID :one
+SELECT id, name FROM categories WHERE id = $1;
+-- name: GetCategoryByName :one
+SELECT id, name FROM categories WHERE name = $1;
 
 -- name: PostTagInsert :exec
 INSERT INTO post_tags (post_id, tag) VALUES ($1, $2) ON CONFLICT DO NOTHING;

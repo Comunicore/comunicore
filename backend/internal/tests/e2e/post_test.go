@@ -28,6 +28,7 @@ func TestPostCreate(t *testing.T) {
 
 type PostItem struct {
 	ID              int       `json:"id"`
+	Category        string    `json:"category"`
 	AuthorID        int       `json:"authorId"`
 	AuthorName      string    `json:"authorName"`
 	AuthorAvatarUrl string    `json:"authorAvatarUrl"`
@@ -47,8 +48,9 @@ func testPostCreateOk(t *testing.T, baseURL string, cookie *http.Cookie) PostIte
 
 		res := auth.POST(postCreatePath).
 			WithJSON(map[string]any{
-				"title":   "Test Post " + tests.RandomString(8),
-				"content": "This is a test post content " + tests.RandomString(20),
+				"category": "Программирование",
+				"title":    "Test Post " + tests.RandomString(8),
+				"content":  "This is a test post content " + tests.RandomString(20),
 			}).
 			Expect().
 			Status(http.StatusCreated).JSON().Object()
@@ -113,6 +115,7 @@ type PostCommentItem struct {
 }
 type PostWithComments struct {
 	Id              int               `json:"id"`
+	Category        string            `json:"category"`
 	AuthorID        int               `json:"authorId"`
 	AuthorName      string            `json:"authorName"`
 	AuthorAvatarUrl string            `json:"authorAvatarUrl"`
@@ -137,9 +140,10 @@ func testPostGet(t *testing.T, baseURL string,
 			Status(http.StatusOK).JSON().Object()
 
 		res.Keys().ContainsOnly(
-			"id", "authorId", "authorName", "authorAvatarUrl", "title", "content",
+			"id", "category", "authorId", "authorName", "authorAvatarUrl", "title", "content",
 			"commentsCount", "createdAt", "comments")
 		res.Value("id").Number().IsEqual(expectedPost.ID)
+		res.Value("category").String().IsEqual(expectedPost.Category)
 		res.Value("authorId").Number().IsEqual(expectedPost.AuthorID)
 		res.Value("authorName").String().IsEqual(expectedPost.AuthorName)
 		// res.Value("authorAvatarUrl").String().IsEqual(expectedPost.AuthorAvatarUrl)

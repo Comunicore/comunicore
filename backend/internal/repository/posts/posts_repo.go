@@ -27,7 +27,7 @@ func NewPostsRepo(dsn string) (*PostsRepo, error) {
 }
 
 // create post
-func (r *PostsRepo) Create(ctx context.Context, post model.PostCreate) (model.PostRepoInfo, error) {
+func (r *PostsRepo) Create(ctx context.Context, post model.PostCreateRepo) (model.PostRepoInfo, error) {
 	row, err := r.queries.PostCreate(ctx, postdDb.PostCreateParams{
 		CategoryID: int32(post.CategoryID),
 		Title:      post.Title,

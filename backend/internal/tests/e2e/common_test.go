@@ -21,7 +21,10 @@ import (
 func postgresStart(ctx context.Context) (stop func()) {
 	postgresContainer, err := postgres.Run(ctx,
 		"postgres:18",
-		postgres.WithInitScripts("../../repository/sqlc/schema.sql"),
+		postgres.WithInitScripts(
+			"../../repository/sqlc/01_schema.sql",
+			"../../repository/sqlc/02_initial-data.sql",
+		),
 		postgres.WithDatabase(globalConfig.DbName),
 		postgres.WithUsername(globalConfig.DbUser),
 		postgres.WithPassword(globalConfig.DbPassword),

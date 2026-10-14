@@ -11,11 +11,13 @@ import (
 )
 
 type CategoryRepo interface {
+	GetCategoryByID(ctx context.Context, id int64) (model.Category, error)
+	GetCategoryByName(ctx context.Context, name string) (model.Category, error)
 	GetDictByIDList(ctx context.Context, idList []int64) (map[int]model.Category, error)
 	DefaultCategory() model.Category
 }
 type PostsRepo interface {
-	Create(ctx context.Context, post model.PostCreate) (model.PostRepoInfo, error)
+	Create(ctx context.Context, post model.PostCreateRepo) (model.PostRepoInfo, error)
 	Get(ctx context.Context, postId int) (*model.PostRepoInfo, error)
 	PageByPageID(ctx context.Context, page, limit int) (model.PostListRepo, error)
 	PageByOffset(ctx context.Context, postId, limit int, before bool) (model.PostListRepo, error)
@@ -69,9 +71,18 @@ func (s *PostsService) AddComment(ctx context.Context, comment model.CommentCrea
 		CreatedAt: createdComment.CreatedAt,
 	}, nil
 }
-func (s *PostsService) Create(ctx context.Context, post model.PostCreate) (model.PostInfo, error) {
-	post.CategoryID = 1 // TODO: implement category selection
-	createdPost, err := s.postsRepo.Create(ctx, post)
+func (s *PostsService) Create(ctx context.Context, post model.PostCreateService) (model.PostInfo, error) {
+	category, err := s.categoryRepo.GetCategoryByName(ctx, post.Category)
+	if err != nil {
+		return model.PostInfo{}, err
+	}
+	createdPost, err := s.postsRepo.Create(ctx, model.PostCreateRepo{
+		CategoryID: category.ID,
+		Title:      post.Title,
+		Content:    post.Content,
+		UserID:     post.UserID,
+		Tags:       post.Tags,
+	})
 	if err != nil {
 		return model.PostInfo{}, err
 	}
@@ -80,26 +91,20 @@ func (s *PostsService) Create(ctx context.Context, post model.PostCreate) (model
 			return model.PostInfo{}, err
 		}
 	}
-	categories, err := s.categoryRepo.GetDictByIDList(ctx, []int64{int64(post.CategoryID)})
-	if err != nil {
-		// TODO: log error
-	}
+
 	userName, err := s.userRepo.GetNameById(ctx, createdPost.UserID)
 	if err != nil {
 		return model.PostInfo{}, err
 	}
 	postInfo := model.PostInfo{
 		ID:            createdPost.ID,
-		Category:      categories[post.CategoryID].Name,
+		Category:      category.Name,
 		Title:         createdPost.Title,
 		Content:       createdPost.Content,
 		UserID:        createdPost.UserID,
 		UserName:      userName,
 		CommentsCount: createdPost.CommentsCount,
 		CreatedAt:     createdPost.CreatedAt,
-	}
-	if _, exists := categories[post.CategoryID]; !exists {
-		postInfo.Category = s.categoryRepo.DefaultCategory().Name
 	}
 	return postInfo, nil
 }
@@ -132,13 +137,13 @@ func (s *PostsService) GetPostWithComments(ctx context.Context, postId int) (mod
 	if err != nil {
 		return model.PostWithComments{}, err
 	}
-	categories, err := s.categoryRepo.GetDictByIDList(ctx, []int64{int64(postInfo.CategoryID)})
+	category, err := s.categoryRepo.GetCategoryByID(ctx, int64(postInfo.CategoryID))
 	if err != nil {
 		// TODO: log error
 	}
 	postWithComments := model.PostWithComments{
 		ID:              postInfo.ID,
-		Category:        categories[postInfo.CategoryID].Name,
+		Category:        category.Name,
 		AuthorID:        postInfo.UserID,
 		AuthorName:      userInfo.Name,
 		AuthorAvatarUrl: userInfo.AvatarURL,
@@ -148,7 +153,7 @@ func (s *PostsService) GetPostWithComments(ctx context.Context, postId int) (mod
 		CreatedAt:       postInfo.CreatedAt,
 		Comments:        commentListItems,
 	}
-	if _, exists := categories[postInfo.CategoryID]; !exists {
+	if category.ID == 0 {
 		postWithComments.Category = s.categoryRepo.DefaultCategory().Name
 	}
 	return postWithComments, nil
