@@ -861,7 +861,7 @@ func decodePostCreateResponse(resp *http.Response) (res PostCreateRes, _ error) 
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response PostListItem
+			var response PostItem
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err

@@ -34,7 +34,7 @@ func (h *PostsHandler) PostAddComment(
 	postCreate := model.CommentCreate{
 		PostID:  params.PostId,
 		UserID:  globalCtx.UserID,
-		Content: req.Content,
+		Content: req.ContentMd,
 	}
 
 	post, err := h.postsService.AddComment(ctx, postCreate)
@@ -46,7 +46,7 @@ func (h *PostsHandler) PostAddComment(
 		ID:         post.ID,
 		AuthorId:   post.UserID,
 		AuthorName: post.UserName,
-		Content:    post.Content,
+		ContentMd:  post.Content,
 		CreatedAt:  post.CreatedAt,
 	}, nil
 }
@@ -62,7 +62,7 @@ func (h *PostsHandler) PostCreate(
 	modelPostCreate := model.PostCreateService{
 		Category: req.Category,
 		Title:    req.Title,
-		Content:  req.Content,
+		Content:  req.ContentMd,
 		UserID:   globalCtx.UserID,
 		Tags:     req.Tags,
 	}
@@ -71,11 +71,11 @@ func (h *PostsHandler) PostCreate(
 	if err != nil {
 		return nil, err
 	}
-	return &api.PostListItem{
+	return &api.PostItem{
 		ID:            post.ID,
 		Category:      post.Category,
 		Title:         post.Title,
-		Content:       post.Content,
+		ContentMd:     post.Content,
 		AuthorId:      post.UserID,
 		AuthorName:    post.UserName,
 		CommentsCount: post.CommentsCount,
@@ -100,7 +100,7 @@ func (h *PostsHandler) PostGet(ctx context.Context, params api.PostGetParams) (a
 			AuthorId:        post.UserID,
 			AuthorName:      post.UserName,
 			AuthorAvatarUrl: *avatarUrl,
-			Content:         post.Content,
+			ContentMd:       post.Content,
 			CreatedAt:       post.CreatedAt,
 		})
 	}
@@ -110,7 +110,7 @@ func (h *PostsHandler) PostGet(ctx context.Context, params api.PostGetParams) (a
 		AuthorId:      postWithComments.AuthorID,
 		AuthorName:    postWithComments.AuthorName,
 		Title:         postWithComments.Title,
-		Content:       postWithComments.Content,
+		ContentMd:     postWithComments.Content,
 		CommentsCount: postWithComments.CommentsCount,
 		CreatedAt:     postWithComments.CreatedAt,
 		Comments:      comments,
@@ -160,10 +160,8 @@ GOT_POST_ID:
 			ID:            post.ID,
 			Category:      post.Category,
 			Title:         post.Title,
-			Content:       post.Content,
 			AuthorId:      post.AuthorID,
 			AuthorName:    post.AuthorName,
-			PostsCount:    post.CommentsCount,
 			CommentsCount: post.CommentsCount,
 			CreatedAt:     post.CreatedAt,
 		}
