@@ -59,11 +59,12 @@ func (h *PostsHandler) PostCreate(
 		res := api.PostCreateInternalServerError("in handler.PostCreate() user ID is not set")
 		return &res, apperror.NewAuthenticationError("handler.PostCreate()", nil, "user ID is not set")
 	}
-	modelPostCreate := model.PostCreate{
-		Title:   req.Title,
-		Content: req.Content,
-		UserID:  globalCtx.UserID,
-		Tags:    req.Tags,
+	modelPostCreate := model.PostCreateService{
+		Category: req.Category,
+		Title:    req.Title,
+		Content:  req.Content,
+		UserID:   globalCtx.UserID,
+		Tags:     req.Tags,
 	}
 
 	post, err := h.postsService.Create(ctx, modelPostCreate)
@@ -105,6 +106,7 @@ func (h *PostsHandler) PostGet(ctx context.Context, params api.PostGetParams) (a
 	}
 	return &api.PostWithCommentsListResponse{
 		ID:            postWithComments.ID,
+		Category:      postWithComments.Category,
 		AuthorId:      postWithComments.AuthorID,
 		AuthorName:    postWithComments.AuthorName,
 		Title:         postWithComments.Title,

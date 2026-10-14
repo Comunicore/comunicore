@@ -48,3 +48,24 @@ func (r *CategoryRepo) GetDictByIDList(ctx context.Context, idList []int64) (map
 	}
 	return categories, nil
 }
+
+func (r *CategoryRepo) GetCategoryByID(ctx context.Context, id int64) (model.Category, error) {
+	row, err := r.queries.GetCategoryByID(ctx, int32(id))
+	if err != nil {
+		return model.Category{}, apperror.PgErrorToAppError(err)
+	}
+	return model.Category{
+		ID:   int(row.ID),
+		Name: row.Name,
+	}, nil
+}
+func (r *CategoryRepo) GetCategoryByName(ctx context.Context, name string) (model.Category, error) {
+	row, err := r.queries.GetCategoryByName(ctx, name)
+	if err != nil {
+		return model.Category{}, apperror.PgErrorToAppError(err)
+	}
+	return model.Category{
+		ID:   int(row.ID),
+		Name: row.Name,
+	}, nil
+}

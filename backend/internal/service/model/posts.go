@@ -17,8 +17,14 @@ type PostWithComments struct {
 	CreatedAt       time.Time
 	Comments        []CommentListItem
 }
-
-type PostCreate struct {
+type PostCreateService struct {
+	Category string
+	Title    string
+	Content  string
+	UserID   int
+	Tags     []string
+}
+type PostCreateRepo struct {
 	CategoryID int
 	Title      string
 	Content    string

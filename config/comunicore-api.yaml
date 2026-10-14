@@ -725,6 +725,8 @@ components:
     PostCreateRequest:
       type: object
       properties:
+        category:
+          type: string
         title:
           type: string
         content:
@@ -735,9 +737,11 @@ components:
             type: string
           description: Optional tags for analytics (normalized to lowercase on server)
       required:
+        - category
         - title
         - content
       example:
+        category: "Программирование"
         title: "How to learn Go?"
         content: "I want to learn Go, but I don't know where to start. Any advice?"
     PostCreateCommentRequest:
