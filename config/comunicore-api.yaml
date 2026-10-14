@@ -603,6 +603,9 @@ components:
         createdAt:
           type: string
           format: date-time
+        updatedAt:
+          type: string
+          format: date-time
       required:
         - id
         - authorId
@@ -645,6 +648,9 @@ components:
           type: integer
           description: Number of comments (rows in comments). The opening message lives in title/content only and is not counted.
         createdAt:
+          type: string
+          format: date-time
+        updatedAt:
           type: string
           format: date-time
       required:
@@ -692,6 +698,9 @@ components:
         createdAt:
           type: string
           format: date-time
+        updatedAt:
+          type: string
+          format: date-time
         comments:
           type: array
           items:
@@ -730,6 +739,7 @@ components:
             authorName: "Anna Ivanova"
             authorAvatarUrl: "https://comunicore.mooo.com/storage/media/avatar2.png"
             createdAt: "2024-01-02T15:30:00Z"
+            updatedAt: "2024-01-02T15:31:25Z"
     PostCommentItem:
       type: object
       properties:
@@ -745,6 +755,9 @@ components:
         contentMd:
           type: string
         createdAt:
+          type: string
+          format: date-time
+        updatedAt:
           type: string
           format: date-time
       required:

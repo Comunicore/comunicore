@@ -11,6 +11,7 @@ type Comment struct {
 	UserID    int
 	Content   string
 	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 type CommentInfo struct {
 	ID        int
@@ -19,6 +20,7 @@ type CommentInfo struct {
 	UserName  string
 	Content   string
 	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 type CommentListItem struct {
 	ID              int
@@ -27,6 +29,7 @@ type CommentListItem struct {
 	AuthorAvatarUrl string
 	Content         string
 	CreatedAt       time.Time
+	UpdatedAt       time.Time
 }
 
 type CommentCreate struct {

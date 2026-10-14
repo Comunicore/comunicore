@@ -37,18 +37,21 @@ func (h *PostsHandler) PostAddComment(
 		Content: req.ContentMd,
 	}
 
-	post, err := h.postsService.AddComment(ctx, postCreate)
+	comment, err := h.postsService.AddComment(ctx, postCreate)
 	if err != nil {
 		return nil, err
 	}
-
-	return &api.PostCommentItem{
-		ID:         post.ID,
-		AuthorId:   post.UserID,
-		AuthorName: post.UserName,
-		ContentMd:  post.Content,
-		CreatedAt:  post.CreatedAt,
-	}, nil
+	apiPost := &api.PostCommentItem{
+		ID:         comment.ID,
+		AuthorId:   comment.UserID,
+		AuthorName: comment.UserName,
+		ContentMd:  comment.Content,
+		CreatedAt:  comment.CreatedAt,
+	}
+	if !comment.UpdatedAt.IsZero() {
+		apiPost.UpdatedAt.SetTo(comment.UpdatedAt)
+	}
+	return apiPost, nil
 }
 
 func (h *PostsHandler) PostCreate(
@@ -71,7 +74,7 @@ func (h *PostsHandler) PostCreate(
 	if err != nil {
 		return nil, err
 	}
-	return &api.PostItem{
+	apiPost := &api.PostItem{
 		ID:            post.ID,
 		Category:      post.Category,
 		Title:         post.Title,
@@ -80,7 +83,11 @@ func (h *PostsHandler) PostCreate(
 		AuthorName:    post.UserName,
 		CommentsCount: post.CommentsCount,
 		CreatedAt:     post.CreatedAt,
-	}, nil
+	}
+	if !post.UpdatedAt.IsZero() {
+		apiPost.UpdatedAt.SetTo(post.UpdatedAt)
+	}
+	return apiPost, nil
 }
 
 // get post with all comments
@@ -90,21 +97,25 @@ func (h *PostsHandler) PostGet(ctx context.Context, params api.PostGetParams) (a
 		return nil, err
 	}
 	var comments []api.PostCommentItem
-	for _, post := range postWithComments.Comments {
-		avatarUrl, err := url.Parse(post.AuthorAvatarUrl)
+	for _, commentModel := range postWithComments.Comments {
+		avatarUrl, err := url.Parse(commentModel.AuthorAvatarUrl)
 		if err != nil {
 			avatarUrl = nil
 		}
-		comments = append(comments, api.PostCommentItem{
-			ID:              post.ID,
-			AuthorId:        post.UserID,
-			AuthorName:      post.UserName,
+		apiComment := api.PostCommentItem{
+			ID:              commentModel.ID,
+			AuthorId:        commentModel.UserID,
+			AuthorName:      commentModel.UserName,
 			AuthorAvatarUrl: *avatarUrl,
-			ContentMd:       post.Content,
-			CreatedAt:       post.CreatedAt,
-		})
+			ContentMd:       commentModel.Content,
+			CreatedAt:       commentModel.CreatedAt,
+		}
+		if !commentModel.UpdatedAt.IsZero() {
+			apiComment.UpdatedAt.SetTo(commentModel.UpdatedAt)
+		}
+		comments = append(comments, apiComment)
 	}
-	return &api.PostWithCommentsListResponse{
+	apiPost := &api.PostWithCommentsListResponse{
 		ID:            postWithComments.ID,
 		Category:      postWithComments.Category,
 		AuthorId:      postWithComments.AuthorID,
@@ -114,7 +125,11 @@ func (h *PostsHandler) PostGet(ctx context.Context, params api.PostGetParams) (a
 		CommentsCount: postWithComments.CommentsCount,
 		CreatedAt:     postWithComments.CreatedAt,
 		Comments:      comments,
-	}, nil
+	}
+	if !postWithComments.UpdatedAt.IsZero() {
+		apiPost.UpdatedAt.SetTo(postWithComments.UpdatedAt)
+	}
+	return apiPost, nil
 }
 
 func (h *PostsHandler) PostsList(ctx context.Context, params api.PostsListParams) (api.PostsListRes, error) {
@@ -164,6 +179,9 @@ GOT_POST_ID:
 			AuthorName:    post.AuthorName,
 			CommentsCount: post.CommentsCount,
 			CreatedAt:     post.CreatedAt,
+		}
+		if !post.UpdatedAt.IsZero() {
+			resPosts[i].UpdatedAt.SetTo(post.UpdatedAt)
 		}
 	}
 	return &api.PostListResponse{

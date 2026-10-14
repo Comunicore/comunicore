@@ -15,6 +15,7 @@ type PostWithComments struct {
 	Content         string
 	CommentsCount   int
 	CreatedAt       time.Time
+	UpdatedAt       time.Time
 	Comments        []CommentListItem
 }
 type PostCreateService struct {
@@ -39,6 +40,7 @@ type PostRepoInfo struct {
 	UserID        int
 	CommentsCount int
 	CreatedAt     time.Time
+	UpdatedAt     time.Time
 }
 type PostListRepo struct {
 	Posts []PostRepoInfo
@@ -57,6 +59,7 @@ type PostInfoResponse struct {
 	AuthorAvatarUrl string
 	CommentsCount   int
 	CreatedAt       time.Time
+	UpdatedAt       time.Time
 }
 
 type PostListResponse struct {
@@ -76,4 +79,5 @@ type PostInfo struct {
 	UserName      string
 	CommentsCount int
 	CreatedAt     time.Time
+	UpdatedAt     time.Time
 }

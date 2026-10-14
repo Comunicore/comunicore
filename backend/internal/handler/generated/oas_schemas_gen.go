@@ -1045,12 +1045,13 @@ func (*PostAddCommentInternalServerError) postAddCommentRes() {}
 
 // Ref: #/components/schemas/PostCommentItem
 type PostCommentItem struct {
-	ID              int       `json:"id"`
-	AuthorId        int       `json:"authorId"`
-	AuthorName      string    `json:"authorName"`
-	AuthorAvatarUrl url.URL   `json:"authorAvatarUrl"`
-	ContentMd       string    `json:"contentMd"`
-	CreatedAt       time.Time `json:"createdAt"`
+	ID              int         `json:"id"`
+	AuthorId        int         `json:"authorId"`
+	AuthorName      string      `json:"authorName"`
+	AuthorAvatarUrl url.URL     `json:"authorAvatarUrl"`
+	ContentMd       string      `json:"contentMd"`
+	CreatedAt       time.Time   `json:"createdAt"`
+	UpdatedAt       OptDateTime `json:"updatedAt"`
 }
 
 // GetID returns the value of ID.
@@ -1083,6 +1084,11 @@ func (s *PostCommentItem) GetCreatedAt() time.Time {
 	return s.CreatedAt
 }
 
+// GetUpdatedAt returns the value of UpdatedAt.
+func (s *PostCommentItem) GetUpdatedAt() OptDateTime {
+	return s.UpdatedAt
+}
+
 // SetID sets the value of ID.
 func (s *PostCommentItem) SetID(val int) {
 	s.ID = val
@@ -1111,6 +1117,11 @@ func (s *PostCommentItem) SetContentMd(val string) {
 // SetCreatedAt sets the value of CreatedAt.
 func (s *PostCommentItem) SetCreatedAt(val time.Time) {
 	s.CreatedAt = val
+}
+
+// SetUpdatedAt sets the value of UpdatedAt.
+func (s *PostCommentItem) SetUpdatedAt(val OptDateTime) {
+	s.UpdatedAt = val
 }
 
 func (*PostCommentItem) postAddCommentRes() {}
@@ -1207,8 +1218,9 @@ type PostItem struct {
 	ContentMd string `json:"contentMd"`
 	// Number of comments (rows in comments). The opening message lives in title/content only and is not
 	// counted.
-	CommentsCount int       `json:"commentsCount"`
-	CreatedAt     time.Time `json:"createdAt"`
+	CommentsCount int         `json:"commentsCount"`
+	CreatedAt     time.Time   `json:"createdAt"`
+	UpdatedAt     OptDateTime `json:"updatedAt"`
 }
 
 // GetID returns the value of ID.
@@ -1256,6 +1268,11 @@ func (s *PostItem) GetCreatedAt() time.Time {
 	return s.CreatedAt
 }
 
+// GetUpdatedAt returns the value of UpdatedAt.
+func (s *PostItem) GetUpdatedAt() OptDateTime {
+	return s.UpdatedAt
+}
+
 // SetID sets the value of ID.
 func (s *PostItem) SetID(val int) {
 	s.ID = val
@@ -1301,6 +1318,11 @@ func (s *PostItem) SetCreatedAt(val time.Time) {
 	s.CreatedAt = val
 }
 
+// SetUpdatedAt sets the value of UpdatedAt.
+func (s *PostItem) SetUpdatedAt(val OptDateTime) {
+	s.UpdatedAt = val
+}
+
 func (*PostItem) postCreateRes() {}
 
 // Ref: #/components/schemas/PostListItem
@@ -1313,8 +1335,9 @@ type PostListItem struct {
 	Title           string  `json:"title"`
 	// Number of comments (rows in comments). The opening message lives in title/content only and is not
 	// counted.
-	CommentsCount int       `json:"commentsCount"`
-	CreatedAt     time.Time `json:"createdAt"`
+	CommentsCount int         `json:"commentsCount"`
+	CreatedAt     time.Time   `json:"createdAt"`
+	UpdatedAt     OptDateTime `json:"updatedAt"`
 }
 
 // GetID returns the value of ID.
@@ -1357,6 +1380,11 @@ func (s *PostListItem) GetCreatedAt() time.Time {
 	return s.CreatedAt
 }
 
+// GetUpdatedAt returns the value of UpdatedAt.
+func (s *PostListItem) GetUpdatedAt() OptDateTime {
+	return s.UpdatedAt
+}
+
 // SetID sets the value of ID.
 func (s *PostListItem) SetID(val int) {
 	s.ID = val
@@ -1395,6 +1423,11 @@ func (s *PostListItem) SetCommentsCount(val int) {
 // SetCreatedAt sets the value of CreatedAt.
 func (s *PostListItem) SetCreatedAt(val time.Time) {
 	s.CreatedAt = val
+}
+
+// SetUpdatedAt sets the value of UpdatedAt.
+func (s *PostListItem) SetUpdatedAt(val OptDateTime) {
+	s.UpdatedAt = val
 }
 
 // Ref: #/components/schemas/PostListResponse
@@ -1460,6 +1493,7 @@ type PostWithCommentsListResponse struct {
 	// Number of comments (rows in comments). The opening message is not included.
 	CommentsCount int               `json:"commentsCount"`
 	CreatedAt     time.Time         `json:"createdAt"`
+	UpdatedAt     OptDateTime       `json:"updatedAt"`
 	Comments      []PostCommentItem `json:"comments"`
 }
 
@@ -1506,6 +1540,11 @@ func (s *PostWithCommentsListResponse) GetCommentsCount() int {
 // GetCreatedAt returns the value of CreatedAt.
 func (s *PostWithCommentsListResponse) GetCreatedAt() time.Time {
 	return s.CreatedAt
+}
+
+// GetUpdatedAt returns the value of UpdatedAt.
+func (s *PostWithCommentsListResponse) GetUpdatedAt() OptDateTime {
+	return s.UpdatedAt
 }
 
 // GetComments returns the value of Comments.
@@ -1556,6 +1595,11 @@ func (s *PostWithCommentsListResponse) SetCommentsCount(val int) {
 // SetCreatedAt sets the value of CreatedAt.
 func (s *PostWithCommentsListResponse) SetCreatedAt(val time.Time) {
 	s.CreatedAt = val
+}
+
+// SetUpdatedAt sets the value of UpdatedAt.
+func (s *PostWithCommentsListResponse) SetUpdatedAt(val OptDateTime) {
+	s.UpdatedAt = val
 }
 
 // SetComments sets the value of Comments.

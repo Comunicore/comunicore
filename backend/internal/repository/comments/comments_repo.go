@@ -30,13 +30,17 @@ func (r *CommentsRepo) Create(ctx context.Context, comment model.CommentCreate) 
 		UserID:  int32(comment.UserID),
 		Content: comment.Content,
 	})
-	return model.Comment{
+	commentRes := model.Comment{
 		ID:        int(row.ID),
 		PostID:    int(row.PostID),
 		UserID:    int(row.UserID),
 		Content:   row.Content,
 		CreatedAt: row.CreatedAt.Time,
-	}, err
+	}
+	if row.UpdatedAt.Valid {
+		commentRes.UpdatedAt = row.UpdatedAt.Time
+	}
+	return commentRes, err
 }
 
 // list comments by post id
@@ -44,14 +48,18 @@ func (r *CommentsRepo) List(ctx context.Context, postId int) ([]model.Comment, e
 	rows, err := r.queries.CommentListByPostId(ctx, int32(postId))
 
 	var comments []model.Comment
-	for _, data := range rows {
-		comments = append(comments, model.Comment{
-			ID:        int(data.ID),
-			PostID:    int(data.PostID),
-			UserID:    int(data.UserID),
-			Content:   data.Content,
-			CreatedAt: data.CreatedAt.Time,
-		})
+	for _, row := range rows {
+		commentRepo := model.Comment{
+			ID:        int(row.ID),
+			PostID:    int(row.PostID),
+			UserID:    int(row.UserID),
+			Content:   row.Content,
+			CreatedAt: row.CreatedAt.Time,
+		}
+		if row.UpdatedAt.Valid {
+			commentRepo.UpdatedAt = row.UpdatedAt.Time
+		}
+		comments = append(comments, commentRepo)
 	}
 	return comments, err
 }
