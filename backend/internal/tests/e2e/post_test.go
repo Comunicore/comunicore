@@ -33,8 +33,8 @@ type PostItem struct {
 	AuthorName      string    `json:"authorName"`
 	AuthorAvatarUrl string    `json:"authorAvatarUrl"`
 	Title           string    `json:"title"`
-	Content         string    `json:"content"`
-	PostsCount      int       `json:"postsCount"`
+	ContentMd       string    `json:"contentMd"`
+	CommentsCount   int       `json:"commentsCount"`
 	CreatedAt       time.Time `json:"createdAt"`
 }
 
@@ -48,24 +48,22 @@ func testPostCreateOk(t *testing.T, baseURL string, cookie *http.Cookie) PostIte
 
 		res := auth.POST(postCreatePath).
 			WithJSON(map[string]any{
-				"category": "Программирование",
-				"title":    "Test Post " + tests.RandomString(8),
-				"content":  "This is a test post content " + tests.RandomString(20),
+				"category":  "Программирование",
+				"title":     "Test Post " + tests.RandomString(8),
+				"contentMd": "This is a test post content " + tests.RandomString(20),
 			}).
 			Expect().
 			Status(http.StatusCreated).JSON().Object()
 
 		res.Keys().ContainsOnly("id", "category", "authorId", "authorName", "authorAvatarUrl", "title",
-			"content", "postsCount", "commentsCount", "createdAt")
+			"contentMd", "commentsCount", "createdAt")
 		res.Value("id").Number().Gt(0)
 		res.Value("category").String().NotEmpty()
 		res.Value("authorId").Number().Gt(0)
 		res.Value("authorName").String().NotEmpty()
 		// res.Value("authorAvatarUrl").String().NotEmpty()
 		res.Value("title").String().HasPrefix("Test Post ")
-		res.Value("content").String().HasPrefix("This is a test post content ")
-		// posts_count is replies-only (table posts); opening message is not counted.
-		res.Value("postsCount").Number().IsEqual(0)
+		res.Value("contentMd").String().HasPrefix("This is a test post content ")
 		res.Value("commentsCount").Number().IsEqual(0)
 		res.Value("createdAt").String().NotEmpty()
 
@@ -86,17 +84,17 @@ func testPostCommentCreateOk(t *testing.T, baseURL string, cookie *http.Cookie, 
 
 		res := auth.POST(postCommentsPath, postId).
 			WithJSON(map[string]any{
-				"content": postContent,
+				"contentMd": postContent,
 			}).
 			Expect().
 			Status(http.StatusCreated).JSON().Object()
 
-		res.Keys().ContainsOnly("id", "authorId", "authorName", "authorAvatarUrl", "content", "createdAt")
+		res.Keys().ContainsOnly("id", "authorId", "authorName", "authorAvatarUrl", "contentMd", "createdAt")
 		res.Value("id").Number().Gt(0)
 		res.Value("authorId").Number().Gt(0)
 		res.Value("authorName").String().NotEmpty()
 		// res.Value("authorAvatarUrl").String().NotEmpty()
-		res.Value("content").String().IsEqual(postContent)
+		res.Value("contentMd").String().IsEqual(postContent)
 		res.Value("createdAt").String().NotEmpty()
 
 		res.Decode(&comment)
@@ -110,7 +108,7 @@ type PostCommentItem struct {
 	AuthorID        int       `json:"authorId"`
 	AuthorName      string    `json:"authorName"`
 	AuthorAvatarUrl string    `json:"authorAvatarUrl"`
-	Content         string    `json:"content"`
+	ContentMd       string    `json:"contentMd"`
 	CreatedAt       time.Time `json:"createdAt"`
 }
 type PostWithComments struct {
@@ -120,7 +118,7 @@ type PostWithComments struct {
 	AuthorName      string            `json:"authorName"`
 	AuthorAvatarUrl string            `json:"authorAvatarUrl"`
 	Title           string            `json:"title"`
-	Content         string            `json:"content"`
+	ContentMd       string            `json:"contentMd"`
 	PostsCount      int               `json:"postsCount"`
 	CreatedAt       time.Time         `json:"createdAt"`
 	Posts           []PostCommentItem `json:"posts"`
@@ -140,7 +138,7 @@ func testPostGet(t *testing.T, baseURL string,
 			Status(http.StatusOK).JSON().Object()
 
 		res.Keys().ContainsOnly(
-			"id", "category", "authorId", "authorName", "authorAvatarUrl", "title", "content",
+			"id", "category", "authorId", "authorName", "authorAvatarUrl", "title", "contentMd",
 			"commentsCount", "createdAt", "comments")
 		res.Value("id").Number().IsEqual(expectedPost.ID)
 		res.Value("category").String().IsEqual(expectedPost.Category)
@@ -148,7 +146,7 @@ func testPostGet(t *testing.T, baseURL string,
 		res.Value("authorName").String().IsEqual(expectedPost.AuthorName)
 		// res.Value("authorAvatarUrl").String().IsEqual(expectedPost.AuthorAvatarUrl)
 		res.Value("title").String().IsEqual(expectedPost.Title)
-		res.Value("content").String().IsEqual(expectedPost.Content)
+		res.Value("contentMd").String().IsEqual(expectedPost.ContentMd)
 		// One reply row exists in posts after postCommentCreateOk.
 		res.Value("commentsCount").Number().IsEqual(1)
 		res.Value("createdAt").String().NotEmpty()
@@ -157,12 +155,12 @@ func testPostGet(t *testing.T, baseURL string,
 		comments.Length().IsEqual(1)
 
 		firstComment := comments.Value(0).Object()
-		firstComment.Keys().ContainsOnly("id", "authorId", "authorName", "authorAvatarUrl", "content", "createdAt")
+		firstComment.Keys().ContainsOnly("id", "authorId", "authorName", "authorAvatarUrl", "contentMd", "createdAt")
 		firstComment.Value("id").Number().IsEqual(expectedComment.ID)
 		firstComment.Value("authorId").Number().IsEqual(expectedComment.AuthorID)
 		firstComment.Value("authorName").String().IsEqual(expectedComment.AuthorName)
 		firstComment.Value("authorAvatarUrl").String().IsEqual(expectedComment.AuthorAvatarUrl)
-		firstComment.Value("content").String().IsEqual(expectedComment.Content)
+		firstComment.Value("contentMd").String().IsEqual(expectedComment.ContentMd)
 		firstComment.Value("createdAt").String().NotEmpty()
 	})
 }

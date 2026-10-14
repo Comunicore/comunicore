@@ -242,7 +242,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PostListItem'
+                $ref: '#/components/schemas/PostItem'
         "401":
           $ref: '#/components/responses/ErrorStringDescription'
         "500":
@@ -578,6 +578,53 @@ components:
         totalCountEstimated: 100
         havePrev: false
         haveNext: true
+    PostItem:
+      type: object
+      properties:
+        id:
+          type: integer
+        authorId:
+          type: integer
+        authorName:
+          type: string
+        authorAvatarUrl:
+          type: string
+          format: uri
+        category:
+          type: string
+        title:
+          type: string
+        contentMd:
+          type: string
+          description: Post content in Markdown format.
+        commentsCount:
+          type: integer
+          description: Number of comments (rows in comments). The opening message lives in title/content only and is not counted.
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - authorId
+        - authorName
+        - authorAvatarUrl
+        - category
+        - title
+        - contentMd
+        - postsCount
+        - commentsCount
+        - createdAt
+      example:
+        id: 1
+        category: "Программирование"
+        title: "First post"
+        contentMd: "This is the content of the first post."
+        authorId: 42
+        authorName: "Petr Semenov"
+        authorAvatarUrl: "https://comunicore.mooo.com/storage/media/avatar1.png"
+        postsCount: 5
+        commentsCount: 5
+        createdAt: "2024-01-01T12:00:00Z"
     PostListItem:
       type: object
       properties:
@@ -594,12 +641,6 @@ components:
           type: string
         title:
           type: string
-        content:
-          type: string
-        postsCount:
-          deprecated: true
-          type: integer
-          description: Number of reply posts (rows in posts). The opening message lives in title/content only and is not counted.
         commentsCount:
           type: integer
           description: Number of comments (rows in comments). The opening message lives in title/content only and is not counted.
@@ -613,14 +654,12 @@ components:
         - authorAvatarUrl
         - category
         - title
-        - content
         - postsCount
         - commentsCount
         - createdAt
       example:
         id: 1
         title: "First post"
-        content: "This is the content of the first post."
         category: "Программирование"
         authorId: 42
         authorName: "Petr Semenov"
@@ -644,7 +683,7 @@ components:
           format: uri
         title:
           type: string
-        content:
+        contentMd:
           type: string
           description: Number of reply posts (rows in posts). The opening message is not included.
         commentsCount:
@@ -664,7 +703,7 @@ components:
         - authorName
         - authorAvatarUrl
         - title
-        - content
+        - contentMd
         - commentsCount
         - createdAt
         - comments
@@ -672,7 +711,7 @@ components:
         id: 1
         category: "Программирование"
         title: "First post"
-        content: "This is the content of the first post."
+        contentMd: "This is the content of the first post."
         authorId: 42
         authorName: "Petr Semenov"
         authorAvatarUrl: "https://comunicore.mooo.com/storage/media/avatar1.png"
@@ -680,13 +719,13 @@ components:
         createdAt: "2024-01-01T12:00:00Z"
         comments:
           - id: 1
-            content: "This is the content of the first post."
+            contentMd: "This is the content of the first post."
             authorId: 42
             authorName: "Petr Semenov"
             authorAvatarUrl: "https://comunicore.mooo.com/storage/media/avatar1.png"
             createdAt: "2024-01-01T12:00:00Z"
           - id: 2
-            content: "This is the content of the second post."
+            contentMd: "This is the content of the second post."
             authorId: 43
             authorName: "Anna Ivanova"
             authorAvatarUrl: "https://comunicore.mooo.com/storage/media/avatar2.png"
@@ -703,7 +742,7 @@ components:
         authorAvatarUrl:
           type: string
           format: uri
-        content:
+        contentMd:
           type: string
         createdAt:
           type: string
@@ -713,11 +752,11 @@ components:
         - authorId
         - authorName
         - authorAvatarUrl
-        - content
+        - contentMd
         - createdAt
       example:
         id: 1
-        content: "Первый ответ в ветке."
+        contentMd: "Первый ответ в ветке."
         authorId: 42
         authorName: "Petr Semenov"
         authorAvatarUrl: "https://comunicore.mooo.com/storage/media/avatar1.png"
@@ -729,7 +768,7 @@ components:
           type: string
         title:
           type: string
-        content:
+        contentMd:
           type: string
         tags:
           type: array
@@ -739,20 +778,20 @@ components:
       required:
         - category
         - title
-        - content
+        - contentMd
       example:
         category: "Программирование"
         title: "How to learn Go?"
-        content: "I want to learn Go, but I don't know where to start. Any advice?"
+        contentMd: "I want to learn Go, but I don't know where to start. Any advice?"
     PostCreateCommentRequest:
       type: object
       properties:
-        content:
+        contentMd:
           type: string
       required:
-        - content
+        - contentMd
       example:
-        content: "I want to learn Go, but I don't know where to start. Any advice?"
+        contentMd: "I want to learn Go, but I don't know where to start. Any advice?"
     # media (files)
     MediaUploadRequest:
       type: object

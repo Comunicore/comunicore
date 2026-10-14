@@ -2502,8 +2502,8 @@ func (s *PostCommentItem) encodeFields(e *jx.Encoder) {
 		json.EncodeURI(e, s.AuthorAvatarUrl)
 	}
 	{
-		e.FieldStart("content")
-		e.Str(s.Content)
+		e.FieldStart("contentMd")
+		e.Str(s.ContentMd)
 	}
 	{
 		e.FieldStart("createdAt")
@@ -2516,7 +2516,7 @@ var jsonFieldsNameOfPostCommentItem = [6]string{
 	1: "authorId",
 	2: "authorName",
 	3: "authorAvatarUrl",
-	4: "content",
+	4: "contentMd",
 	5: "createdAt",
 }
 
@@ -2577,17 +2577,17 @@ func (s *PostCommentItem) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"authorAvatarUrl\"")
 			}
-		case "content":
+		case "contentMd":
 			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
 				v, err := d.Str()
-				s.Content = string(v)
+				s.ContentMd = string(v)
 				if err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"content\"")
+				return errors.Wrap(err, "decode field \"contentMd\"")
 			}
 		case "createdAt":
 			requiredBitSet[0] |= 1 << 5
@@ -2667,13 +2667,13 @@ func (s *PostCreateCommentRequest) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *PostCreateCommentRequest) encodeFields(e *jx.Encoder) {
 	{
-		e.FieldStart("content")
-		e.Str(s.Content)
+		e.FieldStart("contentMd")
+		e.Str(s.ContentMd)
 	}
 }
 
 var jsonFieldsNameOfPostCreateCommentRequest = [1]string{
-	0: "content",
+	0: "contentMd",
 }
 
 // Decode decodes PostCreateCommentRequest from json.
@@ -2685,17 +2685,17 @@ func (s *PostCreateCommentRequest) Decode(d *jx.Decoder) error {
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
-		case "content":
+		case "contentMd":
 			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
 				v, err := d.Str()
-				s.Content = string(v)
+				s.ContentMd = string(v)
 				if err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"content\"")
+				return errors.Wrap(err, "decode field \"contentMd\"")
 			}
 		default:
 			return d.Skip()
@@ -2809,8 +2809,8 @@ func (s *PostCreateRequest) encodeFields(e *jx.Encoder) {
 		e.Str(s.Title)
 	}
 	{
-		e.FieldStart("content")
-		e.Str(s.Content)
+		e.FieldStart("contentMd")
+		e.Str(s.ContentMd)
 	}
 	{
 		if s.Tags != nil {
@@ -2827,7 +2827,7 @@ func (s *PostCreateRequest) encodeFields(e *jx.Encoder) {
 var jsonFieldsNameOfPostCreateRequest = [4]string{
 	0: "category",
 	1: "title",
-	2: "content",
+	2: "contentMd",
 	3: "tags",
 }
 
@@ -2864,17 +2864,17 @@ func (s *PostCreateRequest) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"title\"")
 			}
-		case "content":
+		case "contentMd":
 			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
 				v, err := d.Str()
-				s.Content = string(v)
+				s.ContentMd = string(v)
 				if err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"content\"")
+				return errors.Wrap(err, "decode field \"contentMd\"")
 			}
 		case "tags":
 			if err := func() error {
@@ -3066,14 +3066,14 @@ func (s *PostGetInternalServerError) UnmarshalJSON(data []byte) error {
 }
 
 // Encode implements json.Marshaler.
-func (s *PostListItem) Encode(e *jx.Encoder) {
+func (s *PostItem) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
 	e.ObjEnd()
 }
 
 // encodeFields encodes fields.
-func (s *PostListItem) encodeFields(e *jx.Encoder) {
+func (s *PostItem) encodeFields(e *jx.Encoder) {
 	{
 		e.FieldStart("id")
 		e.Int(s.ID)
@@ -3099,12 +3099,8 @@ func (s *PostListItem) encodeFields(e *jx.Encoder) {
 		e.Str(s.Title)
 	}
 	{
-		e.FieldStart("content")
-		e.Str(s.Content)
-	}
-	{
-		e.FieldStart("postsCount")
-		e.Int(s.PostsCount)
+		e.FieldStart("contentMd")
+		e.Str(s.ContentMd)
 	}
 	{
 		e.FieldStart("commentsCount")
@@ -3116,23 +3112,22 @@ func (s *PostListItem) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfPostListItem = [10]string{
+var jsonFieldsNameOfPostItem = [9]string{
 	0: "id",
 	1: "authorId",
 	2: "authorName",
 	3: "authorAvatarUrl",
 	4: "category",
 	5: "title",
-	6: "content",
-	7: "postsCount",
-	8: "commentsCount",
-	9: "createdAt",
+	6: "contentMd",
+	7: "commentsCount",
+	8: "createdAt",
 }
 
-// Decode decodes PostListItem from json.
-func (s *PostListItem) Decode(d *jx.Decoder) error {
+// Decode decodes PostItem from json.
+func (s *PostItem) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode PostListItem to nil")
+		return errors.New("invalid: unable to decode PostItem to nil")
 	}
 	var requiredBitSet [2]uint8
 
@@ -3210,32 +3205,20 @@ func (s *PostListItem) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"title\"")
 			}
-		case "content":
+		case "contentMd":
 			requiredBitSet[0] |= 1 << 6
 			if err := func() error {
 				v, err := d.Str()
-				s.Content = string(v)
+				s.ContentMd = string(v)
 				if err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"content\"")
-			}
-		case "postsCount":
-			requiredBitSet[0] |= 1 << 7
-			if err := func() error {
-				v, err := d.Int()
-				s.PostsCount = int(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"postsCount\"")
+				return errors.Wrap(err, "decode field \"contentMd\"")
 			}
 		case "commentsCount":
-			requiredBitSet[1] |= 1 << 0
+			requiredBitSet[0] |= 1 << 7
 			if err := func() error {
 				v, err := d.Int()
 				s.CommentsCount = int(v)
@@ -3247,7 +3230,223 @@ func (s *PostListItem) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"commentsCount\"")
 			}
 		case "createdAt":
-			requiredBitSet[1] |= 1 << 1
+			requiredBitSet[1] |= 1 << 0
+			if err := func() error {
+				v, err := json.DecodeDateTime(d)
+				s.CreatedAt = v
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"createdAt\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode PostItem")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [2]uint8{
+		0b11111111,
+		0b00000001,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfPostItem) {
+					name = jsonFieldsNameOfPostItem[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *PostItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *PostItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *PostListItem) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *PostListItem) encodeFields(e *jx.Encoder) {
+	{
+		e.FieldStart("id")
+		e.Int(s.ID)
+	}
+	{
+		e.FieldStart("authorId")
+		e.Int(s.AuthorId)
+	}
+	{
+		e.FieldStart("authorName")
+		e.Str(s.AuthorName)
+	}
+	{
+		e.FieldStart("authorAvatarUrl")
+		json.EncodeURI(e, s.AuthorAvatarUrl)
+	}
+	{
+		e.FieldStart("category")
+		e.Str(s.Category)
+	}
+	{
+		e.FieldStart("title")
+		e.Str(s.Title)
+	}
+	{
+		e.FieldStart("commentsCount")
+		e.Int(s.CommentsCount)
+	}
+	{
+		e.FieldStart("createdAt")
+		json.EncodeDateTime(e, s.CreatedAt)
+	}
+}
+
+var jsonFieldsNameOfPostListItem = [8]string{
+	0: "id",
+	1: "authorId",
+	2: "authorName",
+	3: "authorAvatarUrl",
+	4: "category",
+	5: "title",
+	6: "commentsCount",
+	7: "createdAt",
+}
+
+// Decode decodes PostListItem from json.
+func (s *PostListItem) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode PostListItem to nil")
+	}
+	var requiredBitSet [1]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "id":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				v, err := d.Int()
+				s.ID = int(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"id\"")
+			}
+		case "authorId":
+			requiredBitSet[0] |= 1 << 1
+			if err := func() error {
+				v, err := d.Int()
+				s.AuthorId = int(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"authorId\"")
+			}
+		case "authorName":
+			requiredBitSet[0] |= 1 << 2
+			if err := func() error {
+				v, err := d.Str()
+				s.AuthorName = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"authorName\"")
+			}
+		case "authorAvatarUrl":
+			requiredBitSet[0] |= 1 << 3
+			if err := func() error {
+				v, err := json.DecodeURI(d)
+				s.AuthorAvatarUrl = v
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"authorAvatarUrl\"")
+			}
+		case "category":
+			requiredBitSet[0] |= 1 << 4
+			if err := func() error {
+				v, err := d.Str()
+				s.Category = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"category\"")
+			}
+		case "title":
+			requiredBitSet[0] |= 1 << 5
+			if err := func() error {
+				v, err := d.Str()
+				s.Title = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"title\"")
+			}
+		case "commentsCount":
+			requiredBitSet[0] |= 1 << 6
+			if err := func() error {
+				v, err := d.Int()
+				s.CommentsCount = int(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"commentsCount\"")
+			}
+		case "createdAt":
+			requiredBitSet[0] |= 1 << 7
 			if err := func() error {
 				v, err := json.DecodeDateTime(d)
 				s.CreatedAt = v
@@ -3267,9 +3466,8 @@ func (s *PostListItem) Decode(d *jx.Decoder) error {
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
-	for i, mask := range [2]uint8{
+	for i, mask := range [1]uint8{
 		0b11111111,
-		0b00000011,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -3506,8 +3704,8 @@ func (s *PostWithCommentsListResponse) encodeFields(e *jx.Encoder) {
 		e.Str(s.Title)
 	}
 	{
-		e.FieldStart("content")
-		e.Str(s.Content)
+		e.FieldStart("contentMd")
+		e.Str(s.ContentMd)
 	}
 	{
 		e.FieldStart("commentsCount")
@@ -3534,7 +3732,7 @@ var jsonFieldsNameOfPostWithCommentsListResponse = [10]string{
 	3: "authorName",
 	4: "authorAvatarUrl",
 	5: "title",
-	6: "content",
+	6: "contentMd",
 	7: "commentsCount",
 	8: "createdAt",
 	9: "comments",
@@ -3621,17 +3819,17 @@ func (s *PostWithCommentsListResponse) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"title\"")
 			}
-		case "content":
+		case "contentMd":
 			requiredBitSet[0] |= 1 << 6
 			if err := func() error {
 				v, err := d.Str()
-				s.Content = string(v)
+				s.ContentMd = string(v)
 				if err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"content\"")
+				return errors.Wrap(err, "decode field \"contentMd\"")
 			}
 		case "commentsCount":
 			requiredBitSet[0] |= 1 << 7

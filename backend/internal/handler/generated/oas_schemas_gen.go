@@ -1049,7 +1049,7 @@ type PostCommentItem struct {
 	AuthorId        int       `json:"authorId"`
 	AuthorName      string    `json:"authorName"`
 	AuthorAvatarUrl url.URL   `json:"authorAvatarUrl"`
-	Content         string    `json:"content"`
+	ContentMd       string    `json:"contentMd"`
 	CreatedAt       time.Time `json:"createdAt"`
 }
 
@@ -1073,9 +1073,9 @@ func (s *PostCommentItem) GetAuthorAvatarUrl() url.URL {
 	return s.AuthorAvatarUrl
 }
 
-// GetContent returns the value of Content.
-func (s *PostCommentItem) GetContent() string {
-	return s.Content
+// GetContentMd returns the value of ContentMd.
+func (s *PostCommentItem) GetContentMd() string {
+	return s.ContentMd
 }
 
 // GetCreatedAt returns the value of CreatedAt.
@@ -1103,9 +1103,9 @@ func (s *PostCommentItem) SetAuthorAvatarUrl(val url.URL) {
 	s.AuthorAvatarUrl = val
 }
 
-// SetContent sets the value of Content.
-func (s *PostCommentItem) SetContent(val string) {
-	s.Content = val
+// SetContentMd sets the value of ContentMd.
+func (s *PostCommentItem) SetContentMd(val string) {
+	s.ContentMd = val
 }
 
 // SetCreatedAt sets the value of CreatedAt.
@@ -1117,17 +1117,17 @@ func (*PostCommentItem) postAddCommentRes() {}
 
 // Ref: #/components/schemas/PostCreateCommentRequest
 type PostCreateCommentRequest struct {
-	Content string `json:"content"`
+	ContentMd string `json:"contentMd"`
 }
 
-// GetContent returns the value of Content.
-func (s *PostCreateCommentRequest) GetContent() string {
-	return s.Content
+// GetContentMd returns the value of ContentMd.
+func (s *PostCreateCommentRequest) GetContentMd() string {
+	return s.ContentMd
 }
 
-// SetContent sets the value of Content.
-func (s *PostCreateCommentRequest) SetContent(val string) {
-	s.Content = val
+// SetContentMd sets the value of ContentMd.
+func (s *PostCreateCommentRequest) SetContentMd(val string) {
+	s.ContentMd = val
 }
 
 type PostCreateInternalServerError AnalyticsMetricsGetInternalServerErrorApplicationJSON
@@ -1136,9 +1136,9 @@ func (*PostCreateInternalServerError) postCreateRes() {}
 
 // Ref: #/components/schemas/PostCreateRequest
 type PostCreateRequest struct {
-	Category string `json:"category"`
-	Title    string `json:"title"`
-	Content  string `json:"content"`
+	Category  string `json:"category"`
+	Title     string `json:"title"`
+	ContentMd string `json:"contentMd"`
 	// Optional tags for analytics (normalized to lowercase on server).
 	Tags []string `json:"tags"`
 }
@@ -1153,9 +1153,9 @@ func (s *PostCreateRequest) GetTitle() string {
 	return s.Title
 }
 
-// GetContent returns the value of Content.
-func (s *PostCreateRequest) GetContent() string {
-	return s.Content
+// GetContentMd returns the value of ContentMd.
+func (s *PostCreateRequest) GetContentMd() string {
+	return s.ContentMd
 }
 
 // GetTags returns the value of Tags.
@@ -1173,9 +1173,9 @@ func (s *PostCreateRequest) SetTitle(val string) {
 	s.Title = val
 }
 
-// SetContent sets the value of Content.
-func (s *PostCreateRequest) SetContent(val string) {
-	s.Content = val
+// SetContentMd sets the value of ContentMd.
+func (s *PostCreateRequest) SetContentMd(val string) {
+	s.ContentMd = val
 }
 
 // SetTags sets the value of Tags.
@@ -1195,6 +1195,114 @@ type PostGetInternalServerError AnalyticsMetricsGetInternalServerErrorApplicatio
 
 func (*PostGetInternalServerError) postGetRes() {}
 
+// Ref: #/components/schemas/PostItem
+type PostItem struct {
+	ID              int     `json:"id"`
+	AuthorId        int     `json:"authorId"`
+	AuthorName      string  `json:"authorName"`
+	AuthorAvatarUrl url.URL `json:"authorAvatarUrl"`
+	Category        string  `json:"category"`
+	Title           string  `json:"title"`
+	// Post content in Markdown format.
+	ContentMd string `json:"contentMd"`
+	// Number of comments (rows in comments). The opening message lives in title/content only and is not
+	// counted.
+	CommentsCount int       `json:"commentsCount"`
+	CreatedAt     time.Time `json:"createdAt"`
+}
+
+// GetID returns the value of ID.
+func (s *PostItem) GetID() int {
+	return s.ID
+}
+
+// GetAuthorId returns the value of AuthorId.
+func (s *PostItem) GetAuthorId() int {
+	return s.AuthorId
+}
+
+// GetAuthorName returns the value of AuthorName.
+func (s *PostItem) GetAuthorName() string {
+	return s.AuthorName
+}
+
+// GetAuthorAvatarUrl returns the value of AuthorAvatarUrl.
+func (s *PostItem) GetAuthorAvatarUrl() url.URL {
+	return s.AuthorAvatarUrl
+}
+
+// GetCategory returns the value of Category.
+func (s *PostItem) GetCategory() string {
+	return s.Category
+}
+
+// GetTitle returns the value of Title.
+func (s *PostItem) GetTitle() string {
+	return s.Title
+}
+
+// GetContentMd returns the value of ContentMd.
+func (s *PostItem) GetContentMd() string {
+	return s.ContentMd
+}
+
+// GetCommentsCount returns the value of CommentsCount.
+func (s *PostItem) GetCommentsCount() int {
+	return s.CommentsCount
+}
+
+// GetCreatedAt returns the value of CreatedAt.
+func (s *PostItem) GetCreatedAt() time.Time {
+	return s.CreatedAt
+}
+
+// SetID sets the value of ID.
+func (s *PostItem) SetID(val int) {
+	s.ID = val
+}
+
+// SetAuthorId sets the value of AuthorId.
+func (s *PostItem) SetAuthorId(val int) {
+	s.AuthorId = val
+}
+
+// SetAuthorName sets the value of AuthorName.
+func (s *PostItem) SetAuthorName(val string) {
+	s.AuthorName = val
+}
+
+// SetAuthorAvatarUrl sets the value of AuthorAvatarUrl.
+func (s *PostItem) SetAuthorAvatarUrl(val url.URL) {
+	s.AuthorAvatarUrl = val
+}
+
+// SetCategory sets the value of Category.
+func (s *PostItem) SetCategory(val string) {
+	s.Category = val
+}
+
+// SetTitle sets the value of Title.
+func (s *PostItem) SetTitle(val string) {
+	s.Title = val
+}
+
+// SetContentMd sets the value of ContentMd.
+func (s *PostItem) SetContentMd(val string) {
+	s.ContentMd = val
+}
+
+// SetCommentsCount sets the value of CommentsCount.
+func (s *PostItem) SetCommentsCount(val int) {
+	s.CommentsCount = val
+}
+
+// SetCreatedAt sets the value of CreatedAt.
+func (s *PostItem) SetCreatedAt(val time.Time) {
+	s.CreatedAt = val
+}
+
+func (*PostItem) postCreateRes() {}
+
 // Ref: #/components/schemas/PostListItem
 type PostListItem struct {
 	ID              int     `json:"id"`
@@ -1203,12 +1311,6 @@ type PostListItem struct {
 	AuthorAvatarUrl url.URL `json:"authorAvatarUrl"`
 	Category        string  `json:"category"`
 	Title           string  `json:"title"`
-	Content         string  `json:"content"`
-	// Number of reply posts (rows in posts). The opening message lives in title/content only and is not
-	// counted.
-	//
-	// Deprecated: schema marks this property as deprecated.
-	PostsCount int `json:"postsCount"`
 	// Number of comments (rows in comments). The opening message lives in title/content only and is not
 	// counted.
 	CommentsCount int       `json:"commentsCount"`
@@ -1243,16 +1345,6 @@ func (s *PostListItem) GetCategory() string {
 // GetTitle returns the value of Title.
 func (s *PostListItem) GetTitle() string {
 	return s.Title
-}
-
-// GetContent returns the value of Content.
-func (s *PostListItem) GetContent() string {
-	return s.Content
-}
-
-// GetPostsCount returns the value of PostsCount.
-func (s *PostListItem) GetPostsCount() int {
-	return s.PostsCount
 }
 
 // GetCommentsCount returns the value of CommentsCount.
@@ -1295,16 +1387,6 @@ func (s *PostListItem) SetTitle(val string) {
 	s.Title = val
 }
 
-// SetContent sets the value of Content.
-func (s *PostListItem) SetContent(val string) {
-	s.Content = val
-}
-
-// SetPostsCount sets the value of PostsCount.
-func (s *PostListItem) SetPostsCount(val int) {
-	s.PostsCount = val
-}
-
 // SetCommentsCount sets the value of CommentsCount.
 func (s *PostListItem) SetCommentsCount(val int) {
 	s.CommentsCount = val
@@ -1314,8 +1396,6 @@ func (s *PostListItem) SetCommentsCount(val int) {
 func (s *PostListItem) SetCreatedAt(val time.Time) {
 	s.CreatedAt = val
 }
-
-func (*PostListItem) postCreateRes() {}
 
 // Ref: #/components/schemas/PostListResponse
 type PostListResponse struct {
@@ -1376,7 +1456,7 @@ type PostWithCommentsListResponse struct {
 	AuthorAvatarUrl url.URL `json:"authorAvatarUrl"`
 	Title           string  `json:"title"`
 	// Number of reply posts (rows in posts). The opening message is not included.
-	Content string `json:"content"`
+	ContentMd string `json:"contentMd"`
 	// Number of comments (rows in comments). The opening message is not included.
 	CommentsCount int               `json:"commentsCount"`
 	CreatedAt     time.Time         `json:"createdAt"`
@@ -1413,9 +1493,9 @@ func (s *PostWithCommentsListResponse) GetTitle() string {
 	return s.Title
 }
 
-// GetContent returns the value of Content.
-func (s *PostWithCommentsListResponse) GetContent() string {
-	return s.Content
+// GetContentMd returns the value of ContentMd.
+func (s *PostWithCommentsListResponse) GetContentMd() string {
+	return s.ContentMd
 }
 
 // GetCommentsCount returns the value of CommentsCount.
@@ -1463,9 +1543,9 @@ func (s *PostWithCommentsListResponse) SetTitle(val string) {
 	s.Title = val
 }
 
-// SetContent sets the value of Content.
-func (s *PostWithCommentsListResponse) SetContent(val string) {
-	s.Content = val
+// SetContentMd sets the value of ContentMd.
+func (s *PostWithCommentsListResponse) SetContentMd(val string) {
+	s.ContentMd = val
 }
 
 // SetCommentsCount sets the value of CommentsCount.
