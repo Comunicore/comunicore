@@ -1,6 +1,6 @@
 module github.com/comunicore/comunicore/backend
 
-go 1.27.1
+go 1.27.2
 
 require (
 	github.com/gavv/httpexpect/v2 v2.17.0
