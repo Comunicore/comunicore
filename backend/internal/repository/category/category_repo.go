@@ -5,9 +5,8 @@ package category
 
 import (
 	"context"
+	"fmt"
 	"sync"
-
-	"github.com/jackc/pgx/v5"
 
 	"github.com/comunicore/comunicore/backend/internal/apperror"
 	"github.com/comunicore/comunicore/backend/internal/repository"
@@ -130,7 +129,7 @@ func (r *CategoryRepo) GetCategoryByID(ctx context.Context, id int64) (model.Cat
 	intID := int(id)
 	name, ok := r.idToName[intID]
 	if !ok {
-		return model.Category{}, pgx.ErrNoRows
+		return model.Category{}, fmt.Errorf("category with ID %d not found", intID)
 	}
 	return model.Category{
 		ID:   intID,
@@ -147,7 +146,7 @@ func (r *CategoryRepo) GetCategoryByName(ctx context.Context, name string) (mode
 
 	id, ok := r.nameToID[name]
 	if !ok {
-		return model.Category{}, pgx.ErrNoRows
+		return model.Category{}, fmt.Errorf("category with name %s not found", name)
 	}
 	return model.Category{
 		ID:   id,
