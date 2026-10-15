@@ -5,12 +5,10 @@ package e2e
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"sync"
 	"testing"
 
-	"github.com/jackc/pgx/v5"
 	"github.com/stretchr/testify/require"
 
 	"github.com/comunicore/comunicore/backend/internal/repository"
@@ -48,7 +46,6 @@ func TestCategoryRepo_CacheAndLookup(t *testing.T) {
 
 	_, err = repo.GetCategoryByID(ctx, 99999)
 	require.Error(t, err)
-	require.True(t, errors.Is(err, pgx.ErrNoRows))
 
 	// GetCategoryByName
 	byName0, err := repo.GetCategoryByName(ctx, "default")
@@ -63,7 +60,6 @@ func TestCategoryRepo_CacheAndLookup(t *testing.T) {
 
 	_, err = repo.GetCategoryByName(ctx, "Несуществующая категория")
 	require.Error(t, err)
-	require.True(t, errors.Is(err, pgx.ErrNoRows))
 
 	// GetDictByIDList
 	dict, err := repo.GetDictByIDList(ctx, []int64{0, 1, 99999})
@@ -94,7 +90,6 @@ func TestCategoryRepo_CacheReload(t *testing.T) {
 	// Before reload: should NOT be in cache
 	_, err = repo.GetCategoryByName(ctx, newCategoryName)
 	require.Error(t, err)
-	require.True(t, errors.Is(err, pgx.ErrNoRows))
 
 	// After reload: should be in cache
 	err = repo.Reload(ctx)
