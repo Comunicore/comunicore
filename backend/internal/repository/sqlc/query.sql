@@ -68,6 +68,8 @@ FROM posts
 WHERE id > $1
 ORDER BY id DESC LIMIT $2;
 
+-- name: GetAllCategories :many
+SELECT id, name FROM categories ORDER BY id;
 -- name: GetCategoriesByIDList :many
 SELECT id, name FROM categories WHERE id = ANY($1::bigint[]);
 -- name: GetCategoryByID :one
