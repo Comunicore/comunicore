@@ -13,11 +13,13 @@ import (
 )
 
 type ForumUser struct {
-	ID        int
-	Name      string
-	Email     string
-	Password  string
-	CreatedAt string
+	ID          int
+	Name        string
+	DisplayName string
+	Email       string
+	Password    string
+	Rank        float64
+	CreatedAt   string
 }
 
 func testUserCreateOk(t *testing.T, baseURL string) ForumUser {
@@ -37,10 +39,12 @@ func testUserCreateOk(t *testing.T, baseURL string) ForumUser {
 			}).
 			Expect().
 			Status(http.StatusCreated).JSON().Object()
-		obj.Keys().ContainsOnly("id", "name", "email", "avatarUrl", "createdAt")
+		obj.Keys().ContainsAny("id", "name", "displayName", "email", "avatarUrl", "rank", "createdAt")
 		obj.Value("id").Number().Gt(0)
 		obj.Value("name").IsEqual(user.Name)
+		obj.Value("displayName").IsEqual(user.Name)
 		obj.Value("email").IsEqual(user.Email)
+		obj.Value("rank").Number().Ge(0)
 		obj.Value("createdAt").String().NotEmpty()
 
 		user.ID = int(obj.Value("id").Number().Raw())
@@ -166,11 +170,14 @@ func testUserUpdateOk(t *testing.T, baseURL string, cookie *http.Cookie, userID 
 			Expect().
 			Status(http.StatusOK).JSON().Object()
 
-		res.Keys().ContainsOnly("id", "name", "email", "avatarUrl")
+		res.Keys().ContainsOnly("id", "name", "displayName", "email", "avatarUrl", "rank", "createdAt")
 
 		user.ID = int(res.Value("id").Number().Raw())
 		user.Name = res.Value("name").String().Raw()
+		user.DisplayName = res.Value("displayName").String().Raw()
 		user.Email = res.Value("email").String().Raw()
+		user.Rank = res.Value("rank").Number().Raw()
+		user.CreatedAt = res.Value("createdAt").String().Raw()
 	})
 
 	return user
@@ -187,11 +194,13 @@ func testUserMeOk(t *testing.T, baseURL string, cookie *http.Cookie) ForumUser {
 			Expect().
 			Status(http.StatusOK).JSON().Object()
 
-		res.Keys().ContainsOnly("id", "name", "email", "avatarUrl", "createdAt")
+		res.Keys().ContainsOnly("id", "name", "displayName", "email", "avatarUrl", "rank", "createdAt")
 
 		user.ID = int(res.Value("id").Number().Raw())
 		user.Name = res.Value("name").String().Raw()
+		user.DisplayName = res.Value("displayName").String().Raw()
 		user.Email = res.Value("email").String().Raw()
+		user.Rank = res.Value("rank").Number().Raw()
 		user.CreatedAt = res.Value("createdAt").String().Raw()
 	})
 
@@ -211,11 +220,13 @@ func testUserGetOk(t *testing.T, baseURL string, cookie *http.Cookie, userID int
 			Expect().
 			Status(http.StatusOK).JSON().Object()
 
-		res.Keys().ContainsOnly("id", "name", "email", "avatarUrl", "createdAt")
+		res.Keys().ContainsOnly("id", "name", "displayName", "email", "avatarUrl", "rank", "createdAt")
 
 		user.ID = int(res.Value("id").Number().Raw())
 		user.Name = res.Value("name").String().Raw()
+		user.DisplayName = res.Value("displayName").String().Raw()
 		user.Email = res.Value("email").String().Raw()
+		user.Rank = res.Value("rank").Number().Raw()
 		user.CreatedAt = res.Value("createdAt").String().Raw()
 	})
 

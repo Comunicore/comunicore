@@ -26,16 +26,21 @@ func TestPostCreate(t *testing.T) {
 	testPostGet(t, globalConfig.URL, sessionCookie2, post2, comment2)
 }
 
+type MessageAuthor struct {
+	ID          int    `json:"id"`
+	Username    string `json:"username"`
+	DisplayName string `json:"displayName"`
+	// AvatarUrl   *url.URL
+	Rank int `json:"rank"`
+}
 type PostItem struct {
-	ID              int       `json:"id"`
-	Category        string    `json:"category"`
-	AuthorID        int       `json:"authorId"`
-	AuthorName      string    `json:"authorName"`
-	AuthorAvatarUrl string    `json:"authorAvatarUrl"`
-	Title           string    `json:"title"`
-	ContentMd       string    `json:"contentMd"`
-	CommentsCount   int       `json:"commentsCount"`
-	CreatedAt       time.Time `json:"createdAt"`
+	ID            int    `json:"id"`
+	Category      string `json:"category"`
+	Author        MessageAuthor
+	Title         string    `json:"title"`
+	ContentMd     string    `json:"contentMd"`
+	CommentsCount int       `json:"commentsCount"`
+	CreatedAt     time.Time `json:"createdAt"`
 }
 
 func testPostCreateOk(t *testing.T, baseURL string, cookie *http.Cookie) PostItem {
@@ -55,17 +60,24 @@ func testPostCreateOk(t *testing.T, baseURL string, cookie *http.Cookie) PostIte
 			Expect().
 			Status(http.StatusCreated).JSON().Object()
 
-		res.Keys().ContainsOnly("id", "category", "authorId", "authorName", "authorAvatarUrl", "title",
-			"contentMd", "commentsCount", "createdAt")
+		res.Keys().ContainsOnly(
+			"id", "category", "author", "title",
+			"contentMd", "commentsCount", "createdAt",
+		)
 		res.Value("id").Number().Gt(0)
 		res.Value("category").String().NotEmpty()
-		res.Value("authorId").Number().Gt(0)
-		res.Value("authorName").String().NotEmpty()
 		// res.Value("authorAvatarUrl").String().NotEmpty()
 		res.Value("title").String().HasPrefix("Test Post ")
 		res.Value("contentMd").String().HasPrefix("This is a test post content ")
 		res.Value("commentsCount").Number().IsEqual(0)
 		res.Value("createdAt").String().NotEmpty()
+
+		author := res.Value("author").Object()
+		author.Keys().ContainsAny("id", "username", "displayName", "rank", "avatarUrl")
+		author.Value("id").Number().Gt(0)
+		author.Value("username").String().NotEmpty()
+		author.Value("displayName").String().NotEmpty()
+		author.Value("rank").Number().Ge(0)
 
 		res.Decode(&post)
 	})
@@ -89,13 +101,17 @@ func testPostCommentCreateOk(t *testing.T, baseURL string, cookie *http.Cookie, 
 			Expect().
 			Status(http.StatusCreated).JSON().Object()
 
-		res.Keys().ContainsOnly("id", "authorId", "authorName", "authorAvatarUrl", "contentMd", "createdAt")
+		res.Keys().ContainsOnly("id", "author", "contentMd", "createdAt")
 		res.Value("id").Number().Gt(0)
-		res.Value("authorId").Number().Gt(0)
-		res.Value("authorName").String().NotEmpty()
-		// res.Value("authorAvatarUrl").String().NotEmpty()
 		res.Value("contentMd").String().IsEqual(postContent)
 		res.Value("createdAt").String().NotEmpty()
+
+		author := res.Value("author").Object()
+		author.Keys().ContainsAny("id", "username", "displayName", "rank", "avatarUrl")
+		author.Value("id").Number().Gt(0)
+		author.Value("username").String().NotEmpty()
+		author.Value("displayName").String().NotEmpty()
+		author.Value("rank").Number().Ge(0)
 
 		res.Decode(&comment)
 	})
@@ -104,24 +120,20 @@ func testPostCommentCreateOk(t *testing.T, baseURL string, cookie *http.Cookie, 
 }
 
 type PostCommentItem struct {
-	ID              int       `json:"id"`
-	AuthorID        int       `json:"authorId"`
-	AuthorName      string    `json:"authorName"`
-	AuthorAvatarUrl string    `json:"authorAvatarUrl"`
-	ContentMd       string    `json:"contentMd"`
-	CreatedAt       time.Time `json:"createdAt"`
+	ID        int `json:"id"`
+	Author    MessageAuthor
+	ContentMd string    `json:"contentMd"`
+	CreatedAt time.Time `json:"createdAt"`
 }
 type PostWithComments struct {
-	Id              int               `json:"id"`
-	Category        string            `json:"category"`
-	AuthorID        int               `json:"authorId"`
-	AuthorName      string            `json:"authorName"`
-	AuthorAvatarUrl string            `json:"authorAvatarUrl"`
-	Title           string            `json:"title"`
-	ContentMd       string            `json:"contentMd"`
-	PostsCount      int               `json:"postsCount"`
-	CreatedAt       time.Time         `json:"createdAt"`
-	Posts           []PostCommentItem `json:"posts"`
+	Id         int    `json:"id"`
+	Category   string `json:"category"`
+	Author     MessageAuthor
+	Title      string            `json:"title"`
+	ContentMd  string            `json:"contentMd"`
+	PostsCount int               `json:"postsCount"`
+	CreatedAt  time.Time         `json:"createdAt"`
+	Posts      []PostCommentItem `json:"posts"`
 }
 
 func testPostGet(t *testing.T, baseURL string,
@@ -138,29 +150,39 @@ func testPostGet(t *testing.T, baseURL string,
 			Status(http.StatusOK).JSON().Object()
 
 		res.Keys().ContainsOnly(
-			"id", "category", "authorId", "authorName", "authorAvatarUrl", "title", "contentMd",
+			"id", "category", "author", "title", "contentMd",
 			"commentsCount", "createdAt", "comments")
 		res.Value("id").Number().IsEqual(expectedPost.ID)
 		res.Value("category").String().IsEqual(expectedPost.Category)
-		res.Value("authorId").Number().IsEqual(expectedPost.AuthorID)
-		res.Value("authorName").String().IsEqual(expectedPost.AuthorName)
-		// res.Value("authorAvatarUrl").String().IsEqual(expectedPost.AuthorAvatarUrl)
 		res.Value("title").String().IsEqual(expectedPost.Title)
 		res.Value("contentMd").String().IsEqual(expectedPost.ContentMd)
 		// One reply row exists in posts after postCommentCreateOk.
 		res.Value("commentsCount").Number().IsEqual(1)
 		res.Value("createdAt").String().NotEmpty()
 
+		author := res.Value("author").Object()
+		author.Keys().ContainsAny("id", "username", "displayName", "rank", "avatarUrl")
+		author.Value("id").Number().IsEqual(expectedPost.Author.ID)
+		author.Value("username").String().IsEqual(expectedPost.Author.Username)
+		author.Value("displayName").String().IsEqual(expectedPost.Author.Username)
+		author.Value("rank").Number().Ge(0)
+
 		comments := res.Value("comments").Array()
 		comments.Length().IsEqual(1)
 
 		firstComment := comments.Value(0).Object()
-		firstComment.Keys().ContainsOnly("id", "authorId", "authorName", "authorAvatarUrl", "contentMd", "createdAt")
+		firstComment.Keys().ContainsOnly("id", "author", "contentMd", "createdAt")
 		firstComment.Value("id").Number().IsEqual(expectedComment.ID)
-		firstComment.Value("authorId").Number().IsEqual(expectedComment.AuthorID)
-		firstComment.Value("authorName").String().IsEqual(expectedComment.AuthorName)
-		firstComment.Value("authorAvatarUrl").String().IsEqual(expectedComment.AuthorAvatarUrl)
+
 		firstComment.Value("contentMd").String().IsEqual(expectedComment.ContentMd)
 		firstComment.Value("createdAt").String().NotEmpty()
+
+		author = res.Value("author").Object()
+		author.Keys().ContainsAny("id", "username", "displayName", "rank", "avatarUrl")
+		author.Value("id").Number().IsEqual(expectedComment.Author.ID)
+		author.Value("username").String().IsEqual(expectedComment.Author.Username)
+		author.Value("displayName").String().IsEqual(expectedPost.Author.Username)
+		// author.Value("authorAvatarUrl").String().IsEqual(expectedComment.Author.AvatarUrl)
+		author.Value("rank").Number().Ge(0)
 	})
 }

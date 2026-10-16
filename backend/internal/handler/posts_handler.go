@@ -5,7 +5,6 @@ package handler
 
 import (
 	"context"
-	"net/url"
 
 	"github.com/comunicore/comunicore/backend/internal/apperror"
 	api "github.com/comunicore/comunicore/backend/internal/handler/generated"
@@ -42,14 +41,21 @@ func (h *PostsHandler) PostAddComment(
 		return nil, err
 	}
 	apiPost := &api.PostCommentItem{
-		ID:         comment.ID,
-		AuthorId:   comment.UserID,
-		AuthorName: comment.UserName,
-		ContentMd:  comment.Content,
-		CreatedAt:  comment.CreatedAt,
+		ID: comment.ID,
+		Author: api.MessageAuthor{
+			ID:          comment.Author.ID,
+			Username:    comment.Author.Username,
+			DisplayName: comment.Author.DisplayName,
+			Rank:        float64(comment.Author.Rank),
+		},
+		ContentMd: comment.Content,
+		CreatedAt: comment.CreatedAt,
 	}
 	if !comment.UpdatedAt.IsZero() {
 		apiPost.UpdatedAt.SetTo(comment.UpdatedAt)
+	}
+	if comment.Author.AvatarUrl != nil {
+		apiPost.Author.AvatarUrl.SetTo(*comment.Author.AvatarUrl)
 	}
 	return apiPost, nil
 }
@@ -75,17 +81,24 @@ func (h *PostsHandler) PostCreate(
 		return nil, err
 	}
 	apiPost := &api.PostItem{
-		ID:            post.ID,
-		Category:      post.Category,
-		Title:         post.Title,
-		ContentMd:     post.Content,
-		AuthorId:      post.UserID,
-		AuthorName:    post.UserName,
+		ID:        post.ID,
+		Category:  post.Category,
+		Title:     post.Title,
+		ContentMd: post.Content,
+		Author: api.MessageAuthor{
+			ID:          post.Author.ID,
+			Username:    post.Author.Username,
+			DisplayName: post.Author.DisplayName,
+			Rank:        float64(post.Author.Rank),
+		},
 		CommentsCount: post.CommentsCount,
 		CreatedAt:     post.CreatedAt,
 	}
 	if !post.UpdatedAt.IsZero() {
 		apiPost.UpdatedAt.SetTo(post.UpdatedAt)
+	}
+	if post.Author.AvatarUrl != nil {
+		apiPost.Author.AvatarUrl.SetTo(*post.Author.AvatarUrl)
 	}
 	return apiPost, nil
 }
@@ -98,28 +111,34 @@ func (h *PostsHandler) PostGet(ctx context.Context, params api.PostGetParams) (a
 	}
 	var comments []api.PostCommentItem
 	for _, commentModel := range postWithComments.Comments {
-		avatarUrl, err := url.Parse(commentModel.AuthorAvatarUrl)
-		if err != nil {
-			avatarUrl = nil
-		}
 		apiComment := api.PostCommentItem{
-			ID:              commentModel.ID,
-			AuthorId:        commentModel.UserID,
-			AuthorName:      commentModel.UserName,
-			AuthorAvatarUrl: *avatarUrl,
-			ContentMd:       commentModel.Content,
-			CreatedAt:       commentModel.CreatedAt,
+			ID: commentModel.ID,
+			Author: api.MessageAuthor{
+				ID:          commentModel.Author.ID,
+				Username:    commentModel.Author.Username,
+				DisplayName: commentModel.Author.DisplayName,
+				Rank:        5,
+			},
+			ContentMd: commentModel.Content,
+			CreatedAt: commentModel.CreatedAt,
 		}
 		if !commentModel.UpdatedAt.IsZero() {
 			apiComment.UpdatedAt.SetTo(commentModel.UpdatedAt)
 		}
+		if commentModel.Author.AvatarUrl != nil {
+			apiComment.Author.AvatarUrl.SetTo(*commentModel.Author.AvatarUrl)
+		}
 		comments = append(comments, apiComment)
 	}
 	apiPost := &api.PostWithCommentsListResponse{
-		ID:            postWithComments.ID,
-		Category:      postWithComments.Category,
-		AuthorId:      postWithComments.AuthorID,
-		AuthorName:    postWithComments.AuthorName,
+		ID:       postWithComments.ID,
+		Category: postWithComments.Category,
+		Author: api.MessageAuthor{
+			ID:          postWithComments.Author.ID,
+			Username:    postWithComments.Author.Username,
+			DisplayName: postWithComments.Author.DisplayName,
+			Rank:        float64(postWithComments.Author.Rank),
+		},
 		Title:         postWithComments.Title,
 		ContentMd:     postWithComments.Content,
 		CommentsCount: postWithComments.CommentsCount,
@@ -129,6 +148,10 @@ func (h *PostsHandler) PostGet(ctx context.Context, params api.PostGetParams) (a
 	if !postWithComments.UpdatedAt.IsZero() {
 		apiPost.UpdatedAt.SetTo(postWithComments.UpdatedAt)
 	}
+	if postWithComments.Author.AvatarUrl != nil {
+		apiPost.Author.AvatarUrl.SetTo(*postWithComments.Author.AvatarUrl)
+	}
+
 	return apiPost, nil
 }
 
@@ -172,16 +195,23 @@ GOT_POST_ID:
 	resPosts := make([]api.PostListItem, len(postsList.Posts))
 	for i, post := range postsList.Posts {
 		resPosts[i] = api.PostListItem{
-			ID:            post.ID,
-			Category:      post.Category,
-			Title:         post.Title,
-			AuthorId:      post.AuthorID,
-			AuthorName:    post.AuthorName,
+			ID:       post.ID,
+			Category: post.Category,
+			Title:    post.Title,
+			Author: api.MessageAuthor{
+				ID:          post.Author.ID,
+				Username:    post.Author.Username,
+				DisplayName: post.Author.DisplayName,
+				Rank:        float64(post.Author.Rank),
+			},
 			CommentsCount: post.CommentsCount,
 			CreatedAt:     post.CreatedAt,
 		}
 		if !post.UpdatedAt.IsZero() {
 			resPosts[i].UpdatedAt.SetTo(post.UpdatedAt)
+		}
+		if post.Author.AvatarUrl != nil {
+			resPosts[i].Author.AvatarUrl.SetTo(*post.Author.AvatarUrl)
 		}
 	}
 	return &api.PostListResponse{

@@ -64,10 +64,12 @@ type Session struct {
 }
 
 type User struct {
-	ID        int32
-	Name      string
-	Email     string
-	AvatarUrl pgtype.Text
-	CreatedAt pgtype.Timestamptz
-	UpdatedAt pgtype.Timestamptz
+	ID          int32
+	Name        string
+	DisplayName string
+	Email       string
+	AvatarUrl   pgtype.Text
+	Rank        int32
+	CreatedAt   pgtype.Timestamptz
+	UpdatedAt   pgtype.Timestamptz
 }

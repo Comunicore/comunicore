@@ -845,9 +845,9 @@ func (q *Queries) PostTagInsert(ctx context.Context, arg PostTagInsertParams) er
 }
 
 const userCreate = `-- name: UserCreate :one
-INSERT INTO users (name, email)
-VALUES ($1, $2)
-RETURNING id, name, email, avatar_url, created_at
+INSERT INTO users (name, display_name, email)
+VALUES ($1, $1, $2)
+RETURNING id, name, display_name, email, avatar_url, rank, created_at
 `
 
 type UserCreateParams struct {
@@ -856,11 +856,13 @@ type UserCreateParams struct {
 }
 
 type UserCreateRow struct {
-	ID        int32
-	Name      string
-	Email     string
-	AvatarUrl pgtype.Text
-	CreatedAt pgtype.Timestamptz
+	ID          int32
+	Name        string
+	DisplayName string
+	Email       string
+	AvatarUrl   pgtype.Text
+	Rank        int32
+	CreatedAt   pgtype.Timestamptz
 }
 
 func (q *Queries) UserCreate(ctx context.Context, arg UserCreateParams) (UserCreateRow, error) {
@@ -869,25 +871,29 @@ func (q *Queries) UserCreate(ctx context.Context, arg UserCreateParams) (UserCre
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
+		&i.DisplayName,
 		&i.Email,
 		&i.AvatarUrl,
+		&i.Rank,
 		&i.CreatedAt,
 	)
 	return i, err
 }
 
 const userGet = `-- name: UserGet :one
-SELECT id, name, email, avatar_url, created_at
+SELECT id, name, display_name, email, avatar_url, rank, created_at
 FROM users
 WHERE id = $1
 `
 
 type UserGetRow struct {
-	ID        int32
-	Name      string
-	Email     string
-	AvatarUrl pgtype.Text
-	CreatedAt pgtype.Timestamptz
+	ID          int32
+	Name        string
+	DisplayName string
+	Email       string
+	AvatarUrl   pgtype.Text
+	Rank        int32
+	CreatedAt   pgtype.Timestamptz
 }
 
 func (q *Queries) UserGet(ctx context.Context, id int32) (UserGetRow, error) {
@@ -896,8 +902,10 @@ func (q *Queries) UserGet(ctx context.Context, id int32) (UserGetRow, error) {
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
+		&i.DisplayName,
 		&i.Email,
 		&i.AvatarUrl,
+		&i.Rank,
 		&i.CreatedAt,
 	)
 	return i, err
@@ -954,9 +962,9 @@ func (q *Queries) UserGetNameById(ctx context.Context, id int32) (string, error)
 
 const userUpdate = `-- name: UserUpdate :one
 UPDATE users
-SET name = $1, email = $2
+SET name = $1, display_name = $1, email = $2
 WHERE id = $3
-RETURNING id, name, email, avatar_url, created_at
+RETURNING id, name, display_name, email, avatar_url, rank, created_at
 `
 
 type UserUpdateParams struct {
@@ -966,11 +974,13 @@ type UserUpdateParams struct {
 }
 
 type UserUpdateRow struct {
-	ID        int32
-	Name      string
-	Email     string
-	AvatarUrl pgtype.Text
-	CreatedAt pgtype.Timestamptz
+	ID          int32
+	Name        string
+	DisplayName string
+	Email       string
+	AvatarUrl   pgtype.Text
+	Rank        int32
+	CreatedAt   pgtype.Timestamptz
 }
 
 func (q *Queries) UserUpdate(ctx context.Context, arg UserUpdateParams) (UserUpdateRow, error) {
@@ -979,8 +989,10 @@ func (q *Queries) UserUpdate(ctx context.Context, arg UserUpdateParams) (UserUpd
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
+		&i.DisplayName,
 		&i.Email,
 		&i.AvatarUrl,
+		&i.Rank,
 		&i.CreatedAt,
 	)
 	return i, err
