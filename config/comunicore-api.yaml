@@ -488,24 +488,31 @@ components:
           type: integer
         name:
           type: string
+        displayName:
+          type: string
         email:
           type: string
           format: email
         avatarUrl:
           type: string
           format: uri
+        rank:
+          type: number
         createdAt:
           type: string
           format: date-time
       required:
         - id
         - name
+        - displayName
         - email
-        - avatarUrl
+        - rank
       example:
         id: 1
         name: "john_doe"
+        displayName: "John Doe"
         email: "test@mail.ru"
+        rank: 5
         avatarUrl: "https://comunicore.mooo.com/storage/media/avatar1.png"
     UserUpdateRequest:
       type: object
@@ -583,13 +590,8 @@ components:
       properties:
         id:
           type: integer
-        authorId:
-          type: integer
-        authorName:
-          type: string
-        authorAvatarUrl:
-          type: string
-          format: uri
+        author:
+          $ref: '#/components/schemas/MessageAuthor'
         category:
           type: string
         title:
@@ -608,9 +610,7 @@ components:
           format: date-time
       required:
         - id
-        - authorId
-        - authorName
-        - authorAvatarUrl
+        - author
         - category
         - title
         - contentMd
@@ -622,9 +622,12 @@ components:
         category: "Программирование"
         title: "First post"
         contentMd: "This is the content of the first post."
-        authorId: 42
-        authorName: "Petr Semenov"
-        authorAvatarUrl: "https://comunicore.mooo.com/storage/media/avatar1.png"
+        author:
+          id: 42
+          username: "booblick"
+          displayName: "Petr Semenov"
+          avatarUrl: "https://comunicore.mooo.com/storage/media/avatar1.png"
+          rank: 5
         postsCount: 5
         commentsCount: 5
         createdAt: "2024-01-01T12:00:00Z"
@@ -633,13 +636,8 @@ components:
       properties:
         id:
           type: integer
-        authorId:
-          type: integer
-        authorName:
-          type: string
-        authorAvatarUrl:
-          type: string
-          format: uri
+        author:
+          $ref: '#/components/schemas/MessageAuthor'
         category:
           type: string
         title:
@@ -655,9 +653,7 @@ components:
           format: date-time
       required:
         - id
-        - authorId
-        - authorName
-        - authorAvatarUrl
+        - author
         - category
         - title
         - postsCount
@@ -667,9 +663,12 @@ components:
         id: 1
         title: "First post"
         category: "Программирование"
-        authorId: 42
-        authorName: "Petr Semenov"
-        authorAvatarUrl: "https://comunicore.mooo.com/storage/media/avatar1.png"
+        author:
+          id: 42
+          username: "booblick"
+          displayName: "Petr Semenov"
+          avatarUrl: "https://comunicore.mooo.com/storage/media/avatar1.png"
+          rank: 5
         postsCount: 5
         commentsCount: 5
         createdAt: "2024-01-01T12:00:00Z"
@@ -680,13 +679,8 @@ components:
           type: integer
         category:
           type: string
-        authorId:
-          type: integer
-        authorName  :
-          type: string
-        authorAvatarUrl:
-          type: string
-          format: uri
+        author:
+          $ref: '#/components/schemas/MessageAuthor'
         title:
           type: string
         contentMd:
@@ -708,9 +702,7 @@ components:
       required:
         - id
         - category
-        - authorId
-        - authorName
-        - authorAvatarUrl
+        - author
         - title
         - contentMd
         - commentsCount
@@ -721,37 +713,67 @@ components:
         category: "Программирование"
         title: "First post"
         contentMd: "This is the content of the first post."
-        authorId: 42
-        authorName: "Petr Semenov"
-        authorAvatarUrl: "https://comunicore.mooo.com/storage/media/avatar1.png"
-        commentsCount: 5
+        author:
+          id: 42
+          username: "booblick"
+          displayName: "Petr Semenov"
+          avatarUrl: "https://comunicore.mooo.com/storage/media/avatar1.png"
+          rank: 5
         createdAt: "2024-01-01T12:00:00Z"
         comments:
           - id: 1
             contentMd: "This is the content of the first post."
-            authorId: 42
-            authorName: "Petr Semenov"
+            author:
+              id: 42
+              username: "booblick"
+              displayName: "Petr Semenov"
+              avatarUrl: "https://comunicore.mooo.com/storage/media/avatar1.png"
+              rank: 5
             authorAvatarUrl: "https://comunicore.mooo.com/storage/media/avatar1.png"
             createdAt: "2024-01-01T12:00:00Z"
           - id: 2
             contentMd: "This is the content of the second post."
-            authorId: 43
-            authorName: "Anna Ivanova"
+            author:
+              id: 43
+              username: "annai"
+              displayName: "Anna Ivanova"
+              avatarUrl: "https://comunicore.mooo.com/storage/media/avatar2.png"
+              rank: 3
             authorAvatarUrl: "https://comunicore.mooo.com/storage/media/avatar2.png"
             createdAt: "2024-01-02T15:30:00Z"
             updatedAt: "2024-01-02T15:31:25Z"
+    MessageAuthor:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        displayName:
+          type: string
+        avatarUrl:
+          type: string
+          format: uri
+        rank:
+          type: number
+      required:
+        - id
+        - username
+        - displayName
+        - rank
+      example:
+        id: 42
+        username: "booblick"
+        displayName: "Petr Semenov"
+        avatarUrl: "https://comunicore.mooo.com/storage/media/avatar1.png"
+        rank: 5
     PostCommentItem:
       type: object
       properties:
         id:
           type: integer
-        authorId:
-          type: integer
-        authorName:
-          type: string
-        authorAvatarUrl:
-          type: string
-          format: uri
+        author:
+          $ref: '#/components/schemas/MessageAuthor'
         contentMd:
           type: string
         createdAt:
@@ -762,15 +784,18 @@ components:
           format: date-time
       required:
         - id
-        - authorId
-        - authorName
-        - authorAvatarUrl
+        - author
         - contentMd
         - createdAt
       example:
         id: 1
         contentMd: "Первый ответ в ветке."
-        authorId: 42
+        author:
+          id: 42
+          username: "booblick"
+          displayName: "Petr Semenov"
+          avatarUrl: "https://comunicore.mooo.com/storage/media/avatar1.png"
+          rank: 5
         authorName: "Petr Semenov"
         authorAvatarUrl: "https://comunicore.mooo.com/storage/media/avatar1.png"
         createdAt: "2024-01-01T12:00:00Z"

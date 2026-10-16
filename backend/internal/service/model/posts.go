@@ -6,17 +6,15 @@ package model
 import "time"
 
 type PostWithComments struct {
-	ID              int
-	Category        string
-	AuthorID        int
-	AuthorName      string
-	AuthorAvatarUrl string
-	Title           string
-	Content         string
-	CommentsCount   int
-	CreatedAt       time.Time
-	UpdatedAt       time.Time
-	Comments        []CommentListItem
+	ID            int
+	Category      string
+	Author        MessageAuthor
+	Title         string
+	Content       string
+	CommentsCount int
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
+	Comments      []CommentListItem
 }
 type PostCreateService struct {
 	Category string
@@ -50,16 +48,14 @@ type PostListRepo struct {
 	HaveNext            bool
 }
 type PostInfoResponse struct {
-	ID              int
-	Category        string
-	Title           string
-	Content         string
-	AuthorID        int
-	AuthorName      string
-	AuthorAvatarUrl string
-	CommentsCount   int
-	CreatedAt       time.Time
-	UpdatedAt       time.Time
+	ID            int
+	Category      string
+	Title         string
+	Content       string
+	Author        MessageAuthor
+	CommentsCount int
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
 }
 
 type PostListResponse struct {
@@ -75,8 +71,7 @@ type PostInfo struct {
 	Category      string
 	Title         string
 	Content       string
-	UserID        int
-	UserName      string
+	Author        MessageAuthor
 	CommentsCount int
 	CreatedAt     time.Time
 	UpdatedAt     time.Time

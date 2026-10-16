@@ -1,5 +1,5 @@
 -- name: UserGet :one
-SELECT id, name, email, avatar_url, created_at
+SELECT id, name, display_name, email, avatar_url, rank, created_at
 FROM users
 WHERE id = $1;
 
@@ -14,15 +14,15 @@ FROM users
 WHERE id = $1;
 
 -- name: UserCreate :one
-INSERT INTO users (name, email)
-VALUES ($1, $2)
-RETURNING id, name, email, avatar_url, created_at;
+INSERT INTO users (name, display_name, email)
+VALUES ($1, $1, $2)
+RETURNING id, name, display_name, email, avatar_url, rank, created_at;
 
 -- name: UserUpdate :one
 UPDATE users
-SET name = $1, email = $2
+SET name = $1, display_name = $1, email = $2
 WHERE id = $3
-RETURNING id, name, email, avatar_url, created_at;
+RETURNING id, name, display_name, email, avatar_url, rank, created_at;
 
 -- name: AuthCreate :exec
 INSERT INTO auth_passwords (user_id, login, password_hash) VALUES ($1, $2, $3);

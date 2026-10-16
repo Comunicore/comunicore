@@ -8,7 +8,6 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"net/url"
 
 	"github.com/comunicore/comunicore/backend/internal/apperror"
 	api "github.com/comunicore/comunicore/backend/internal/handler/generated"
@@ -35,17 +34,19 @@ func (u *UserHandler) userGetById(ctx context.Context, userId int) (*api.UserCre
 	if err != nil {
 		return nil, err
 	}
-	avatarUrl, err := url.Parse(user.AvatarURL)
-	if err != nil {
-		return nil, err
+	userRes := &api.UserCreateResponse{
+		ID:          user.ID,
+		Name:        user.Name,
+		DisplayName: user.DisplayName,
+		Email:       user.Email,
+		Rank:        float64(user.Rank),
+		CreatedAt:   api.NewOptDateTime(user.CreatedAt),
 	}
-	return &api.UserCreateResponse{
-		ID:        user.ID,
-		Name:      user.Name,
-		Email:     user.Email,
-		AvatarUrl: *avatarUrl,
-		CreatedAt: api.NewOptDateTime(user.CreatedAt),
-	}, nil
+	if user.AvatarURL != nil {
+		userRes.AvatarUrl.SetTo(*user.AvatarURL)
+	}
+
+	return userRes, nil
 }
 func (u *UserHandler) UserMe(ctx context.Context) (api.UserMeRes, error) {
 	globalCtx := GlobalContextFromContext(ctx)
@@ -58,17 +59,19 @@ func (u *UserHandler) UserMe(ctx context.Context) (api.UserMeRes, error) {
 func (u *UserHandler) UserCreate(ctx context.Context, req *api.UserCreateRequest) (api.UserCreateRes, error) {
 	user, err := u.userService.Create(ctx, req.Name, req.Email, req.Password)
 	if err == nil {
-		avatarUrl, err := url.Parse(user.AvatarURL)
-		if err != nil {
-			return nil, err
+		userRes := &api.UserCreateResponse{
+			ID:          user.ID,
+			Name:        user.Name,
+			DisplayName: user.DisplayName,
+			Email:       user.Email,
+			Rank:        float64(user.Rank),
+			CreatedAt:   api.NewOptDateTime(user.CreatedAt),
 		}
-		return &api.UserCreateResponse{
-			ID:        user.ID,
-			Name:      user.Name,
-			Email:     user.Email,
-			AvatarUrl: *avatarUrl,
-			CreatedAt: api.NewOptDateTime(user.CreatedAt),
-		}, nil
+		if user.AvatarURL != nil {
+			userRes.AvatarUrl.SetTo(*user.AvatarURL)
+		}
+
+		return userRes, nil
 	}
 	var nonUniqueFields []string
 	if _, ok := errors.AsType[*apperror.NameNotUniqueError](err); ok {
@@ -103,14 +106,17 @@ func (u *UserHandler) UserUpdate(ctx context.Context, req *api.UserUpdateRequest
 	if err != nil {
 		return nil, err
 	}
-	avatarUrl, err := url.Parse(user.AvatarURL)
-	if err != nil {
-		return nil, err
+	userRes := &api.UserCreateResponse{
+		ID:          user.ID,
+		Name:        user.Name,
+		DisplayName: user.DisplayName,
+		Email:       user.Email,
+		Rank:        float64(user.Rank),
+		CreatedAt:   api.NewOptDateTime(user.CreatedAt),
 	}
-	return &api.UserCreateResponse{
-		ID:        user.ID,
-		Name:      user.Name,
-		Email:     user.Email,
-		AvatarUrl: *avatarUrl,
-	}, nil
+	if user.AvatarURL != nil {
+		userRes.AvatarUrl.SetTo(*user.AvatarURL)
+	}
+
+	return userRes, nil
 }

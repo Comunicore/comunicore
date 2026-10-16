@@ -3,12 +3,25 @@
 
 package model
 
-import "time"
+import (
+	"net/url"
+	"time"
+)
 
-type User struct {
-	ID        int
-	Name      string
-	Email     string
-	AvatarURL string
-	CreatedAt time.Time
+type UserRepo struct {
+	ID          int
+	Name        string
+	DisplayName string
+	Email       string
+	AvatarURL   *url.URL
+	Rank        int
+	CreatedAt   time.Time
+}
+
+type MessageAuthor struct {
+	ID          int
+	Username    string
+	DisplayName string
+	AvatarUrl   *url.URL
+	Rank        int
 }
