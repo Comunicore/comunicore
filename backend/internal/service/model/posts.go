@@ -6,15 +6,15 @@ package model
 import "time"
 
 type PostWithComments struct {
-	ID            int
-	Category      string
-	Author        MessageAuthor
-	Title         string
-	Content       string
-	CommentsCount int
-	CreatedAt     time.Time
-	UpdatedAt     time.Time
-	Comments      []CommentListItem
+	ID        int
+	Category  string
+	Author    MessageAuthor
+	Title     string
+	Content   string
+	PostStats PostStats
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	Comments  []CommentListItem
 }
 type PostCreateService struct {
 	Category string
@@ -31,14 +31,14 @@ type PostCreateRepo struct {
 	Tags       []string
 }
 type PostRepoInfo struct {
-	ID            int
-	CategoryID    int
-	Title         string
-	Content       string
-	UserID        int
-	CommentsCount int
-	CreatedAt     time.Time
-	UpdatedAt     time.Time
+	ID         int
+	CategoryID int
+	Title      string
+	Content    string
+	UserID     int
+	PostStats  PostStats
+	CreatedAt  time.Time
+	UpdatedAt  time.Time
 }
 type PostListRepo struct {
 	Posts []PostRepoInfo
@@ -48,14 +48,14 @@ type PostListRepo struct {
 	HaveNext            bool
 }
 type PostInfoResponse struct {
-	ID            int
-	Category      string
-	Title         string
-	Content       string
-	Author        MessageAuthor
-	CommentsCount int
-	CreatedAt     time.Time
-	UpdatedAt     time.Time
+	ID        int
+	Category  string
+	Title     string
+	Content   string
+	Author    MessageAuthor
+	PostStats PostStats
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 type PostListResponse struct {
@@ -67,12 +67,18 @@ type PostListResponse struct {
 }
 
 type PostInfo struct {
-	ID            int
-	Category      string
-	Title         string
-	Content       string
-	Author        MessageAuthor
+	ID        int
+	Category  string
+	Title     string
+	Content   string
+	Author    MessageAuthor
+	PostStats PostStats
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}
+
+type PostStats struct {
 	CommentsCount int
-	CreatedAt     time.Time
-	UpdatedAt     time.Time
+	LikesCount    int
+	ViewsCount    int
 }

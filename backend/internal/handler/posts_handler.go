@@ -91,8 +91,12 @@ func (h *PostsHandler) PostCreate(
 			DisplayName: post.Author.DisplayName,
 			Rank:        float64(post.Author.Rank),
 		},
-		CommentsCount: post.CommentsCount,
-		CreatedAt:     post.CreatedAt,
+		PostStats: api.PostStats{
+			CommentsCount: post.PostStats.CommentsCount,
+			LikesCount:    post.PostStats.LikesCount,
+			ViewsCount:    post.PostStats.ViewsCount,
+		},
+		CreatedAt: post.CreatedAt,
 	}
 	if !post.UpdatedAt.IsZero() {
 		apiPost.UpdatedAt.SetTo(post.UpdatedAt)
@@ -117,7 +121,7 @@ func (h *PostsHandler) PostGet(ctx context.Context, params api.PostGetParams) (a
 				ID:          commentModel.Author.ID,
 				Username:    commentModel.Author.Username,
 				DisplayName: commentModel.Author.DisplayName,
-				Rank:        5,
+				Rank:        float64(commentModel.Author.Rank),
 			},
 			ContentMd: commentModel.Content,
 			CreatedAt: commentModel.CreatedAt,
@@ -139,11 +143,15 @@ func (h *PostsHandler) PostGet(ctx context.Context, params api.PostGetParams) (a
 			DisplayName: postWithComments.Author.DisplayName,
 			Rank:        float64(postWithComments.Author.Rank),
 		},
-		Title:         postWithComments.Title,
-		ContentMd:     postWithComments.Content,
-		CommentsCount: postWithComments.CommentsCount,
-		CreatedAt:     postWithComments.CreatedAt,
-		Comments:      comments,
+		Title:     postWithComments.Title,
+		ContentMd: postWithComments.Content,
+		PostStats: api.PostStats{
+			CommentsCount: postWithComments.PostStats.CommentsCount,
+			LikesCount:    postWithComments.PostStats.LikesCount,
+			ViewsCount:    postWithComments.PostStats.ViewsCount,
+		},
+		CreatedAt: postWithComments.CreatedAt,
+		Comments:  comments,
 	}
 	if !postWithComments.UpdatedAt.IsZero() {
 		apiPost.UpdatedAt.SetTo(postWithComments.UpdatedAt)
@@ -204,8 +212,12 @@ GOT_POST_ID:
 				DisplayName: post.Author.DisplayName,
 				Rank:        float64(post.Author.Rank),
 			},
-			CommentsCount: post.CommentsCount,
-			CreatedAt:     post.CreatedAt,
+			PostStats: api.PostStats{
+				CommentsCount: post.PostStats.CommentsCount,
+				LikesCount:    post.PostStats.LikesCount,
+				ViewsCount:    post.PostStats.ViewsCount,
+			},
+			CreatedAt: post.CreatedAt,
 		}
 		if !post.UpdatedAt.IsZero() {
 			resPosts[i].UpdatedAt.SetTo(post.UpdatedAt)

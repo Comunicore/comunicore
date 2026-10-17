@@ -114,9 +114,9 @@ func (s *PostsService) Create(ctx context.Context, post model.PostCreateService)
 			AvatarUrl:   userInfo.AvatarURL,
 			Rank:        userInfo.Rank,
 		},
-		CommentsCount: createdPost.CommentsCount,
-		CreatedAt:     createdPost.CreatedAt,
-		UpdatedAt:     createdPost.UpdatedAt,
+		PostStats: createdPost.PostStats,
+		CreatedAt: createdPost.CreatedAt,
+		UpdatedAt: createdPost.UpdatedAt,
 	}
 	return postInfo, nil
 }
@@ -168,12 +168,12 @@ func (s *PostsService) GetPostWithComments(ctx context.Context, postId int) (mod
 			AvatarUrl:   userInfo.AvatarURL,
 			Rank:        userInfo.Rank,
 		},
-		Title:         postInfo.Title,
-		Content:       postInfo.Content,
-		CommentsCount: postInfo.CommentsCount,
-		CreatedAt:     postInfo.CreatedAt,
-		UpdatedAt:     postInfo.UpdatedAt,
-		Comments:      commentListItems,
+		Title:     postInfo.Title,
+		Content:   postInfo.Content,
+		PostStats: postInfo.PostStats,
+		CreatedAt: postInfo.CreatedAt,
+		UpdatedAt: postInfo.UpdatedAt,
+		Comments:  commentListItems,
 	}
 	if category.ID == 0 {
 		postWithComments.Category = s.categoryRepo.DefaultCategory().Name
@@ -225,9 +225,9 @@ func (s *PostsService) convertPostListRepoToResponse(
 				AvatarUrl:   userInfo.AvatarURL,
 				Rank:        userInfo.Rank,
 			},
-			CommentsCount: post.CommentsCount,
-			CreatedAt:     post.CreatedAt,
-			UpdatedAt:     post.UpdatedAt,
+			PostStats: post.PostStats,
+			CreatedAt: post.CreatedAt,
+			UpdatedAt: post.UpdatedAt,
 		}
 		_, exists := categories[post.CategoryID]
 		if !exists {

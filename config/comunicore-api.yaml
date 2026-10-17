@@ -599,9 +599,8 @@ components:
         contentMd:
           type: string
           description: Post content in Markdown format.
-        commentsCount:
-          type: integer
-          description: Number of comments (rows in comments). The opening message lives in title/content only and is not counted.
+        postStats:
+          $ref: '#/components/schemas/PostStats'
         createdAt:
           type: string
           format: date-time
@@ -615,7 +614,7 @@ components:
         - title
         - contentMd
         - postsCount
-        - commentsCount
+        - postStats
         - createdAt
       example:
         id: 1
@@ -629,8 +628,31 @@ components:
           avatarUrl: "https://comunicore.mooo.com/storage/media/avatar1.png"
           rank: 5
         postsCount: 5
-        commentsCount: 5
+        postStats:
+          commentsCount: 5
+          likesCount: 10
+          viewsCount: 100
         createdAt: "2024-01-01T12:00:00Z"
+    PostStats:
+      type: object
+      properties:
+        commentsCount:
+          type: integer
+          description: Number of comments (rows in comments). The opening message lives in title/content only and is not counted.
+        likesCount:
+          type: integer
+          description: Number of likes for the post.
+        viewsCount:
+          type: integer
+          description: Number of views for the post.
+      required:
+        - commentsCount
+        - likesCount
+        - viewsCount
+      example:
+        commentsCount: 5
+        likesCount: 10
+        viewsCount: 100
     PostListItem:
       type: object
       properties:
@@ -642,9 +664,8 @@ components:
           type: string
         title:
           type: string
-        commentsCount:
-          type: integer
-          description: Number of comments (rows in comments). The opening message lives in title/content only and is not counted.
+        postStats:
+          $ref: '#/components/schemas/PostStats'
         createdAt:
           type: string
           format: date-time
@@ -656,8 +677,7 @@ components:
         - author
         - category
         - title
-        - postsCount
-        - commentsCount
+        - postStats
         - createdAt
       example:
         id: 1
@@ -669,8 +689,10 @@ components:
           displayName: "Petr Semenov"
           avatarUrl: "https://comunicore.mooo.com/storage/media/avatar1.png"
           rank: 5
-        postsCount: 5
-        commentsCount: 5
+        postStats:
+          commentsCount: 5
+          likesCount: 10
+          viewsCount: 100
         createdAt: "2024-01-01T12:00:00Z"
     PostWithCommentsListResponse:
       type: object
@@ -686,9 +708,8 @@ components:
         contentMd:
           type: string
           description: Number of reply posts (rows in posts). The opening message is not included.
-        commentsCount:
-          type: integer
-          description: Number of comments (rows in comments). The opening message is not included.
+        postStats:
+          $ref: '#/components/schemas/PostStats'
         createdAt:
           type: string
           format: date-time
@@ -705,7 +726,7 @@ components:
         - author
         - title
         - contentMd
-        - commentsCount
+        - postStats
         - createdAt
         - comments
       example:
@@ -720,6 +741,10 @@ components:
           avatarUrl: "https://comunicore.mooo.com/storage/media/avatar1.png"
           rank: 5
         createdAt: "2024-01-01T12:00:00Z"
+        postStats:
+          commentsCount: 5
+          likesCount: 10
+          viewsCount: 100
         comments:
           - id: 1
             contentMd: "This is the content of the first post."
