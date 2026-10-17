@@ -1094,6 +1094,98 @@ func (o OptInt) Or(d int) int {
 	return d
 }
 
+// NewOptSeoMeta returns new OptSeoMeta with value set to v.
+func NewOptSeoMeta(v SeoMeta) OptSeoMeta {
+	return OptSeoMeta{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptSeoMeta is optional SeoMeta.
+type OptSeoMeta struct {
+	Value SeoMeta
+	Set   bool
+}
+
+// IsSet returns true if OptSeoMeta was set.
+func (o OptSeoMeta) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptSeoMeta) Reset() {
+	var v SeoMeta
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptSeoMeta) SetTo(v SeoMeta) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptSeoMeta) Get() (v SeoMeta, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptSeoMeta) Or(d SeoMeta) SeoMeta {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptString returns new OptString with value set to v.
+func NewOptString(v string) OptString {
+	return OptString{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptString is optional string.
+type OptString struct {
+	Value string
+	Set   bool
+}
+
+// IsSet returns true if OptString was set.
+func (o OptString) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptString) Reset() {
+	var v string
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptString) SetTo(v string) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptString) Get() (v string, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptString) Or(d string) string {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptURI returns new OptURI with value set to v.
 func NewOptURI(v url.URL) OptURI {
 	return OptURI{
@@ -1298,6 +1390,7 @@ type PostItem struct {
 	// Post content in Markdown format.
 	ContentMd string      `json:"contentMd"`
 	PostStats PostStats   `json:"postStats"`
+	SeoMeta   OptSeoMeta  `json:"seoMeta"`
 	CreatedAt time.Time   `json:"createdAt"`
 	UpdatedAt OptDateTime `json:"updatedAt"`
 }
@@ -1330,6 +1423,11 @@ func (s *PostItem) GetContentMd() string {
 // GetPostStats returns the value of PostStats.
 func (s *PostItem) GetPostStats() PostStats {
 	return s.PostStats
+}
+
+// GetSeoMeta returns the value of SeoMeta.
+func (s *PostItem) GetSeoMeta() OptSeoMeta {
+	return s.SeoMeta
 }
 
 // GetCreatedAt returns the value of CreatedAt.
@@ -1372,6 +1470,11 @@ func (s *PostItem) SetPostStats(val PostStats) {
 	s.PostStats = val
 }
 
+// SetSeoMeta sets the value of SeoMeta.
+func (s *PostItem) SetSeoMeta(val OptSeoMeta) {
+	s.SeoMeta = val
+}
+
 // SetCreatedAt sets the value of CreatedAt.
 func (s *PostItem) SetCreatedAt(val time.Time) {
 	s.CreatedAt = val
@@ -1391,6 +1494,7 @@ type PostListItem struct {
 	Category  string        `json:"category"`
 	Title     string        `json:"title"`
 	PostStats PostStats     `json:"postStats"`
+	SeoMeta   OptSeoMeta    `json:"seoMeta"`
 	CreatedAt time.Time     `json:"createdAt"`
 	UpdatedAt OptDateTime   `json:"updatedAt"`
 }
@@ -1418,6 +1522,11 @@ func (s *PostListItem) GetTitle() string {
 // GetPostStats returns the value of PostStats.
 func (s *PostListItem) GetPostStats() PostStats {
 	return s.PostStats
+}
+
+// GetSeoMeta returns the value of SeoMeta.
+func (s *PostListItem) GetSeoMeta() OptSeoMeta {
+	return s.SeoMeta
 }
 
 // GetCreatedAt returns the value of CreatedAt.
@@ -1453,6 +1562,11 @@ func (s *PostListItem) SetTitle(val string) {
 // SetPostStats sets the value of PostStats.
 func (s *PostListItem) SetPostStats(val PostStats) {
 	s.PostStats = val
+}
+
+// SetSeoMeta sets the value of SeoMeta.
+func (s *PostListItem) SetSeoMeta(val OptSeoMeta) {
+	s.SeoMeta = val
 }
 
 // SetCreatedAt sets the value of CreatedAt.
@@ -1565,6 +1679,7 @@ type PostWithCommentsListResponse struct {
 	// Number of reply posts (rows in posts). The opening message is not included.
 	ContentMd string            `json:"contentMd"`
 	PostStats PostStats         `json:"postStats"`
+	SeoMeta   OptSeoMeta        `json:"seoMeta"`
 	CreatedAt time.Time         `json:"createdAt"`
 	UpdatedAt OptDateTime       `json:"updatedAt"`
 	Comments  []PostCommentItem `json:"comments"`
@@ -1598,6 +1713,11 @@ func (s *PostWithCommentsListResponse) GetContentMd() string {
 // GetPostStats returns the value of PostStats.
 func (s *PostWithCommentsListResponse) GetPostStats() PostStats {
 	return s.PostStats
+}
+
+// GetSeoMeta returns the value of SeoMeta.
+func (s *PostWithCommentsListResponse) GetSeoMeta() OptSeoMeta {
+	return s.SeoMeta
 }
 
 // GetCreatedAt returns the value of CreatedAt.
@@ -1645,6 +1765,11 @@ func (s *PostWithCommentsListResponse) SetPostStats(val PostStats) {
 	s.PostStats = val
 }
 
+// SetSeoMeta sets the value of SeoMeta.
+func (s *PostWithCommentsListResponse) SetSeoMeta(val OptSeoMeta) {
+	s.SeoMeta = val
+}
+
 // SetCreatedAt sets the value of CreatedAt.
 func (s *PostWithCommentsListResponse) SetCreatedAt(val time.Time) {
 	s.CreatedAt = val
@@ -1661,6 +1786,43 @@ func (s *PostWithCommentsListResponse) SetComments(val []PostCommentItem) {
 }
 
 func (*PostWithCommentsListResponse) postGetRes() {}
+
+// Ref: #/components/schemas/SeoMeta
+type SeoMeta struct {
+	Description OptString `json:"description"`
+	OgImageUrl  OptURI    `json:"ogImageUrl"`
+	Keywords    []string  `json:"keywords"`
+}
+
+// GetDescription returns the value of Description.
+func (s *SeoMeta) GetDescription() OptString {
+	return s.Description
+}
+
+// GetOgImageUrl returns the value of OgImageUrl.
+func (s *SeoMeta) GetOgImageUrl() OptURI {
+	return s.OgImageUrl
+}
+
+// GetKeywords returns the value of Keywords.
+func (s *SeoMeta) GetKeywords() []string {
+	return s.Keywords
+}
+
+// SetDescription sets the value of Description.
+func (s *SeoMeta) SetDescription(val OptString) {
+	s.Description = val
+}
+
+// SetOgImageUrl sets the value of OgImageUrl.
+func (s *SeoMeta) SetOgImageUrl(val OptURI) {
+	s.OgImageUrl = val
+}
+
+// SetKeywords sets the value of Keywords.
+func (s *SeoMeta) SetKeywords(val []string) {
+	s.Keywords = val
+}
 
 // UserCreateBadRequest represents sum type.
 type UserCreateBadRequest struct {

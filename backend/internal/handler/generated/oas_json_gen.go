@@ -2564,6 +2564,74 @@ func (s *OptDateTime) UnmarshalJSON(data []byte) error {
 	return s.Decode(d, json.DecodeDateTime)
 }
 
+// Encode encodes SeoMeta as json.
+func (o OptSeoMeta) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes SeoMeta from json.
+func (o *OptSeoMeta) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptSeoMeta to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptSeoMeta) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptSeoMeta) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes string as json.
+func (o OptString) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	e.Str(string(o.Value))
+}
+
+// Decode decodes string from json.
+func (o *OptString) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptString to nil")
+	}
+	o.Set = true
+	v, err := d.Str()
+	if err != nil {
+		return err
+	}
+	o.Value = string(v)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptString) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptString) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode encodes url.URL as json.
 func (o OptURI) Encode(e *jx.Encoder) {
 	if !o.Set {
@@ -3279,6 +3347,12 @@ func (s *PostItem) encodeFields(e *jx.Encoder) {
 		s.PostStats.Encode(e)
 	}
 	{
+		if s.SeoMeta.Set {
+			e.FieldStart("seoMeta")
+			s.SeoMeta.Encode(e)
+		}
+	}
+	{
 		e.FieldStart("createdAt")
 		json.EncodeDateTime(e, s.CreatedAt)
 	}
@@ -3290,15 +3364,16 @@ func (s *PostItem) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfPostItem = [8]string{
+var jsonFieldsNameOfPostItem = [9]string{
 	0: "id",
 	1: "author",
 	2: "category",
 	3: "title",
 	4: "contentMd",
 	5: "postStats",
-	6: "createdAt",
-	7: "updatedAt",
+	6: "seoMeta",
+	7: "createdAt",
+	8: "updatedAt",
 }
 
 // Decode decodes PostItem from json.
@@ -3306,7 +3381,7 @@ func (s *PostItem) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode PostItem to nil")
 	}
-	var requiredBitSet [1]uint8
+	var requiredBitSet [2]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -3378,8 +3453,18 @@ func (s *PostItem) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"postStats\"")
 			}
+		case "seoMeta":
+			if err := func() error {
+				s.SeoMeta.Reset()
+				if err := s.SeoMeta.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"seoMeta\"")
+			}
 		case "createdAt":
-			requiredBitSet[0] |= 1 << 6
+			requiredBitSet[0] |= 1 << 7
 			if err := func() error {
 				v, err := json.DecodeDateTime(d)
 				s.CreatedAt = v
@@ -3409,8 +3494,9 @@ func (s *PostItem) Decode(d *jx.Decoder) error {
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
-	for i, mask := range [1]uint8{
-		0b01111111,
+	for i, mask := range [2]uint8{
+		0b10111111,
+		0b00000000,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -3486,6 +3572,12 @@ func (s *PostListItem) encodeFields(e *jx.Encoder) {
 		s.PostStats.Encode(e)
 	}
 	{
+		if s.SeoMeta.Set {
+			e.FieldStart("seoMeta")
+			s.SeoMeta.Encode(e)
+		}
+	}
+	{
 		e.FieldStart("createdAt")
 		json.EncodeDateTime(e, s.CreatedAt)
 	}
@@ -3497,14 +3589,15 @@ func (s *PostListItem) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfPostListItem = [7]string{
+var jsonFieldsNameOfPostListItem = [8]string{
 	0: "id",
 	1: "author",
 	2: "category",
 	3: "title",
 	4: "postStats",
-	5: "createdAt",
-	6: "updatedAt",
+	5: "seoMeta",
+	6: "createdAt",
+	7: "updatedAt",
 }
 
 // Decode decodes PostListItem from json.
@@ -3572,8 +3665,18 @@ func (s *PostListItem) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"postStats\"")
 			}
+		case "seoMeta":
+			if err := func() error {
+				s.SeoMeta.Reset()
+				if err := s.SeoMeta.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"seoMeta\"")
+			}
 		case "createdAt":
-			requiredBitSet[0] |= 1 << 5
+			requiredBitSet[0] |= 1 << 6
 			if err := func() error {
 				v, err := json.DecodeDateTime(d)
 				s.CreatedAt = v
@@ -3604,7 +3707,7 @@ func (s *PostListItem) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00111111,
+		0b01011111,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -3971,6 +4074,12 @@ func (s *PostWithCommentsListResponse) encodeFields(e *jx.Encoder) {
 		s.PostStats.Encode(e)
 	}
 	{
+		if s.SeoMeta.Set {
+			e.FieldStart("seoMeta")
+			s.SeoMeta.Encode(e)
+		}
+	}
+	{
 		e.FieldStart("createdAt")
 		json.EncodeDateTime(e, s.CreatedAt)
 	}
@@ -3990,16 +4099,17 @@ func (s *PostWithCommentsListResponse) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfPostWithCommentsListResponse = [9]string{
+var jsonFieldsNameOfPostWithCommentsListResponse = [10]string{
 	0: "id",
 	1: "category",
 	2: "author",
 	3: "title",
 	4: "contentMd",
 	5: "postStats",
-	6: "createdAt",
-	7: "updatedAt",
-	8: "comments",
+	6: "seoMeta",
+	7: "createdAt",
+	8: "updatedAt",
+	9: "comments",
 }
 
 // Decode decodes PostWithCommentsListResponse from json.
@@ -4079,8 +4189,18 @@ func (s *PostWithCommentsListResponse) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"postStats\"")
 			}
+		case "seoMeta":
+			if err := func() error {
+				s.SeoMeta.Reset()
+				if err := s.SeoMeta.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"seoMeta\"")
+			}
 		case "createdAt":
-			requiredBitSet[0] |= 1 << 6
+			requiredBitSet[0] |= 1 << 7
 			if err := func() error {
 				v, err := json.DecodeDateTime(d)
 				s.CreatedAt = v
@@ -4102,7 +4222,7 @@ func (s *PostWithCommentsListResponse) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"updatedAt\"")
 			}
 		case "comments":
-			requiredBitSet[1] |= 1 << 0
+			requiredBitSet[1] |= 1 << 1
 			if err := func() error {
 				s.Comments = make([]PostCommentItem, 0)
 				if err := d.Arr(func(d *jx.Decoder) error {
@@ -4129,8 +4249,8 @@ func (s *PostWithCommentsListResponse) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [2]uint8{
-		0b01111111,
-		0b00000001,
+		0b10111111,
+		0b00000010,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -4172,6 +4292,116 @@ func (s *PostWithCommentsListResponse) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *PostWithCommentsListResponse) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *SeoMeta) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *SeoMeta) encodeFields(e *jx.Encoder) {
+	{
+		if s.Description.Set {
+			e.FieldStart("description")
+			s.Description.Encode(e)
+		}
+	}
+	{
+		if s.OgImageUrl.Set {
+			e.FieldStart("ogImageUrl")
+			s.OgImageUrl.Encode(e)
+		}
+	}
+	{
+		if s.Keywords != nil {
+			e.FieldStart("keywords")
+			e.ArrStart()
+			for _, elem := range s.Keywords {
+				e.Str(elem)
+			}
+			e.ArrEnd()
+		}
+	}
+}
+
+var jsonFieldsNameOfSeoMeta = [3]string{
+	0: "description",
+	1: "ogImageUrl",
+	2: "keywords",
+}
+
+// Decode decodes SeoMeta from json.
+func (s *SeoMeta) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode SeoMeta to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "description":
+			if err := func() error {
+				s.Description.Reset()
+				if err := s.Description.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"description\"")
+			}
+		case "ogImageUrl":
+			if err := func() error {
+				s.OgImageUrl.Reset()
+				if err := s.OgImageUrl.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"ogImageUrl\"")
+			}
+		case "keywords":
+			if err := func() error {
+				s.Keywords = make([]string, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem string
+					v, err := d.Str()
+					elem = string(v)
+					if err != nil {
+						return err
+					}
+					s.Keywords = append(s.Keywords, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"keywords\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode SeoMeta")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *SeoMeta) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *SeoMeta) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }

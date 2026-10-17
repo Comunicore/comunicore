@@ -115,6 +115,7 @@ func (s *PostsService) Create(ctx context.Context, post model.PostCreateService)
 			Rank:        userInfo.Rank,
 		},
 		PostStats: createdPost.PostStats,
+		SeoMeta:   createdPost.SeoMeta,
 		CreatedAt: createdPost.CreatedAt,
 		UpdatedAt: createdPost.UpdatedAt,
 	}
@@ -171,6 +172,7 @@ func (s *PostsService) GetPostWithComments(ctx context.Context, postId int) (mod
 		Title:     postInfo.Title,
 		Content:   postInfo.Content,
 		PostStats: postInfo.PostStats,
+		SeoMeta:   postInfo.SeoMeta,
 		CreatedAt: postInfo.CreatedAt,
 		UpdatedAt: postInfo.UpdatedAt,
 		Comments:  commentListItems,
@@ -226,6 +228,7 @@ func (s *PostsService) convertPostListRepoToResponse(
 				Rank:        userInfo.Rank,
 			},
 			PostStats: post.PostStats,
+			SeoMeta:   post.SeoMeta,
 			CreatedAt: post.CreatedAt,
 			UpdatedAt: post.UpdatedAt,
 		}
