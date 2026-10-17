@@ -25,9 +25,15 @@ CREATE TABLE IF NOT EXISTS posts (
     title TEXT NOT NULL,
     content TEXT NOT NULL,
     user_id INTEGER NOT NULL,
-    comments_count INTEGER NOT NULL DEFAULT 0,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NULL
+);
+-- actively changed fields for posts
+CREATE TABLE IF NOT EXISTS posts_extras (
+    post_id INTEGER PRIMARY KEY,
+    likes_count   INTEGER NOT NULL DEFAULT 0,
+    views_count   INTEGER NOT NULL DEFAULT 0,
+    comments_count INTEGER NOT NULL DEFAULT 0
 );
 CREATE TABLE IF NOT EXISTS comments (
     id SERIAL PRIMARY KEY,
@@ -66,7 +72,8 @@ CREATE INDEX IF NOT EXISTS analytics_visit_batches_user_id_idx ON analytics_visi
 CREATE OR REPLACE FUNCTION posts_bump_comments_count()
 RETURNS TRIGGER AS $$
 BEGIN
-    UPDATE posts SET comments_count = comments_count + 1 WHERE id = NEW.post_id;
+    INSERT INTO posts_extras (post_id, comments_count) VALUES (NEW.post_id, 1)
+    ON CONFLICT (post_id) DO UPDATE SET comments_count = posts_extras.comments_count + 1;
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;

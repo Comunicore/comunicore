@@ -3275,8 +3275,8 @@ func (s *PostItem) encodeFields(e *jx.Encoder) {
 		e.Str(s.ContentMd)
 	}
 	{
-		e.FieldStart("commentsCount")
-		e.Int(s.CommentsCount)
+		e.FieldStart("postStats")
+		s.PostStats.Encode(e)
 	}
 	{
 		e.FieldStart("createdAt")
@@ -3296,7 +3296,7 @@ var jsonFieldsNameOfPostItem = [8]string{
 	2: "category",
 	3: "title",
 	4: "contentMd",
-	5: "commentsCount",
+	5: "postStats",
 	6: "createdAt",
 	7: "updatedAt",
 }
@@ -3368,17 +3368,15 @@ func (s *PostItem) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"contentMd\"")
 			}
-		case "commentsCount":
+		case "postStats":
 			requiredBitSet[0] |= 1 << 5
 			if err := func() error {
-				v, err := d.Int()
-				s.CommentsCount = int(v)
-				if err != nil {
+				if err := s.PostStats.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"commentsCount\"")
+				return errors.Wrap(err, "decode field \"postStats\"")
 			}
 		case "createdAt":
 			requiredBitSet[0] |= 1 << 6
@@ -3484,8 +3482,8 @@ func (s *PostListItem) encodeFields(e *jx.Encoder) {
 		e.Str(s.Title)
 	}
 	{
-		e.FieldStart("commentsCount")
-		e.Int(s.CommentsCount)
+		e.FieldStart("postStats")
+		s.PostStats.Encode(e)
 	}
 	{
 		e.FieldStart("createdAt")
@@ -3504,7 +3502,7 @@ var jsonFieldsNameOfPostListItem = [7]string{
 	1: "author",
 	2: "category",
 	3: "title",
-	4: "commentsCount",
+	4: "postStats",
 	5: "createdAt",
 	6: "updatedAt",
 }
@@ -3564,17 +3562,15 @@ func (s *PostListItem) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"title\"")
 			}
-		case "commentsCount":
+		case "postStats":
 			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
-				v, err := d.Int()
-				s.CommentsCount = int(v)
-				if err != nil {
+				if err := s.PostStats.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"commentsCount\"")
+				return errors.Wrap(err, "decode field \"postStats\"")
 			}
 		case "createdAt":
 			requiredBitSet[0] |= 1 << 5
@@ -3812,6 +3808,136 @@ func (s *PostListResponse) UnmarshalJSON(data []byte) error {
 }
 
 // Encode implements json.Marshaler.
+func (s *PostStats) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *PostStats) encodeFields(e *jx.Encoder) {
+	{
+		e.FieldStart("commentsCount")
+		e.Int(s.CommentsCount)
+	}
+	{
+		e.FieldStart("likesCount")
+		e.Int(s.LikesCount)
+	}
+	{
+		e.FieldStart("viewsCount")
+		e.Int(s.ViewsCount)
+	}
+}
+
+var jsonFieldsNameOfPostStats = [3]string{
+	0: "commentsCount",
+	1: "likesCount",
+	2: "viewsCount",
+}
+
+// Decode decodes PostStats from json.
+func (s *PostStats) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode PostStats to nil")
+	}
+	var requiredBitSet [1]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "commentsCount":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				v, err := d.Int()
+				s.CommentsCount = int(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"commentsCount\"")
+			}
+		case "likesCount":
+			requiredBitSet[0] |= 1 << 1
+			if err := func() error {
+				v, err := d.Int()
+				s.LikesCount = int(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"likesCount\"")
+			}
+		case "viewsCount":
+			requiredBitSet[0] |= 1 << 2
+			if err := func() error {
+				v, err := d.Int()
+				s.ViewsCount = int(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"viewsCount\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode PostStats")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000111,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfPostStats) {
+					name = jsonFieldsNameOfPostStats[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *PostStats) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *PostStats) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
 func (s *PostWithCommentsListResponse) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
@@ -3841,8 +3967,8 @@ func (s *PostWithCommentsListResponse) encodeFields(e *jx.Encoder) {
 		e.Str(s.ContentMd)
 	}
 	{
-		e.FieldStart("commentsCount")
-		e.Int(s.CommentsCount)
+		e.FieldStart("postStats")
+		s.PostStats.Encode(e)
 	}
 	{
 		e.FieldStart("createdAt")
@@ -3870,7 +3996,7 @@ var jsonFieldsNameOfPostWithCommentsListResponse = [9]string{
 	2: "author",
 	3: "title",
 	4: "contentMd",
-	5: "commentsCount",
+	5: "postStats",
 	6: "createdAt",
 	7: "updatedAt",
 	8: "comments",
@@ -3943,17 +4069,15 @@ func (s *PostWithCommentsListResponse) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"contentMd\"")
 			}
-		case "commentsCount":
+		case "postStats":
 			requiredBitSet[0] |= 1 << 5
 			if err := func() error {
-				v, err := d.Int()
-				s.CommentsCount = int(v)
-				if err != nil {
+				if err := s.PostStats.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"commentsCount\"")
+				return errors.Wrap(err, "decode field \"postStats\"")
 			}
 		case "createdAt":
 			requiredBitSet[0] |= 1 << 6

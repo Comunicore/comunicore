@@ -34,18 +34,21 @@ func (r *PostsRepo) Create(ctx context.Context, post model.PostCreateRepo) (mode
 		Content:    post.Content,
 		UserID:     int32(post.UserID),
 	})
+	if err != nil {
+		return model.PostRepoInfo{}, err
+	}
 	postRepo := model.PostRepoInfo{
-		ID:            int(row.ID),
-		CategoryID:    int(row.CategoryID),
-		UserID:        int(row.UserID),
-		Title:         row.Title,
-		Content:       row.Content,
-		CommentsCount: int(row.CommentsCount),
-		CreatedAt:     row.CreatedAt.Time,
+		ID:         int(row.ID),
+		CategoryID: int(row.CategoryID),
+		UserID:     int(row.UserID),
+		Title:      row.Title,
+		Content:    row.Content,
+		CreatedAt:  row.CreatedAt.Time,
 	}
 	if row.UpdatedAt.Valid {
 		postRepo.UpdatedAt = row.UpdatedAt.Time
 	}
+	// post stats is empty - post just creted, so all values are zero (by default)
 	return postRepo, err
 }
 
@@ -81,18 +84,23 @@ func (r *PostsRepo) PageByPageID(ctx context.Context, page, limit int) (model.Po
 	}
 
 	posts := make([]model.PostRepoInfo, 0, limit)
-	for _, row := range rows {
+	for _, postRow := range rows {
 		postRepo := model.PostRepoInfo{
-			ID:            int(row.ID),
-			CategoryID:    int(row.CategoryID),
-			UserID:        int(row.UserID),
-			Title:         row.Title,
-			Content:       row.Content,
-			CommentsCount: int(row.CommentsCount),
-			CreatedAt:     row.CreatedAt.Time,
+			ID:         int(postRow.ID),
+			CategoryID: int(postRow.CategoryID),
+			UserID:     int(postRow.UserID),
+			Title:      postRow.Title,
+			Content:    postRow.Content,
+			CreatedAt:  postRow.CreatedAt.Time,
 		}
-		if row.UpdatedAt.Valid {
-			postRepo.UpdatedAt = row.UpdatedAt.Time
+		if postRow.UpdatedAt.Valid {
+			postRepo.UpdatedAt = postRow.UpdatedAt.Time
+		}
+		stats, err := r.stats(ctx, int(postRow.ID))
+		// if there is an error, we will return the post without stats,
+		// post stats for zero values will default to zero, so we can ignore the error here
+		if err == nil {
+			postRepo.PostStats = stats
 		}
 		posts = append(posts, postRepo)
 	}
@@ -123,17 +131,22 @@ func (r *PostsRepo) PageByOffset(ctx context.Context, postId, limit int, before 
 		if err != nil {
 			return model.PostListRepo{}, err
 		}
-		for _, row := range rows {
+		for _, postRow := range rows {
 			postRepo := model.PostRepoInfo{
-				ID:            int(row.ID),
-				UserID:        int(row.UserID),
-				Title:         row.Title,
-				Content:       row.Content,
-				CommentsCount: int(row.CommentsCount),
-				CreatedAt:     row.CreatedAt.Time,
+				ID:        int(postRow.ID),
+				UserID:    int(postRow.UserID),
+				Title:     postRow.Title,
+				Content:   postRow.Content,
+				CreatedAt: postRow.CreatedAt.Time,
 			}
-			if row.UpdatedAt.Valid {
-				postRepo.UpdatedAt = row.UpdatedAt.Time
+			if postRow.UpdatedAt.Valid {
+				postRepo.UpdatedAt = postRow.UpdatedAt.Time
+			}
+			stats, err := r.stats(ctx, int(postRow.ID))
+			// if there is an error, we will return the post without stats,
+			// post stats for zero values will default to zero, so we can ignore the error here
+			if err == nil {
+				postRepo.PostStats = stats
 			}
 			posts = append(posts, postRepo)
 		}
@@ -145,17 +158,22 @@ func (r *PostsRepo) PageByOffset(ctx context.Context, postId, limit int, before 
 		if err != nil {
 			return model.PostListRepo{}, err
 		}
-		for _, row := range rows {
+		for _, postRow := range rows {
 			postRepo := model.PostRepoInfo{
-				ID:            int(row.ID),
-				UserID:        int(row.UserID),
-				Title:         row.Title,
-				Content:       row.Content,
-				CommentsCount: int(row.CommentsCount),
-				CreatedAt:     row.CreatedAt.Time,
+				ID:        int(postRow.ID),
+				UserID:    int(postRow.UserID),
+				Title:     postRow.Title,
+				Content:   postRow.Content,
+				CreatedAt: postRow.CreatedAt.Time,
 			}
-			if row.UpdatedAt.Valid {
-				postRepo.UpdatedAt = row.UpdatedAt.Time
+			if postRow.UpdatedAt.Valid {
+				postRepo.UpdatedAt = postRow.UpdatedAt.Time
+			}
+			stats, err := r.stats(ctx, int(postRow.ID))
+			// if there is an error, we will return the post without stats,
+			// post stats for zero values will default to zero, so we can ignore the error here
+			if err == nil {
+				postRepo.PostStats = stats
 			}
 			posts = append(posts, postRepo)
 		}
@@ -211,18 +229,40 @@ func (r *PostsRepo) postListInfo(ctx context.Context, minId, maxId int) (model.P
 }
 
 func (r *PostsRepo) Get(ctx context.Context, postId int) (model.PostRepoInfo, error) {
-	row, err := r.queries.PostGetById(ctx, int32(postId))
+	postRow, err := r.queries.PostGetById(ctx, int32(postId))
+	if err != nil {
+		return model.PostRepoInfo{}, err
+	}
+
 	post := model.PostRepoInfo{
-		ID:            int(row.ID),
-		UserID:        int(row.UserID),
-		CategoryID:    int(row.CategoryID),
-		Title:         row.Title,
-		Content:       row.Content,
-		CommentsCount: int(row.CommentsCount),
-		CreatedAt:     row.CreatedAt.Time,
+		ID:         int(postRow.ID),
+		UserID:     int(postRow.UserID),
+		CategoryID: int(postRow.CategoryID),
+		Title:      postRow.Title,
+		Content:    postRow.Content,
+		CreatedAt:  postRow.CreatedAt.Time,
 	}
-	if row.UpdatedAt.Valid {
-		post.UpdatedAt = row.UpdatedAt.Time
+	if postRow.UpdatedAt.Valid {
+		post.UpdatedAt = postRow.UpdatedAt.Time
 	}
+	stats, err := r.stats(ctx, post.ID)
+	// if there is an error, we will return the post without stats,
+	// post stats for zero values will default to zero, so we can ignore the error here
+	if err == nil {
+		post.PostStats = stats
+	}
+
 	return post, err
+}
+
+func (r *PostsRepo) stats(ctx context.Context, postId int) (model.PostStats, error) {
+	row, err := r.queries.PostStats(ctx, int32(postId))
+	if err != nil {
+		return model.PostStats{}, err
+	}
+	return model.PostStats{
+		CommentsCount: int(row.CommentsCount),
+		LikesCount:    int(row.LikesCount),
+		ViewsCount:    int(row.ViewsCount),
+	}, nil
 }

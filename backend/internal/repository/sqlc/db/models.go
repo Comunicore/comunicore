@@ -43,19 +43,25 @@ type Comment struct {
 }
 
 type Post struct {
-	ID            int32
-	CategoryID    int32
-	Title         string
-	Content       string
-	UserID        int32
-	CommentsCount int32
-	CreatedAt     pgtype.Timestamptz
-	UpdatedAt     pgtype.Timestamptz
+	ID         int32
+	CategoryID int32
+	Title      string
+	Content    string
+	UserID     int32
+	CreatedAt  pgtype.Timestamptz
+	UpdatedAt  pgtype.Timestamptz
 }
 
 type PostTag struct {
 	PostID int32
 	Tag    string
+}
+
+type PostsExtra struct {
+	PostID        int32
+	LikesCount    int32
+	ViewsCount    int32
+	CommentsCount int32
 }
 
 type Session struct {
