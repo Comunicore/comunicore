@@ -5,6 +5,8 @@ package posts
 
 import (
 	"context"
+	"encoding/json"
+	"net/url"
 	"strings"
 
 	"github.com/comunicore/comunicore/backend/internal/repository"
@@ -43,6 +45,7 @@ func (r *PostsRepo) Create(ctx context.Context, post model.PostCreateRepo) (mode
 		UserID:     int(row.UserID),
 		Title:      row.Title,
 		Content:    row.Content,
+		SeoMeta:    extractSeoMeta(row.SeoMeta),
 		CreatedAt:  row.CreatedAt.Time,
 	}
 	if row.UpdatedAt.Valid {
@@ -91,6 +94,7 @@ func (r *PostsRepo) PageByPageID(ctx context.Context, page, limit int) (model.Po
 			UserID:     int(postRow.UserID),
 			Title:      postRow.Title,
 			Content:    postRow.Content,
+			SeoMeta:    extractSeoMeta(postRow.SeoMeta),
 			CreatedAt:  postRow.CreatedAt.Time,
 		}
 		if postRow.UpdatedAt.Valid {
@@ -137,6 +141,7 @@ func (r *PostsRepo) PageByOffset(ctx context.Context, postId, limit int, before 
 				UserID:    int(postRow.UserID),
 				Title:     postRow.Title,
 				Content:   postRow.Content,
+				SeoMeta:   extractSeoMeta(postRow.SeoMeta),
 				CreatedAt: postRow.CreatedAt.Time,
 			}
 			if postRow.UpdatedAt.Valid {
@@ -164,6 +169,7 @@ func (r *PostsRepo) PageByOffset(ctx context.Context, postId, limit int, before 
 				UserID:    int(postRow.UserID),
 				Title:     postRow.Title,
 				Content:   postRow.Content,
+				SeoMeta:   extractSeoMeta(postRow.SeoMeta),
 				CreatedAt: postRow.CreatedAt.Time,
 			}
 			if postRow.UpdatedAt.Valid {
@@ -228,6 +234,12 @@ func (r *PostsRepo) postListInfo(ctx context.Context, minId, maxId int) (model.P
 	return res, nil
 }
 
+type SeoMeta struct {
+	Description string   `json:"description"`
+	OgImageUrl  string   `json:"ogImageUrl"`
+	Keywords    []string `json:"keywords"`
+}
+
 func (r *PostsRepo) Get(ctx context.Context, postId int) (model.PostRepoInfo, error) {
 	postRow, err := r.queries.PostGetById(ctx, int32(postId))
 	if err != nil {
@@ -240,6 +252,7 @@ func (r *PostsRepo) Get(ctx context.Context, postId int) (model.PostRepoInfo, er
 		CategoryID: int(postRow.CategoryID),
 		Title:      postRow.Title,
 		Content:    postRow.Content,
+		SeoMeta:    extractSeoMeta(postRow.SeoMeta),
 		CreatedAt:  postRow.CreatedAt.Time,
 	}
 	if postRow.UpdatedAt.Valid {
@@ -253,6 +266,25 @@ func (r *PostsRepo) Get(ctx context.Context, postId int) (model.PostRepoInfo, er
 	}
 
 	return post, err
+}
+
+func extractSeoMeta(seoJsonb []byte) model.SeoMeta {
+	if len(seoJsonb) == 0 {
+		return model.SeoMeta{}
+	}
+	var seoMeta SeoMeta
+	if err := json.Unmarshal(seoJsonb, &seoMeta); err == nil {
+		res := model.SeoMeta{
+			Description: seoMeta.Description,
+			Keywords:    seoMeta.Keywords,
+		}
+		ogImageUrl, err := url.Parse(seoMeta.OgImageUrl)
+		if err == nil {
+			res.OgImageUrl = ogImageUrl
+		}
+		return res
+	}
+	return model.SeoMeta{}
 }
 
 func (r *PostsRepo) stats(ctx context.Context, postId int) (model.PostStats, error) {
