@@ -7,18 +7,8 @@ import Link from 'next/link';
 import { EditorFormTracker } from '@/widgets/editor-form-tracker';
 
 import { AppRouter } from '@/shared/config/app-router';
+import { communityRules } from '@/shared/config/community-rules';
 import { Tile } from '@/shared/ui';
-
-const communityRulesMap = [
-  'Будьте вежливы и уважительны',
-  'Запрещён спам, флуд и любая несанкционированная реклама',
-  'Не публикуйте личные данные (как свои так и чужие)',
-  'Офтоп. Запрещено уводить обсуждение в сторону от темы, заданной автором топика. Для отвлеченных разговоров есть соответствующий раздел',
-  'Строго запрещено обсуждение политики, религии и межнациональных розней',
-  'Запрещена намеренная дезинформация, клевета, фейки и провокации (троллинг)',
-  'Используйте поиск перед публикацией, чтобы избежать повтора тем',
-  'Оформляйте код, логи и большие изображения в специальные теги/спойлеры',
-] as const;
 
 interface HintsProps {
   editorModeParam: string;
@@ -26,18 +16,18 @@ interface HintsProps {
 }
 
 export default function Hints({ editorModeParam, previewMode }: HintsProps) {
-  const [rules, setRules] = useState(() => communityRulesMap.slice(0, 3));
+  const [rules, setRules] = useState(() => communityRules.slice(0, 3));
 
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 768) {
-        setRules(communityRulesMap.slice(0, 3));
+        setRules(communityRules.slice(0, 3));
       } else {
-        setRules([...communityRulesMap]);
+        setRules([...communityRules]);
       }
     };
 
-    handleResize(); // Pierwsze przeliczenie po zamontowaniu w przeglądarce
+    handleResize();
     window.addEventListener('resize', handleResize);
 
     return () => window.removeEventListener('resize', handleResize);
@@ -50,7 +40,6 @@ export default function Hints({ editorModeParam, previewMode }: HintsProps) {
         previewMode={previewMode}
       />
 
-      {/* rules */}
       <Tile className='flex flex-col gap-y-5' color='bordered'>
         <h2>Правила сообщества</h2>
 

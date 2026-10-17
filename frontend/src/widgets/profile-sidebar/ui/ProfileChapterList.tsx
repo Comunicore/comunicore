@@ -14,8 +14,10 @@ export function ProfileChapterList(props: HTMLAttributes<HTMLDivElement>) {
   const hasUnreadNotifications = true;
   return (
     <Tile
+      radius='md'
       className={cn(
-        'overflow-hidden rounded-[0.625rem] max-xl:bg-transparent max-xl:p-0',
+        // До xl меню — просто ряд вкладок без плитки
+        'overflow-hidden max-xl:border-0 max-xl:bg-transparent max-xl:p-0',
         props.className,
       )}
     >
