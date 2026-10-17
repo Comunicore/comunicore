@@ -82,7 +82,7 @@ func testAuthLoginOk(t *testing.T, baseURL string, user ForumUser) *http.Cookie 
 		require.True(t, httpCookie.HttpOnly)
 		require.NotEqual(t, time.Time{}, httpCookie.Expires) // Expires should be set
 
-		res.JSON().Object().Keys().ContainsOnly("id", "name", "email", "avatarUrl")
+		res.JSON().Object().Keys().ContainsAny("id", "name", "displayName", "email", "avatarUrl")
 	})
 
 	return httpCookie

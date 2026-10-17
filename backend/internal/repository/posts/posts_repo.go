@@ -34,7 +34,7 @@ func (r *PostsRepo) Create(ctx context.Context, post model.PostCreateRepo) (mode
 		Content:    post.Content,
 		UserID:     int32(post.UserID),
 	})
-	return model.PostRepoInfo{
+	postRepo := model.PostRepoInfo{
 		ID:            int(row.ID),
 		CategoryID:    int(row.CategoryID),
 		UserID:        int(row.UserID),
@@ -42,7 +42,11 @@ func (r *PostsRepo) Create(ctx context.Context, post model.PostCreateRepo) (mode
 		Content:       row.Content,
 		CommentsCount: int(row.CommentsCount),
 		CreatedAt:     row.CreatedAt.Time,
-	}, err
+	}
+	if row.UpdatedAt.Valid {
+		postRepo.UpdatedAt = row.UpdatedAt.Time
+	}
+	return postRepo, err
 }
 
 func (r *PostsRepo) InsertPostTags(ctx context.Context, postID int, tags []string) error {
@@ -78,14 +82,19 @@ func (r *PostsRepo) PageByPageID(ctx context.Context, page, limit int) (model.Po
 
 	posts := make([]model.PostRepoInfo, 0, limit)
 	for _, row := range rows {
-		posts = append(posts, model.PostRepoInfo{
+		postRepo := model.PostRepoInfo{
 			ID:            int(row.ID),
+			CategoryID:    int(row.CategoryID),
 			UserID:        int(row.UserID),
 			Title:         row.Title,
 			Content:       row.Content,
 			CommentsCount: int(row.CommentsCount),
 			CreatedAt:     row.CreatedAt.Time,
-		})
+		}
+		if row.UpdatedAt.Valid {
+			postRepo.UpdatedAt = row.UpdatedAt.Time
+		}
+		posts = append(posts, postRepo)
 	}
 	if len(posts) == 0 {
 		return model.PostListRepo{
@@ -115,14 +124,18 @@ func (r *PostsRepo) PageByOffset(ctx context.Context, postId, limit int, before 
 			return model.PostListRepo{}, err
 		}
 		for _, row := range rows {
-			posts = append(posts, model.PostRepoInfo{
+			postRepo := model.PostRepoInfo{
 				ID:            int(row.ID),
 				UserID:        int(row.UserID),
 				Title:         row.Title,
 				Content:       row.Content,
 				CommentsCount: int(row.CommentsCount),
 				CreatedAt:     row.CreatedAt.Time,
-			})
+			}
+			if row.UpdatedAt.Valid {
+				postRepo.UpdatedAt = row.UpdatedAt.Time
+			}
+			posts = append(posts, postRepo)
 		}
 	} else {
 		rows, err := r.queries.PostPagesBeforePostID(ctx, postdDb.PostPagesBeforePostIDParams{
@@ -133,14 +146,18 @@ func (r *PostsRepo) PageByOffset(ctx context.Context, postId, limit int, before 
 			return model.PostListRepo{}, err
 		}
 		for _, row := range rows {
-			posts = append(posts, model.PostRepoInfo{
+			postRepo := model.PostRepoInfo{
 				ID:            int(row.ID),
 				UserID:        int(row.UserID),
 				Title:         row.Title,
 				Content:       row.Content,
 				CommentsCount: int(row.CommentsCount),
 				CreatedAt:     row.CreatedAt.Time,
-			})
+			}
+			if row.UpdatedAt.Valid {
+				postRepo.UpdatedAt = row.UpdatedAt.Time
+			}
+			posts = append(posts, postRepo)
 		}
 	}
 
@@ -193,9 +210,9 @@ func (r *PostsRepo) postListInfo(ctx context.Context, minId, maxId int) (model.P
 	return res, nil
 }
 
-func (r *PostsRepo) Get(ctx context.Context, postId int) (*model.PostRepoInfo, error) {
+func (r *PostsRepo) Get(ctx context.Context, postId int) (model.PostRepoInfo, error) {
 	row, err := r.queries.PostGetById(ctx, int32(postId))
-	return &model.PostRepoInfo{
+	post := model.PostRepoInfo{
 		ID:            int(row.ID),
 		UserID:        int(row.UserID),
 		CategoryID:    int(row.CategoryID),
@@ -203,5 +220,9 @@ func (r *PostsRepo) Get(ctx context.Context, postId int) (*model.PostRepoInfo, e
 		Content:       row.Content,
 		CommentsCount: int(row.CommentsCount),
 		CreatedAt:     row.CreatedAt.Time,
-	}, err
+	}
+	if row.UpdatedAt.Valid {
+		post.UpdatedAt = row.UpdatedAt.Time
+	}
+	return post, err
 }

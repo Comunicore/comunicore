@@ -18,7 +18,7 @@ type CategoryRepo interface {
 }
 type PostsRepo interface {
 	Create(ctx context.Context, post model.PostCreateRepo) (model.PostRepoInfo, error)
-	Get(ctx context.Context, postId int) (*model.PostRepoInfo, error)
+	Get(ctx context.Context, postId int) (model.PostRepoInfo, error)
 	PageByPageID(ctx context.Context, page, limit int) (model.PostListRepo, error)
 	PageByOffset(ctx context.Context, postId, limit int, before bool) (model.PostListRepo, error)
 	InsertPostTags(ctx context.Context, postId int, tags []string) error
@@ -28,8 +28,7 @@ type CommentsRepo interface {
 	List(ctx context.Context, postId int) ([]model.Comment, error)
 }
 type UserRepo interface {
-	GetNameById(ctx context.Context, userId int) (string, error)
-	Get(ctx context.Context, userId int) (model.User, error)
+	Get(ctx context.Context, userId int) (model.UserRepo, error)
 }
 
 type PostsService struct {
@@ -58,18 +57,25 @@ func (s *PostsService) AddComment(ctx context.Context, comment model.CommentCrea
 	if err != nil {
 		return model.CommentInfo{}, err
 	}
-	userName, err := s.userRepo.GetNameById(ctx, createdComment.UserID)
+	userInfo, err := s.userRepo.Get(ctx, createdComment.UserID)
 	if err != nil {
 		return model.CommentInfo{}, err
 	}
-	return model.CommentInfo{
-		ID:        createdComment.ID,
-		PostID:    createdComment.PostID,
-		UserID:    createdComment.UserID,
-		UserName:  userName,
+	commentInfo := model.CommentInfo{
+		ID:     createdComment.ID,
+		PostID: createdComment.PostID,
+		Author: model.MessageAuthor{
+			ID:          createdComment.UserID,
+			Username:    userInfo.Name,
+			DisplayName: userInfo.DisplayName,
+			AvatarUrl:   userInfo.AvatarURL,
+			Rank:        userInfo.Rank,
+		},
 		Content:   createdComment.Content,
 		CreatedAt: createdComment.CreatedAt,
-	}, nil
+		UpdatedAt: createdComment.UpdatedAt,
+	}
+	return commentInfo, nil
 }
 func (s *PostsService) Create(ctx context.Context, post model.PostCreateService) (model.PostInfo, error) {
 	category, err := s.categoryRepo.GetCategoryByName(ctx, post.Category)
@@ -92,19 +98,25 @@ func (s *PostsService) Create(ctx context.Context, post model.PostCreateService)
 		}
 	}
 
-	userName, err := s.userRepo.GetNameById(ctx, createdPost.UserID)
+	userInfo, err := s.userRepo.Get(ctx, createdPost.UserID)
 	if err != nil {
 		return model.PostInfo{}, err
 	}
 	postInfo := model.PostInfo{
-		ID:            createdPost.ID,
-		Category:      category.Name,
-		Title:         createdPost.Title,
-		Content:       createdPost.Content,
-		UserID:        createdPost.UserID,
-		UserName:      userName,
+		ID:       createdPost.ID,
+		Category: category.Name,
+		Title:    createdPost.Title,
+		Content:  createdPost.Content,
+		Author: model.MessageAuthor{
+			ID:          userInfo.ID,
+			Username:    userInfo.Name,
+			DisplayName: userInfo.DisplayName,
+			AvatarUrl:   userInfo.AvatarURL,
+			Rank:        userInfo.Rank,
+		},
 		CommentsCount: createdPost.CommentsCount,
 		CreatedAt:     createdPost.CreatedAt,
+		UpdatedAt:     createdPost.UpdatedAt,
 	}
 	return postInfo, nil
 }
@@ -125,12 +137,17 @@ func (s *PostsService) GetPostWithComments(ctx context.Context, postId int) (mod
 			return model.PostWithComments{}, err
 		}
 		commentListItems = append(commentListItems, model.CommentListItem{
-			ID:              comment.ID,
-			UserID:          comment.UserID,
-			UserName:        userInfo.Name,
-			AuthorAvatarUrl: userInfo.AvatarURL,
-			Content:         comment.Content,
-			CreatedAt:       comment.CreatedAt,
+			ID: comment.ID,
+			Author: model.MessageAuthor{
+				ID:          userInfo.ID,
+				Username:    userInfo.Name,
+				DisplayName: userInfo.DisplayName,
+				AvatarUrl:   userInfo.AvatarURL,
+				Rank:        userInfo.Rank,
+			},
+			Content:   comment.Content,
+			CreatedAt: comment.CreatedAt,
+			UpdatedAt: comment.UpdatedAt,
 		})
 	}
 	userInfo, err := s.userRepo.Get(ctx, postInfo.UserID)
@@ -142,16 +159,21 @@ func (s *PostsService) GetPostWithComments(ctx context.Context, postId int) (mod
 		// TODO: log error
 	}
 	postWithComments := model.PostWithComments{
-		ID:              postInfo.ID,
-		Category:        category.Name,
-		AuthorID:        postInfo.UserID,
-		AuthorName:      userInfo.Name,
-		AuthorAvatarUrl: userInfo.AvatarURL,
-		Title:           postInfo.Title,
-		Content:         postInfo.Content,
-		CommentsCount:   postInfo.CommentsCount,
-		CreatedAt:       postInfo.CreatedAt,
-		Comments:        commentListItems,
+		ID:       postInfo.ID,
+		Category: category.Name,
+		Author: model.MessageAuthor{
+			ID:          userInfo.ID,
+			Username:    userInfo.Name,
+			DisplayName: userInfo.DisplayName,
+			AvatarUrl:   userInfo.AvatarURL,
+			Rank:        userInfo.Rank,
+		},
+		Title:         postInfo.Title,
+		Content:       postInfo.Content,
+		CommentsCount: postInfo.CommentsCount,
+		CreatedAt:     postInfo.CreatedAt,
+		UpdatedAt:     postInfo.UpdatedAt,
+		Comments:      commentListItems,
 	}
 	if category.ID == 0 {
 		postWithComments.Category = s.categoryRepo.DefaultCategory().Name
@@ -192,15 +214,20 @@ func (s *PostsService) convertPostListRepoToResponse(
 			return model.PostListResponse{}, err
 		}
 		postInfoResponse := model.PostInfoResponse{
-			ID:              post.ID,
-			Category:        categories[post.CategoryID].Name,
-			Title:           post.Title,
-			Content:         post.Content,
-			AuthorID:        post.UserID,
-			AuthorName:      userInfo.Name,
-			AuthorAvatarUrl: userInfo.AvatarURL,
-			CommentsCount:   post.CommentsCount,
-			CreatedAt:       post.CreatedAt,
+			ID:       post.ID,
+			Category: categories[post.CategoryID].Name,
+			Title:    post.Title,
+			Content:  post.Content,
+			Author: model.MessageAuthor{
+				ID:          userInfo.ID,
+				Username:    userInfo.Name,
+				DisplayName: userInfo.DisplayName,
+				AvatarUrl:   userInfo.AvatarURL,
+				Rank:        userInfo.Rank,
+			},
+			CommentsCount: post.CommentsCount,
+			CreatedAt:     post.CreatedAt,
+			UpdatedAt:     post.UpdatedAt,
 		}
 		_, exists := categories[post.CategoryID]
 		if !exists {

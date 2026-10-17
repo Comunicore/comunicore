@@ -307,7 +307,7 @@ func encodePostAddCommentResponse(response PostAddCommentRes, w http.ResponseWri
 
 func encodePostCreateResponse(response PostCreateRes, w http.ResponseWriter) error {
 	switch response := response.(type) {
-	case *PostListItem:
+	case *PostItem:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(201)
 

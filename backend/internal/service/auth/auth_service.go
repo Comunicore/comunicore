@@ -17,7 +17,7 @@ type AuthRepo interface {
 	Logout(ctx context.Context, sessionUUID uuid.UUID) error
 }
 type UserRepo interface {
-	Get(ctx context.Context, userId int) (model.User, error)
+	Get(ctx context.Context, userId int) (model.UserRepo, error)
 }
 
 type AuthService struct {
@@ -29,15 +29,15 @@ func NewAuthService(authRepo AuthRepo, userRepo UserRepo) *AuthService {
 	return &AuthService{authRepo: authRepo, userRepo: userRepo}
 }
 
-func (r *AuthService) Login(ctx context.Context, login, password string) (model.User, uuid.UUID, error) {
+func (r *AuthService) Login(ctx context.Context, login, password string) (model.UserRepo, uuid.UUID, error) {
 	userID, sessionUUID, err := r.authRepo.Login(ctx, login, password)
 	if err != nil {
-		return model.User{}, uuid.UUID{}, err
+		return model.UserRepo{}, uuid.UUID{}, err
 	}
 
 	user, err := r.userRepo.Get(ctx, userID)
 	if err != nil {
-		return model.User{}, uuid.UUID{}, err
+		return model.UserRepo{}, uuid.UUID{}, err
 	}
 
 	return user, sessionUUID, nil

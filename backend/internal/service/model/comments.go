@@ -11,22 +11,23 @@ type Comment struct {
 	UserID    int
 	Content   string
 	CreatedAt time.Time
+	UpdatedAt time.Time
 }
+
 type CommentInfo struct {
 	ID        int
 	PostID    int
-	UserID    int
-	UserName  string
+	Author    MessageAuthor
 	Content   string
 	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 type CommentListItem struct {
-	ID              int
-	UserID          int
-	UserName        string
-	AuthorAvatarUrl string
-	Content         string
-	CreatedAt       time.Time
+	ID        int
+	Author    MessageAuthor
+	Content   string
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 type CommentCreate struct {
