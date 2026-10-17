@@ -17,13 +17,13 @@ func TestPostCreate(t *testing.T) {
 	sessionCookie := testAuthLoginOk(t, globalConfig.URL, user)
 	post := testPostCreateOk(t, globalConfig.URL, sessionCookie)
 	comment := testPostCommentCreateOk(t, globalConfig.URL, sessionCookie, post.ID)
-	testPostGet(t, globalConfig.URL, sessionCookie, post, comment)
+	testPostGet(t, globalConfig.URL, sessionCookie, post, comment, 1)
 
 	user2 := testUserCreateOk(t, globalConfig.URL)
 	sessionCookie2 := testAuthLoginOk(t, globalConfig.URL, user2)
 	post2 := testPostCreateOk(t, globalConfig.URL, sessionCookie2)
 	comment2 := testPostCommentCreateOk(t, globalConfig.URL, sessionCookie2, post2.ID)
-	testPostGet(t, globalConfig.URL, sessionCookie2, post2, comment2)
+	testPostGet(t, globalConfig.URL, sessionCookie2, post2, comment2, 1)
 }
 
 type MessageAuthor struct {
@@ -33,14 +33,19 @@ type MessageAuthor struct {
 	// AvatarUrl   *url.URL
 	Rank int `json:"rank"`
 }
+type PostStats struct {
+	CommentsCount int `json:"commentsCount"`
+	LikesCount    int `json:"likesCount"`
+	ViewsCount    int `json:"viewsCount"`
+}
 type PostItem struct {
-	ID            int    `json:"id"`
-	Category      string `json:"category"`
-	Author        MessageAuthor
-	Title         string    `json:"title"`
-	ContentMd     string    `json:"contentMd"`
-	CommentsCount int       `json:"commentsCount"`
-	CreatedAt     time.Time `json:"createdAt"`
+	ID        int    `json:"id"`
+	Category  string `json:"category"`
+	Author    MessageAuthor
+	Title     string    `json:"title"`
+	ContentMd string    `json:"contentMd"`
+	PostStats PostStats `json:"postStats"`
+	CreatedAt time.Time `json:"createdAt"`
 }
 
 func testPostCreateOk(t *testing.T, baseURL string, cookie *http.Cookie) PostItem {
@@ -62,14 +67,13 @@ func testPostCreateOk(t *testing.T, baseURL string, cookie *http.Cookie) PostIte
 
 		res.Keys().ContainsOnly(
 			"id", "category", "author", "title",
-			"contentMd", "commentsCount", "createdAt",
+			"contentMd", "postStats", "createdAt",
 		)
 		res.Value("id").Number().Gt(0)
 		res.Value("category").String().NotEmpty()
 		// res.Value("authorAvatarUrl").String().NotEmpty()
 		res.Value("title").String().HasPrefix("Test Post ")
 		res.Value("contentMd").String().HasPrefix("This is a test post content ")
-		res.Value("commentsCount").Number().IsEqual(0)
 		res.Value("createdAt").String().NotEmpty()
 
 		author := res.Value("author").Object()
@@ -78,6 +82,12 @@ func testPostCreateOk(t *testing.T, baseURL string, cookie *http.Cookie) PostIte
 		author.Value("username").String().NotEmpty()
 		author.Value("displayName").String().NotEmpty()
 		author.Value("rank").Number().Ge(0)
+
+		postStats := res.Value("postStats").Object()
+		postStats.Keys().ContainsOnly("commentsCount", "likesCount", "viewsCount")
+		postStats.Value("commentsCount").Number().IsEqual(0)
+		postStats.Value("likesCount").Number().Ge(0)
+		postStats.Value("viewsCount").Number().Ge(0)
 
 		res.Decode(&post)
 	})
@@ -125,19 +135,9 @@ type PostCommentItem struct {
 	ContentMd string    `json:"contentMd"`
 	CreatedAt time.Time `json:"createdAt"`
 }
-type PostWithComments struct {
-	Id         int    `json:"id"`
-	Category   string `json:"category"`
-	Author     MessageAuthor
-	Title      string            `json:"title"`
-	ContentMd  string            `json:"contentMd"`
-	PostsCount int               `json:"postsCount"`
-	CreatedAt  time.Time         `json:"createdAt"`
-	Posts      []PostCommentItem `json:"posts"`
-}
 
 func testPostGet(t *testing.T, baseURL string,
-	cookie *http.Cookie, expectedPost PostItem, expectedComment PostCommentItem) {
+	cookie *http.Cookie, expectedPost PostItem, expectedComment PostCommentItem, commentsCount int) {
 
 	t.Run("Test PostGet OK", func(t *testing.T) {
 		exp := expectCreate(t, baseURL)
@@ -150,14 +150,11 @@ func testPostGet(t *testing.T, baseURL string,
 			Status(http.StatusOK).JSON().Object()
 
 		res.Keys().ContainsOnly(
-			"id", "category", "author", "title", "contentMd",
-			"commentsCount", "createdAt", "comments")
+			"id", "category", "author", "title", "contentMd", "postStats", "createdAt", "comments")
 		res.Value("id").Number().IsEqual(expectedPost.ID)
 		res.Value("category").String().IsEqual(expectedPost.Category)
 		res.Value("title").String().IsEqual(expectedPost.Title)
 		res.Value("contentMd").String().IsEqual(expectedPost.ContentMd)
-		// One reply row exists in posts after postCommentCreateOk.
-		res.Value("commentsCount").Number().IsEqual(1)
 		res.Value("createdAt").String().NotEmpty()
 
 		author := res.Value("author").Object()
@@ -167,8 +164,14 @@ func testPostGet(t *testing.T, baseURL string,
 		author.Value("displayName").String().IsEqual(expectedPost.Author.Username)
 		author.Value("rank").Number().Ge(0)
 
+		postStats := res.Value("postStats").Object()
+		postStats.Keys().ContainsOnly("commentsCount", "likesCount", "viewsCount")
+		postStats.Value("commentsCount").Number().IsEqual(commentsCount)
+		postStats.Value("likesCount").Number().Ge(0)
+		postStats.Value("viewsCount").Number().Ge(0)
+
 		comments := res.Value("comments").Array()
-		comments.Length().IsEqual(1)
+		comments.Length().IsEqual(commentsCount)
 
 		firstComment := comments.Value(0).Object()
 		firstComment.Keys().ContainsOnly("id", "author", "contentMd", "createdAt")

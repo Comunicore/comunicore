@@ -1296,12 +1296,10 @@ type PostItem struct {
 	Category string        `json:"category"`
 	Title    string        `json:"title"`
 	// Post content in Markdown format.
-	ContentMd string `json:"contentMd"`
-	// Number of comments (rows in comments). The opening message lives in title/content only and is not
-	// counted.
-	CommentsCount int         `json:"commentsCount"`
-	CreatedAt     time.Time   `json:"createdAt"`
-	UpdatedAt     OptDateTime `json:"updatedAt"`
+	ContentMd string      `json:"contentMd"`
+	PostStats PostStats   `json:"postStats"`
+	CreatedAt time.Time   `json:"createdAt"`
+	UpdatedAt OptDateTime `json:"updatedAt"`
 }
 
 // GetID returns the value of ID.
@@ -1329,9 +1327,9 @@ func (s *PostItem) GetContentMd() string {
 	return s.ContentMd
 }
 
-// GetCommentsCount returns the value of CommentsCount.
-func (s *PostItem) GetCommentsCount() int {
-	return s.CommentsCount
+// GetPostStats returns the value of PostStats.
+func (s *PostItem) GetPostStats() PostStats {
+	return s.PostStats
 }
 
 // GetCreatedAt returns the value of CreatedAt.
@@ -1369,9 +1367,9 @@ func (s *PostItem) SetContentMd(val string) {
 	s.ContentMd = val
 }
 
-// SetCommentsCount sets the value of CommentsCount.
-func (s *PostItem) SetCommentsCount(val int) {
-	s.CommentsCount = val
+// SetPostStats sets the value of PostStats.
+func (s *PostItem) SetPostStats(val PostStats) {
+	s.PostStats = val
 }
 
 // SetCreatedAt sets the value of CreatedAt.
@@ -1388,15 +1386,13 @@ func (*PostItem) postCreateRes() {}
 
 // Ref: #/components/schemas/PostListItem
 type PostListItem struct {
-	ID       int           `json:"id"`
-	Author   MessageAuthor `json:"author"`
-	Category string        `json:"category"`
-	Title    string        `json:"title"`
-	// Number of comments (rows in comments). The opening message lives in title/content only and is not
-	// counted.
-	CommentsCount int         `json:"commentsCount"`
-	CreatedAt     time.Time   `json:"createdAt"`
-	UpdatedAt     OptDateTime `json:"updatedAt"`
+	ID        int           `json:"id"`
+	Author    MessageAuthor `json:"author"`
+	Category  string        `json:"category"`
+	Title     string        `json:"title"`
+	PostStats PostStats     `json:"postStats"`
+	CreatedAt time.Time     `json:"createdAt"`
+	UpdatedAt OptDateTime   `json:"updatedAt"`
 }
 
 // GetID returns the value of ID.
@@ -1419,9 +1415,9 @@ func (s *PostListItem) GetTitle() string {
 	return s.Title
 }
 
-// GetCommentsCount returns the value of CommentsCount.
-func (s *PostListItem) GetCommentsCount() int {
-	return s.CommentsCount
+// GetPostStats returns the value of PostStats.
+func (s *PostListItem) GetPostStats() PostStats {
+	return s.PostStats
 }
 
 // GetCreatedAt returns the value of CreatedAt.
@@ -1454,9 +1450,9 @@ func (s *PostListItem) SetTitle(val string) {
 	s.Title = val
 }
 
-// SetCommentsCount sets the value of CommentsCount.
-func (s *PostListItem) SetCommentsCount(val int) {
-	s.CommentsCount = val
+// SetPostStats sets the value of PostStats.
+func (s *PostListItem) SetPostStats(val PostStats) {
+	s.PostStats = val
 }
 
 // SetCreatedAt sets the value of CreatedAt.
@@ -1519,6 +1515,47 @@ func (s *PostListResponse) SetHaveNext(val bool) {
 
 func (*PostListResponse) postsListRes() {}
 
+// Ref: #/components/schemas/PostStats
+type PostStats struct {
+	// Number of comments (rows in comments). The opening message lives in title/content only and is not
+	// counted.
+	CommentsCount int `json:"commentsCount"`
+	// Number of likes for the post.
+	LikesCount int `json:"likesCount"`
+	// Number of views for the post.
+	ViewsCount int `json:"viewsCount"`
+}
+
+// GetCommentsCount returns the value of CommentsCount.
+func (s *PostStats) GetCommentsCount() int {
+	return s.CommentsCount
+}
+
+// GetLikesCount returns the value of LikesCount.
+func (s *PostStats) GetLikesCount() int {
+	return s.LikesCount
+}
+
+// GetViewsCount returns the value of ViewsCount.
+func (s *PostStats) GetViewsCount() int {
+	return s.ViewsCount
+}
+
+// SetCommentsCount sets the value of CommentsCount.
+func (s *PostStats) SetCommentsCount(val int) {
+	s.CommentsCount = val
+}
+
+// SetLikesCount sets the value of LikesCount.
+func (s *PostStats) SetLikesCount(val int) {
+	s.LikesCount = val
+}
+
+// SetViewsCount sets the value of ViewsCount.
+func (s *PostStats) SetViewsCount(val int) {
+	s.ViewsCount = val
+}
+
 // Ref: #/components/schemas/PostWithCommentsListResponse
 type PostWithCommentsListResponse struct {
 	ID       int           `json:"id"`
@@ -1526,12 +1563,11 @@ type PostWithCommentsListResponse struct {
 	Author   MessageAuthor `json:"author"`
 	Title    string        `json:"title"`
 	// Number of reply posts (rows in posts). The opening message is not included.
-	ContentMd string `json:"contentMd"`
-	// Number of comments (rows in comments). The opening message is not included.
-	CommentsCount int               `json:"commentsCount"`
-	CreatedAt     time.Time         `json:"createdAt"`
-	UpdatedAt     OptDateTime       `json:"updatedAt"`
-	Comments      []PostCommentItem `json:"comments"`
+	ContentMd string            `json:"contentMd"`
+	PostStats PostStats         `json:"postStats"`
+	CreatedAt time.Time         `json:"createdAt"`
+	UpdatedAt OptDateTime       `json:"updatedAt"`
+	Comments  []PostCommentItem `json:"comments"`
 }
 
 // GetID returns the value of ID.
@@ -1559,9 +1595,9 @@ func (s *PostWithCommentsListResponse) GetContentMd() string {
 	return s.ContentMd
 }
 
-// GetCommentsCount returns the value of CommentsCount.
-func (s *PostWithCommentsListResponse) GetCommentsCount() int {
-	return s.CommentsCount
+// GetPostStats returns the value of PostStats.
+func (s *PostWithCommentsListResponse) GetPostStats() PostStats {
+	return s.PostStats
 }
 
 // GetCreatedAt returns the value of CreatedAt.
@@ -1604,9 +1640,9 @@ func (s *PostWithCommentsListResponse) SetContentMd(val string) {
 	s.ContentMd = val
 }
 
-// SetCommentsCount sets the value of CommentsCount.
-func (s *PostWithCommentsListResponse) SetCommentsCount(val int) {
-	s.CommentsCount = val
+// SetPostStats sets the value of PostStats.
+func (s *PostWithCommentsListResponse) SetPostStats(val PostStats) {
+	s.PostStats = val
 }
 
 // SetCreatedAt sets the value of CreatedAt.

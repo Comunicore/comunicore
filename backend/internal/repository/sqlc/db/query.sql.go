@@ -643,8 +643,8 @@ func (q *Queries) GetCategoryByName(ctx context.Context, name string) (Category,
 }
 
 const postCreate = `-- name: PostCreate :one
-INSERT INTO posts (category_id, title, content, user_id, comments_count) VALUES ($1, $2, $3, $4, 0)
-RETURNING id, category_id, title, content, comments_count, user_id, created_at, updated_at
+INSERT INTO posts (category_id, title, content, user_id) VALUES ($1, $2, $3, $4)
+RETURNING id, category_id, title, content, user_id, created_at, updated_at
 `
 
 type PostCreateParams struct {
@@ -654,31 +654,19 @@ type PostCreateParams struct {
 	UserID     int32
 }
 
-type PostCreateRow struct {
-	ID            int32
-	CategoryID    int32
-	Title         string
-	Content       string
-	CommentsCount int32
-	UserID        int32
-	CreatedAt     pgtype.Timestamptz
-	UpdatedAt     pgtype.Timestamptz
-}
-
-func (q *Queries) PostCreate(ctx context.Context, arg PostCreateParams) (PostCreateRow, error) {
+func (q *Queries) PostCreate(ctx context.Context, arg PostCreateParams) (Post, error) {
 	row := q.db.QueryRow(ctx, postCreate,
 		arg.CategoryID,
 		arg.Title,
 		arg.Content,
 		arg.UserID,
 	)
-	var i PostCreateRow
+	var i Post
 	err := row.Scan(
 		&i.ID,
 		&i.CategoryID,
 		&i.Title,
 		&i.Content,
-		&i.CommentsCount,
 		&i.UserID,
 		&i.CreatedAt,
 		&i.UpdatedAt,
@@ -687,7 +675,7 @@ func (q *Queries) PostCreate(ctx context.Context, arg PostCreateParams) (PostCre
 }
 
 const postGetById = `-- name: PostGetById :one
-SELECT id, category_id, title, content, user_id, comments_count, created_at, updated_at
+SELECT id, category_id, title, content, user_id, created_at, updated_at
 FROM posts
 WHERE id = $1
 `
@@ -701,7 +689,6 @@ func (q *Queries) PostGetById(ctx context.Context, id int32) (Post, error) {
 		&i.Title,
 		&i.Content,
 		&i.UserID,
-		&i.CommentsCount,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -709,7 +696,7 @@ func (q *Queries) PostGetById(ctx context.Context, id int32) (Post, error) {
 }
 
 const postPageByPageID = `-- name: PostPageByPageID :many
-SELECT id, category_id, title, content, user_id, comments_count, created_at, updated_at
+SELECT id, category_id, title, content, user_id, created_at, updated_at
 FROM posts
 ORDER BY id DESC LIMIT $1 OFFSET $2
 `
@@ -734,7 +721,6 @@ func (q *Queries) PostPageByPageID(ctx context.Context, arg PostPageByPageIDPara
 			&i.Title,
 			&i.Content,
 			&i.UserID,
-			&i.CommentsCount,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -749,7 +735,7 @@ func (q *Queries) PostPageByPageID(ctx context.Context, arg PostPageByPageIDPara
 }
 
 const postPagesAfterPostID = `-- name: PostPagesAfterPostID :many
-SELECT id, category_id, title, content, user_id, comments_count, created_at, updated_at
+SELECT id, category_id, title, content, user_id, created_at, updated_at
 FROM posts
 WHERE id > $1
 ORDER BY id DESC LIMIT $2
@@ -775,7 +761,6 @@ func (q *Queries) PostPagesAfterPostID(ctx context.Context, arg PostPagesAfterPo
 			&i.Title,
 			&i.Content,
 			&i.UserID,
-			&i.CommentsCount,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -790,7 +775,7 @@ func (q *Queries) PostPagesAfterPostID(ctx context.Context, arg PostPagesAfterPo
 }
 
 const postPagesBeforePostID = `-- name: PostPagesBeforePostID :many
-SELECT id, category_id, title, content, user_id, comments_count, created_at, updated_at
+SELECT id, category_id, title, content, user_id, created_at, updated_at
 FROM posts
 WHERE id < $1
 ORDER BY id DESC LIMIT $2
@@ -816,7 +801,6 @@ func (q *Queries) PostPagesBeforePostID(ctx context.Context, arg PostPagesBefore
 			&i.Title,
 			&i.Content,
 			&i.UserID,
-			&i.CommentsCount,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -828,6 +812,23 @@ func (q *Queries) PostPagesBeforePostID(ctx context.Context, arg PostPagesBefore
 		return nil, err
 	}
 	return items, nil
+}
+
+const postStats = `-- name: PostStats :one
+SELECT comments_count, likes_count, views_count FROM posts_extras WHERE post_id = $1
+`
+
+type PostStatsRow struct {
+	CommentsCount int32
+	LikesCount    int32
+	ViewsCount    int32
+}
+
+func (q *Queries) PostStats(ctx context.Context, postID int32) (PostStatsRow, error) {
+	row := q.db.QueryRow(ctx, postStats, postID)
+	var i PostStatsRow
+	err := row.Scan(&i.CommentsCount, &i.LikesCount, &i.ViewsCount)
+	return i, err
 }
 
 const postTagInsert = `-- name: PostTagInsert :exec
