@@ -104,7 +104,24 @@ func (h *PostsHandler) PostCreate(
 	if post.Author.AvatarUrl != nil {
 		apiPost.Author.AvatarUrl.SetTo(*post.Author.AvatarUrl)
 	}
+	if !post.SeoMeta.IsEmpty() {
+		apiPost.SeoMeta.SetTo(apiSeoMetaFromModel(&post.SeoMeta))
+	}
 	return apiPost, nil
+}
+
+func apiSeoMetaFromModel(seo *model.SeoMeta) api.SeoMeta {
+	res := api.SeoMeta{
+		Keywords: seo.Keywords,
+	}
+	if seo.OgImageUrl != nil {
+		res.OgImageUrl.SetTo(*seo.OgImageUrl)
+	}
+	if seo.Description != "" {
+		res.Description.SetTo(seo.Description)
+	}
+
+	return res
 }
 
 // get post with all comments
@@ -158,6 +175,9 @@ func (h *PostsHandler) PostGet(ctx context.Context, params api.PostGetParams) (a
 	}
 	if postWithComments.Author.AvatarUrl != nil {
 		apiPost.Author.AvatarUrl.SetTo(*postWithComments.Author.AvatarUrl)
+	}
+	if !postWithComments.SeoMeta.IsEmpty() {
+		apiPost.SeoMeta.SetTo(apiSeoMetaFromModel(&postWithComments.SeoMeta))
 	}
 
 	return apiPost, nil
@@ -224,6 +244,9 @@ GOT_POST_ID:
 		}
 		if post.Author.AvatarUrl != nil {
 			resPosts[i].Author.AvatarUrl.SetTo(*post.Author.AvatarUrl)
+		}
+		if !post.SeoMeta.IsEmpty() {
+			resPosts[i].SeoMeta.SetTo(apiSeoMetaFromModel(&post.SeoMeta))
 		}
 	}
 	return &api.PostListResponse{

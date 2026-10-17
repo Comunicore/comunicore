@@ -601,6 +601,8 @@ components:
           description: Post content in Markdown format.
         postStats:
           $ref: '#/components/schemas/PostStats'
+        seoMeta:
+          $ref: '#/components/schemas/SeoMeta'
         createdAt:
           type: string
           format: date-time
@@ -633,6 +635,23 @@ components:
           likesCount: 10
           viewsCount: 100
         createdAt: "2024-01-01T12:00:00Z"
+    SeoMeta:
+      type: object
+      properties:
+        description:
+          type: string
+        ogImageUrl:
+          type: string
+          format: uri
+        keywords:
+          type: array
+          items:
+            type: string
+      required: []
+      example:
+        description: "This is the content of the first post."
+        ogImageUrl: "https://comunicore.mooo.com/storage/media/og-image1.png"
+        keywords: ["C++", "JavaScript", "современный Rust", "тормознутый Python"]
     PostStats:
       type: object
       properties:
@@ -666,6 +685,8 @@ components:
           type: string
         postStats:
           $ref: '#/components/schemas/PostStats'
+        seoMeta:
+          $ref: '#/components/schemas/SeoMeta'
         createdAt:
           type: string
           format: date-time
@@ -710,6 +731,8 @@ components:
           description: Number of reply posts (rows in posts). The opening message is not included.
         postStats:
           $ref: '#/components/schemas/PostStats'
+        seoMeta:
+          $ref: '#/components/schemas/SeoMeta'
         createdAt:
           type: string
           format: date-time

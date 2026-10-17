@@ -3,7 +3,10 @@
 
 package model
 
-import "time"
+import (
+	"net/url"
+	"time"
+)
 
 type PostWithComments struct {
 	ID        int
@@ -12,6 +15,7 @@ type PostWithComments struct {
 	Title     string
 	Content   string
 	PostStats PostStats
+	SeoMeta   SeoMeta
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	Comments  []CommentListItem
@@ -37,6 +41,7 @@ type PostRepoInfo struct {
 	Content    string
 	UserID     int
 	PostStats  PostStats
+	SeoMeta    SeoMeta
 	CreatedAt  time.Time
 	UpdatedAt  time.Time
 }
@@ -54,6 +59,7 @@ type PostInfoResponse struct {
 	Content   string
 	Author    MessageAuthor
 	PostStats PostStats
+	SeoMeta   SeoMeta
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
@@ -73,6 +79,7 @@ type PostInfo struct {
 	Content   string
 	Author    MessageAuthor
 	PostStats PostStats
+	SeoMeta   SeoMeta
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
@@ -81,4 +88,13 @@ type PostStats struct {
 	CommentsCount int
 	LikesCount    int
 	ViewsCount    int
+}
+type SeoMeta struct {
+	Description string
+	OgImageUrl  *url.URL
+	Keywords    []string
+}
+
+func (sm *SeoMeta) IsEmpty() bool {
+	return len(sm.Description) == 0 && sm.OgImageUrl == nil && len(sm.Keywords) == 0
 }
