@@ -51,7 +51,7 @@ export function PostComments({
       >
         <h2
           id='comments-heading'
-          className='text-2xl leading-normal font-bold sm:text-4xl'
+          className='text-2xl leading-normal font-bold sm:text-3xl'
         >
           Комментарии ({commentsCount})
         </h2>
