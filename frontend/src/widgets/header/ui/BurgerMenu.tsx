@@ -5,6 +5,7 @@ import { FaRegHeart, FaRegMessage, FaTrophy } from 'react-icons/fa6';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
+import { isNavLinkActive } from '../model/isNavLinkActive';
 import { navLinks } from '../model/navLinks';
 
 import { AuthButtons } from './AuthButtons';
@@ -56,12 +57,6 @@ export function BurgerMenu({ menuRef }: BurgerMenuProps) {
   const { user } = useUser({ enabled: isAuthenticated });
   const userData = user?.user;
   const { mutate: logout } = useLogoutMutation();
-
-  const isLinkActive = (href: string) => {
-    if (href === '/') return pathname === href;
-
-    return pathname.startsWith(href);
-  };
 
   useEffect(() => {
     if (!isOpen) return;
@@ -139,7 +134,7 @@ export function BurgerMenu({ menuRef }: BurgerMenuProps) {
 
       <nav className='flex flex-col gap-y-2.5'>
         {navLinks.map(({ label, href, Icon }) => {
-          const isActive = isLinkActive(href);
+          const isActive = isNavLinkActive(pathname, href);
 
           return (
             <Button
