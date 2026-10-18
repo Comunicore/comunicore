@@ -39,7 +39,6 @@ var operationRolesCookieAuth = map[string][]string{
 	MediaUploadOperation:         []string{},
 	PostAddCommentOperation:      []string{},
 	PostCreateOperation:          []string{},
-	PostGetOperation:             []string{},
 	UserDeleteOperation:          []string{},
 	UserGetOperation:             []string{},
 	UserMeOperation:              []string{},
