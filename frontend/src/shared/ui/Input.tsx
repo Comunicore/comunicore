@@ -1,7 +1,6 @@
 import {
   cloneElement,
-  forwardRef,
-  InputHTMLAttributes,
+  ComponentPropsWithRef,
   isValidElement,
   ReactElement,
   ReactNode,
@@ -12,7 +11,8 @@ import { cn } from '../lib/classNames';
 type InputColor = 'transparent' | 'bordered' | 'ghost';
 
 type InputSize = 'sm' | 'md' | 'lg';
-interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+
+interface BaseProps {
   className?: string;
   icon?: ReactNode;
   inputSize?: InputSize;
@@ -20,6 +20,13 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   actionIcon?: ReactNode;
   onActionIconClick?: () => void;
 }
+
+type InputFieldProps = BaseProps &
+  ComponentPropsWithRef<'input'> & { isTextarea?: false };
+
+type TextareaProps = ComponentPropsWithRef<'textarea'> & { maxRows?: number };
+
+type TextareaFieldProps = BaseProps & TextareaProps & { isTextarea: true };
 
 const colorStyles: Record<InputColor, string> = {
   transparent: '',
@@ -34,7 +41,22 @@ const sizeStyles: Record<InputSize, string> = {
   lg: 'px-5 py-2.5 text-lg rounded-[10px] leading-1',
 };
 
-export const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
+const fieldStyles =
+  'text-light placeholder:text-light w-full min-w-0 flex-1 bg-transparent text-[16px] outline-none';
+
+const renderIcon = (icon: ReactNode) => {
+  if (isValidElement(icon)) {
+    return cloneElement(icon as ReactElement<{ size?: number }>, {
+      size: 20,
+      ...(icon.props as object),
+    });
+  }
+  return icon;
+};
+
+export function Input(props: InputFieldProps): ReactElement;
+export function Input(props: TextareaFieldProps): ReactElement;
+export function Input(props: InputFieldProps | TextareaFieldProps) {
   const {
     className,
     icon,
@@ -42,48 +64,74 @@ export const Input = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
     onActionIconClick,
     inputSize = 'md',
     inputColor = 'bordered',
-    ...rest
+    isTextarea,
+    ...fieldProps
   } = props;
 
-  const renderIcon = (icon: ReactNode) => {
-    if (isValidElement(icon)) {
-      return cloneElement(icon as ReactElement<{ size?: number }>, {
-        size: 20, // Стандартный размер по умолчанию
-        ...(icon.props as object),
-      });
-    }
-    return icon;
-  };
-
   const commonClassName = cn(
-    'flex items-center gap-x-2.5 w-full',
+    'flex gap-x-2.5 w-full',
+    isTextarea ? 'items-end' : 'items-center',
     colorStyles[inputColor],
     sizeStyles[inputSize],
     className,
   );
 
+  const iconAlignment = isTextarea ? 'mb-0.5' : '';
+
+  const renderTextarea = () => {
+    const {
+      rows = 1,
+      maxRows = 20,
+      style,
+      ...textareaProps
+    } = fieldProps as TextareaProps;
+
+    return (
+      <textarea
+        className={cn(
+          fieldStyles,
+          'field-sizing-content resize-none leading-normal',
+        )}
+        id={textareaProps.name}
+        rows={rows}
+        style={{
+          minHeight: `${rows}lh`,
+          maxHeight: `${Math.max(rows, maxRows)}lh`,
+          ...style,
+        }}
+        {...textareaProps}
+      />
+    );
+  };
+
   return (
     <div className={commonClassName}>
-      {icon && <div className='text-gray-9e shrink-0'>{renderIcon(icon)}</div>}
-      <input
-        className={cn(
-          'text-light placeholder:text-light w-full min-w-0 flex-1 bg-transparent text-[16px] outline-none',
-        )}
-        ref={ref}
-        id={rest.name}
-        {...rest}
-      />
+      {icon && (
+        <div className={cn('text-gray-9e shrink-0', iconAlignment)}>
+          {renderIcon(icon)}
+        </div>
+      )}
+      {isTextarea ? (
+        renderTextarea()
+      ) : (
+        <input
+          className={fieldStyles}
+          id={fieldProps.name}
+          {...(fieldProps as ComponentPropsWithRef<'input'>)}
+        />
+      )}
       {actionIcon && (
         <button
           type='button'
           onClick={onActionIconClick}
-          className='text-gray-9e hover:text-light ml-2.5 shrink-0 cursor-pointer transition-colors focus:outline-none'
+          className={cn(
+            'text-gray-9e hover:text-light ml-2.5 shrink-0 cursor-pointer transition-colors focus:outline-none',
+            iconAlignment,
+          )}
         >
           {renderIcon(actionIcon)}
         </button>
       )}
     </div>
   );
-});
-
-Input.displayName = 'Input';
+}

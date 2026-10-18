@@ -22,7 +22,7 @@ export function PostComments({
   commentsCount,
 }: PostCommentsProps) {
   const [draft, setDraft] = useState('');
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const handleReply = (comment: PostComment) => {
     const reference = createCommentReference(comment.id, comment.author.name);

@@ -16,7 +16,7 @@ interface AddCommentFormProps {
   postId: number;
   text: string;
   onTextChange: (text: string) => void;
-  inputRef?: Ref<HTMLInputElement>;
+  inputRef?: Ref<HTMLTextAreaElement>;
 }
 
 export function AddCommentForm({
@@ -76,10 +76,10 @@ export function AddCommentForm({
         Комментарий
       </label>
       <Input
+        isTextarea
         ref={inputRef}
         id='post-comment'
         name='comment'
-        type='text'
         value={text}
         onChange={(event) => onTextChange(event.target.value)}
         placeholder='Введите комментарий'
