@@ -57,7 +57,7 @@ export function PostComments({
         </h2>
 
         {comments.length > 0 ? (
-          <ul className='bg-dark-0e border-gray-9e/10 flex flex-col gap-y-5 rounded-3xl border px-4 py-5 sm:rounded-[3.125rem]'>
+          <ul className='flex flex-col gap-y-5'>
             {comments.map((comment) => (
               <CommentItem
                 key={comment.id}
