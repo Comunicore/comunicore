@@ -3,8 +3,6 @@
 import { useRouter } from 'next/navigation';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { LoginFormTypes } from './login-form.schema';
-
 import { useAuthStore } from '@/entities/session';
 
 import {
