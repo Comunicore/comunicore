@@ -9,19 +9,29 @@ import { CommunityRules } from '@/widgets/community-rules';
 import { UserCard } from '@/entities/user';
 
 import { AppRouter } from '@/shared/config/app-router';
+import { DATE_FALLBACK } from '@/shared/lib/helpers/safeFormatDate';
 import { Tile, ViewAllLink } from '@/shared/ui';
 
 const formatPostDate = (date: string) =>
   format(new Date(date), "dd.MM.yyyy 'в' HH:mm");
 
+const renderDate = (date: string | null) =>
+  date ? (
+    <time dateTime={date} suppressHydrationWarning>
+      {formatPostDate(date)}
+    </time>
+  ) : (
+    DATE_FALLBACK
+  );
+
 type PostSidebarProps = Pick<
   PostDetailsData,
   | 'author'
   | 'category'
-  | 'repliesCount'
+  | 'commentsCount'
   | 'viewsCount'
   | 'createdAt'
-  | 'lastReplyAt'
+  | 'lastCommentAt'
 > & {
   relatedPosts: RelatedPost[];
 };
@@ -29,37 +39,28 @@ type PostSidebarProps = Pick<
 export default function PostSidebar({
   author,
   category,
-  repliesCount,
+  commentsCount,
   viewsCount,
   createdAt,
-  lastReplyAt,
+  lastCommentAt,
   relatedPosts,
 }: PostSidebarProps) {
   const postInfo = [
     {
       label: 'Создан',
-      value: (
-        <time dateTime={createdAt} suppressHydrationWarning>
-          {formatPostDate(createdAt)}
-        </time>
-      ),
+      value: renderDate(createdAt),
     },
-    { label: 'Тема', value: category.name },
-    { label: 'Ответов', value: repliesCount },
+    { label: 'Тема', value: category },
+    { label: 'Ответов', value: commentsCount },
     { label: 'Просмотров', value: viewsCount },
     {
       label: 'Последний ответ',
-      value: (
-        <time dateTime={lastReplyAt} suppressHydrationWarning>
-          {formatPostDate(lastReplyAt)}
-        </time>
-      ),
+      value: renderDate(lastCommentAt),
     },
   ];
 
   return (
     <aside className='flex flex-col gap-y-2.5' aria-label='Информация о посте'>
-      {/* Об авторе */}
       <Tile radius='md' size='compact' className='flex flex-col gap-y-3'>
         <h2 className='text-xl leading-normal font-medium'>Об авторе</h2>
         <UserCard user={author} />
@@ -71,7 +72,6 @@ export default function PostSidebar({
         </Link>
       </Tile>
 
-      {/* Информация о посте */}
       <Tile radius='md' size='compact' className='flex flex-col gap-y-4'>
         <h2 className='text-xl leading-normal font-medium'>
           Информация о посте
@@ -86,7 +86,6 @@ export default function PostSidebar({
         </dl>
       </Tile>
 
-      {/* Другие посты из категории */}
       <Tile radius='md' size='compact' className='flex flex-col gap-y-3.75'>
         <h2 className='text-xl leading-normal font-medium'>
           Другие посты из категории

@@ -19,8 +19,10 @@ export type UserGetResponse = {
 export type UserCreateResponse = {
     id: number;
     name: string;
+    displayName: string;
     email: string;
-    avatarUrl: string;
+    avatarUrl?: string;
+    rank: number;
     createdAt?: string;
 };
 
@@ -42,56 +44,89 @@ export type PostListResponse = {
     haveNext: boolean;
 };
 
-export type PostListItem = {
+export type PostItem = {
     id: number;
-    authorId: number;
-    authorName: string;
-    authorAvatarUrl: string;
+    author: MessageAuthor;
+    category: string;
     title: string;
-    content: string;
     /**
-     * Number of reply posts (rows in posts). The opening message lives in title/content only and is not counted.
-     *
-     * @deprecated
+     * Post content in Markdown format.
      */
-    postsCount: number;
+    contentMd: string;
+    postStats: PostStats;
+    seoMeta?: SeoMeta;
+    createdAt: string;
+    updatedAt?: string;
+};
+
+export type SeoMeta = {
+    description?: string;
+    ogImageUrl?: string;
+    keywords?: Array<string>;
+};
+
+export type PostStats = {
     /**
      * Number of comments (rows in comments). The opening message lives in title/content only and is not counted.
      */
     commentsCount: number;
+    /**
+     * Number of likes for the post.
+     */
+    likesCount: number;
+    /**
+     * Number of views for the post.
+     */
+    viewsCount: number;
+};
+
+export type PostListItem = {
+    id: number;
+    author: MessageAuthor;
+    category: string;
+    title: string;
+    postStats: PostStats;
+    seoMeta?: SeoMeta;
     createdAt: string;
+    updatedAt?: string;
 };
 
 export type PostWithCommentsListResponse = {
     id: number;
-    authorId: number;
-    authorName: string;
-    authorAvatarUrl: string;
+    category: string;
+    author: MessageAuthor;
     title: string;
     /**
      * Number of reply posts (rows in posts). The opening message is not included.
      */
-    content: string;
-    /**
-     * Number of comments (rows in comments). The opening message is not included.
-     */
-    commentsCount: number;
+    contentMd: string;
+    postStats: PostStats;
+    seoMeta?: SeoMeta;
     createdAt: string;
+    updatedAt?: string;
     comments: Array<PostCommentItem>;
+};
+
+export type MessageAuthor = {
+    id: number;
+    username: string;
+    displayName: string;
+    avatarUrl?: string;
+    rank: number;
 };
 
 export type PostCommentItem = {
     id: number;
-    authorId: number;
-    authorName: string;
-    authorAvatarUrl: string;
-    content: string;
+    author: MessageAuthor;
+    contentMd: string;
     createdAt: string;
+    updatedAt?: string;
 };
 
 export type PostCreateRequest = {
+    category: string;
     title: string;
-    content: string;
+    contentMd: string;
     /**
      * Optional tags for analytics (normalized to lowercase on server)
      */
@@ -99,7 +134,7 @@ export type PostCreateRequest = {
 };
 
 export type PostCreateCommentRequest = {
-    content: string;
+    contentMd: string;
 };
 
 export type MediaUploadRequest = {
@@ -495,7 +530,7 @@ export type PostCreateResponses = {
     /**
      * Created
      */
-    201: PostListItem;
+    201: PostItem;
 };
 
 export type PostCreateResponse = PostCreateResponses[keyof PostCreateResponses];
