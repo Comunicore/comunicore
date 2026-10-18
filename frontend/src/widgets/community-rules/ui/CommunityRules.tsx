@@ -3,6 +3,8 @@ import { communityRules } from '@/shared/config/community-rules';
 import { cn } from '@/shared/lib/classNames';
 import { Tile, ViewAllLink } from '@/shared/ui';
 
+const MOBILE_RULES_LIMIT = 4;
+
 interface CommunityRulesProps {
   className?: string;
 }
@@ -18,8 +20,14 @@ export function CommunityRules({ className }: CommunityRulesProps) {
         Правила сообщества
       </h2>
       <ul className='text-light/95 flex flex-col gap-y-3 font-(family-name:--font-inter) text-base leading-5 tracking-[0.01em]'>
-        {communityRules.map((rule) => (
-          <li key={rule} className='flex items-baseline gap-x-1'>
+        {communityRules.map((rule, index) => (
+          <li
+            key={rule}
+            className={cn(
+              'flex items-baseline gap-x-1',
+              index >= MOBILE_RULES_LIMIT && 'max-md:hidden',
+            )}
+          >
             <span className='w-2.25 shrink-0' aria-hidden='true'>
               •
             </span>
