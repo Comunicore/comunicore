@@ -1,28 +1,49 @@
+'use client';
+
+import { useRef, useState } from 'react';
+
 import { PostComment } from '../model/post-comment.types';
 
-import { CommentThread } from './CommentThread';
+import { CommentItem } from './CommentItem';
+
+import { AddCommentForm } from '@/features/add-comment';
+
+import { createCommentReference } from '@/entities/comment';
 
 interface PostCommentsProps {
+  postId: number;
   comments: PostComment[];
   commentsCount: number;
 }
 
-export function PostComments({ comments, commentsCount }: PostCommentsProps) {
+export function PostComments({
+  postId,
+  comments,
+  commentsCount,
+}: PostCommentsProps) {
+  const [draft, setDraft] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleReply = (comment: PostComment) => {
+    const reference = createCommentReference(comment.id, comment.author.name);
+
+    setDraft((current) => {
+      const separator = current && !current.endsWith(' ') ? ' ' : '';
+      return `${current}${separator}${reference} `;
+    });
+
+    inputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    inputRef.current?.focus({ preventScroll: true });
+  };
+
   return (
     <>
-      <form className='flex'>
-        <label htmlFor='post-comment' className='sr-only'>
-          Комментарий
-        </label>
-        <input
-          id='post-comment'
-          name='comment'
-          type='text'
-          placeholder='Введите комментарий'
-          autoComplete='off'
-          className='border-gray-9e placeholder:text-gray-9e focus:border-purple-67 h-12.5 w-full rounded-[0.625rem] border bg-transparent px-2.5 text-lg font-medium outline-none'
-        />
-      </form>
+      <AddCommentForm
+        postId={postId}
+        text={draft}
+        onTextChange={setDraft}
+        inputRef={inputRef}
+      />
 
       <section
         aria-labelledby='comments-heading'
@@ -35,11 +56,19 @@ export function PostComments({ comments, commentsCount }: PostCommentsProps) {
           Комментарии ({commentsCount})
         </h2>
 
-        <ul className='bg-dark-0e border-gray-9e/10 flex flex-col gap-y-5 rounded-3xl border px-4 py-5 sm:rounded-[3.125rem]'>
-          {comments.map((comment) => (
-            <CommentThread key={comment.id} comment={comment} />
-          ))}
-        </ul>
+        {comments.length > 0 ? (
+          <ul className='bg-dark-0e border-gray-9e/10 flex flex-col gap-y-5 rounded-3xl border px-4 py-5 sm:rounded-[3.125rem]'>
+            {comments.map((comment) => (
+              <CommentItem
+                key={comment.id}
+                comment={comment}
+                onReply={handleReply}
+              />
+            ))}
+          </ul>
+        ) : (
+          <p className='text-gray-9e'>Комментариев пока нет. Будьте первым!</p>
+        )}
       </section>
     </>
   );

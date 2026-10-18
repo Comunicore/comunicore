@@ -2,7 +2,7 @@ import { Post } from '@/entities/post';
 
 export const postsList = [
   {
-    id: 'ckdn3nld-dmkjs3lnd-mjncd3',
+    id: '1',
     avatarUrl: '/avatar.png',
     title: 'Как выучить TypeScript с нуля в 2024 году',
     authorName: 'CodeMaster',
@@ -12,7 +12,7 @@ export const postsList = [
     views: 5300,
   },
   {
-    id: 'ckdn3nld-dmjs3lnd-mjncd3',
+    id: '2',
     avatarUrl: '/avatar.png',
     title: 'Как выучить TypeScript с нуля в 2024 году',
     authorName: 'CodeMaster',
@@ -22,7 +22,7 @@ export const postsList = [
     views: 5300,
   },
   {
-    id: 'ckdn3nld-dmkjs3nd-mjncd3',
+    id: '3',
     avatarUrl: '/avatar.png',
     title: 'Как выучить TypeScript с нуля в 2024 году',
     authorName: 'CodeMaster',
@@ -32,7 +32,7 @@ export const postsList = [
     views: 5300,
   },
   {
-    id: 'ckdn3ld-dmkjs3lnd-mjncd3',
+    id: '4',
     avatarUrl: '/avatar.png',
     title: 'Как выучить TypeScript с нуля в 2024 году',
     authorName: 'CodeMaster',
@@ -42,7 +42,7 @@ export const postsList = [
     views: 5300,
   },
   {
-    id: 'kdn3nld-dmkjs3lnd-mjncd3',
+    id: '5',
     avatarUrl: '/avatar.png',
     title: 'Как выучить TypeScript с нуля в 2024 году',
     authorName: 'CodeMaster',
@@ -52,7 +52,7 @@ export const postsList = [
     views: 5300,
   },
   {
-    id: 'ckdn3nld-dmkjs3lnd-mjnd3',
+    id: '6',
     avatarUrl: '/avatar.png',
     title: 'Как выучить TypeScript с нуля в 2024 году',
     authorName: 'CodeMaster',

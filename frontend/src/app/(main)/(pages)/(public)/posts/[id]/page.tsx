@@ -1,13 +1,7 @@
-import { mockPost, mockPostIds, mockRelatedPosts } from './model/mock-post';
-import PostActions from './ui/PostActions';
-import PostArticle from './ui/PostArticle';
-import PostSidebar from './ui/PostSidebar';
+import { mockPostIds } from './model/mock-post';
+import PostPageContent from './ui/PostPageContent';
 
-import { PostComments } from '@/widgets/post-comments';
 import { postsList } from '@/widgets/posts-section';
-
-import { cn } from '@/shared/lib/classNames';
-import { Container } from '@/shared/ui';
 
 export function generateStaticParams() {
   const ids = new Set([
@@ -18,39 +12,12 @@ export function generateStaticParams() {
   return [...ids].map((id) => ({ id }));
 }
 
-export default function PostPage() {
-  // TODO: заменить на данные из API по id поста
-  const post = mockPost;
+interface PostPageProps {
+  params: Promise<{ id: string }>;
+}
 
-  return (
-    <Container
-      className={cn(
-        'grid gap-y-10 pt-11 pb-17',
-        'xl:grid-cols-[1fr_25rem] xl:items-start xl:gap-x-5',
-      )}
-    >
-      <div className='flex min-w-0 flex-col gap-y-10'>
-        <PostArticle
-          title={post.title}
-          content={post.content}
-          category={post.category}
-        />
-        <PostActions likesCount={post.likesCount} />
-        <PostComments
-          comments={post.comments}
-          commentsCount={post.commentsCount}
-        />
-      </div>
+export default async function PostPage({ params }: PostPageProps) {
+  const { id } = await params;
 
-      <PostSidebar
-        author={post.author}
-        category={post.category}
-        repliesCount={post.repliesCount}
-        viewsCount={post.viewsCount}
-        createdAt={post.createdAt}
-        lastReplyAt={post.lastReplyAt}
-        relatedPosts={mockRelatedPosts}
-      />
-    </Container>
-  );
+  return <PostPageContent postId={Number(id)} />;
 }
