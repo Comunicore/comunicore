@@ -14,11 +14,13 @@ export function CommunityRules({ className }: CommunityRulesProps) {
       size='compact'
       className={cn('flex flex-col gap-y-3.75', className)}
     >
-      <h2 className='text-lg leading-normal font-bold'>Правила сообщества</h2>
-      <ul className='text-light/95 flex flex-col gap-y-3 font-(family-name:--font-inter) text-lg leading-5 tracking-[0.01em]'>
+      <h2 className='text-[20px] leading-normal font-bold'>
+        Правила сообщества
+      </h2>
+      <ul className='text-light/95 flex flex-col gap-y-3 font-(family-name:--font-inter) text-base leading-5 tracking-[0.01em]'>
         {communityRules.map((rule) => (
           <li key={rule} className='flex items-baseline gap-x-1'>
-            <span className='w-2.25 shrink-0 text-base' aria-hidden='true'>
+            <span className='w-2.25 shrink-0' aria-hidden='true'>
               •
             </span>
             {rule}
@@ -28,7 +30,7 @@ export function CommunityRules({ className }: CommunityRulesProps) {
       <ViewAllLink
         href={AppRouter.rules.community}
         label='Читать правила полностью'
-        className='w-fit gap-2.5 text-lg leading-6.25'
+        className='gap-2.5 self-center text-lg leading-6.25'
       />
     </Tile>
   );
