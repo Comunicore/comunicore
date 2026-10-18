@@ -1,5 +1,10 @@
 export type { ApiUser, ApiUserEnvelope } from './model/apiUser.types';
 export { mapApiUserToUser } from './model/mapApiUserToUser';
+export {
+  mapMessageAuthorToPreview,
+  mapUserToMessageAuthor,
+  mapUserToPreview,
+} from './model/mapUserPreview';
 export { useAuthMeQuery } from './model/useAuthMeQuery';
 export type { User, UserAchievement, UserLocation } from './model/user.types';
 export type { UserPreview, UserRole } from './model/user-preview.types';

@@ -1,15 +1,49 @@
 'use client';
 
-import { useState } from 'react';
+import { MouseEvent, useMemo, useState } from 'react';
+
+import {
+  CommentTextPart,
+  getCommentElementId,
+  getPreviewParts,
+  getVisibleLength,
+  highlightComment,
+  parseCommentText,
+} from '../lib/commentReference';
 
 const COMMENT_PREVIEW_LENGTH = 300;
 
-const getPreview = (text: string) => {
-  const cut = text.slice(0, COMMENT_PREVIEW_LENGTH);
-  const lastSpace = cut.lastIndexOf(' ');
+function CommentReferenceLink({
+  part,
+}: {
+  part: Extract<CommentTextPart, { type: 'reference' }>;
+}) {
+  const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    if (highlightComment(part.commentId)) {
+      event.preventDefault();
+    }
+  };
 
-  return (lastSpace > 0 ? cut.slice(0, lastSpace) : cut).trimEnd();
-};
+  return (
+    <a
+      href={`#${getCommentElementId(part.commentId)}`}
+      onClick={handleClick}
+      className='text-purple-67 hover:text-purple-86 font-semibold transition-colors'
+    >
+      @{part.authorName}
+    </a>
+  );
+}
+
+function renderParts(parts: CommentTextPart[]) {
+  return parts.map((part, index) =>
+    part.type === 'text' ? (
+      part.value
+    ) : (
+      <CommentReferenceLink key={index} part={part} />
+    ),
+  );
+}
 
 interface CommentTextProps {
   text: string;
@@ -17,21 +51,26 @@ interface CommentTextProps {
 
 export function CommentText({ text }: CommentTextProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const isLong = text.length > COMMENT_PREVIEW_LENGTH;
+  const parts = useMemo(() => parseCommentText(text), [text]);
+  const isLong = getVisibleLength(parts) > COMMENT_PREVIEW_LENGTH;
   const isCollapsed = isLong && !isExpanded;
 
   return (
     <p className='leading-normal whitespace-pre-line'>
-      {isCollapsed ? `${getPreview(text)}… ` : text}
-      {isCollapsed && (
-        <button
-          type='button'
-          aria-expanded={false}
-          onClick={() => setIsExpanded(true)}
-          className='text-purple-67 hover:text-purple-86 font-semibold transition-colors'
-        >
-          ещё
-        </button>
+      {isCollapsed ? (
+        <>
+          {renderParts(getPreviewParts(parts, COMMENT_PREVIEW_LENGTH))}…{' '}
+          <button
+            type='button'
+            aria-expanded={false}
+            onClick={() => setIsExpanded(true)}
+            className='text-purple-67 hover:text-purple-86 font-semibold transition-colors'
+          >
+            ещё
+          </button>
+        </>
+      ) : (
+        renderParts(parts)
       )}
     </p>
   );

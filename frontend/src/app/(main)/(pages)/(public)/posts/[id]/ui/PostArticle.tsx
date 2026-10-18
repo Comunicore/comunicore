@@ -22,7 +22,7 @@ export default function PostArticle({
           href={AppRouter.posts.root}
           className='text-pink-86 hover:underline'
         >
-          {category.name}
+          {category}
         </Link>
       </p>
 

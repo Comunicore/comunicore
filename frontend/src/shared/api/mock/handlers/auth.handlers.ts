@@ -163,7 +163,9 @@ function createTokenPair(userId: string) {
   };
 }
 
-function getUserByAccessToken(authHeader: string | null): MockUser | null {
+export function getUserByAccessToken(
+  authHeader: string | null,
+): MockUser | null {
   let token: string | null = null;
 
   if (authHeader?.startsWith('Bearer ')) {
