@@ -251,6 +251,7 @@ paths:
     get:
       operationId: postGet
       summary: Get single post with all comments by post id
+      security: []
       parameters:
         - name: postId
           in: path
