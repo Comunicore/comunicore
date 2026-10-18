@@ -4,50 +4,60 @@ import Link from 'next/link';
 
 import { PostComment } from '../model/post-comment.types';
 
+import { CommentReply } from './CommentReply';
+
 import { CommentCard } from '@/entities/comment';
 import { RoleBadge, UserAvatar } from '@/entities/user';
 
 import { AppRouter } from '@/shared/config/app-router';
 import { cn } from '@/shared/lib/classNames';
 
-// Линия вниз от аватара родителя до списка ответов
 const parentLineStyles = cn(
-  'after:absolute after:top-[calc(50%+2.1875rem)] after:left-8.75 after:w-px',
+  'after:absolute after:top-17.5 after:left-8.75 after:w-px',
   'after:bg-gray-9e/30',
 );
 
-// Изгиб к последнему ребёнку: сверху до его центра
 const lastElbowStyles = cn(
-  'before:absolute before:top-0 before:bottom-1/2',
+  'before:absolute before:top-0 before:h-(--node-center)',
   'before:left-[calc(-1*var(--branch-offset))] before:w-(--branch-offset)',
   'before:rounded-bl-xl before:border-b before:border-l',
   'before:border-gray-9e/30',
 );
 
-// Ответвление к промежуточному ребёнку (вертикаль рисует rail у li)
 const branchStyles = cn(
-  'before:absolute before:bottom-1/2 before:h-3',
+  'before:absolute before:top-[calc(var(--node-center)-0.75rem)] before:h-3',
   'before:left-[calc(-1*var(--branch-offset))] before:w-(--branch-offset)',
   'before:rounded-bl-xl before:border-b before:border-l',
   'before:border-gray-9e/30',
 );
 
-// Вертикаль вдоль промежуточного ребёнка и отступа до следующего
 const railStyles = cn(
   'after:absolute after:top-0 after:-bottom-5 after:w-px',
   'after:left-[calc(-1*var(--branch-offset))] after:bg-gray-9e/30',
 );
 
+const nodeCenterStyles = {
+  comment: '[--node-center:2.1875rem]',
+  toggle: '[--node-center:0.75rem]',
+};
+
 interface ThreadNodeProps {
   isLast: boolean;
+  kind: keyof typeof nodeCenterStyles;
   children: ReactNode;
   nested?: ReactNode;
 }
 
-function ThreadNode({ isLast, children, nested }: ThreadNodeProps) {
+function ThreadNode({ isLast, kind, children, nested }: ThreadNodeProps) {
   return (
     <li className={cn('relative', !isLast && railStyles)}>
-      <div className={cn('relative', isLast ? lastElbowStyles : branchStyles)}>
+      <div
+        className={cn(
+          'relative',
+          nodeCenterStyles[kind],
+          isLast ? lastElbowStyles : branchStyles,
+        )}
+      >
         {children}
       </div>
       {nested}
@@ -106,6 +116,7 @@ function ThreadComment({ comment }: CommentProps) {
         </>
       }
       text={text}
+      actions={<CommentReply commentId={comment.id} authorName={author.name} />}
     />
   );
 }
@@ -122,7 +133,7 @@ function CommentReplies({ comment }: CommentProps) {
   if (!replies.length) {
     return (
       <ul className='mt-1 pl-17.5 [--branch-offset:2.1875rem]'>
-        <ThreadNode isLast>
+        <ThreadNode isLast kind='toggle'>
           <HiddenRepliesButton count={hiddenCount} />
         </ThreadNode>
       </ul>
@@ -141,13 +152,14 @@ function CommentReplies({ comment }: CommentProps) {
         <ThreadNode
           key={reply.id}
           isLast={index === lastIndex}
+          kind='comment'
           nested={<CommentReplies comment={reply} />}
         >
           <ThreadComment comment={reply} />
         </ThreadNode>
       ))}
       {!!hiddenCount && (
-        <ThreadNode isLast>
+        <ThreadNode isLast kind='toggle'>
           <HiddenRepliesButton count={hiddenCount} />
         </ThreadNode>
       )}
