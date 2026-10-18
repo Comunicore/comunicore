@@ -1,6 +1,7 @@
 'use client';
 
-import { FormEvent, Ref, useState } from 'react';
+import { FormEvent, Ref, useRef, useState } from 'react';
+import { LuSend } from 'react-icons/lu';
 import Link from 'next/link';
 
 import { useAddComment } from '../model/useAddComment';
@@ -9,9 +10,7 @@ import { selectIsAuthenticated, useAuthStore } from '@/entities/session';
 import { mapUserToMessageAuthor, useUser } from '@/entities/user';
 
 import { AppRouter } from '@/shared/config/app-router';
-
-const fieldStyles =
-  'border-gray-9e placeholder:text-gray-9e focus:border-purple-67 h-12.5 w-full rounded-[0.625rem] border bg-transparent px-2.5 text-lg font-medium outline-none';
+import { Input } from '@/shared/ui';
 
 interface AddCommentFormProps {
   postId: number;
@@ -33,6 +32,7 @@ export function AddCommentForm({
 
   const { mutate } = useAddComment(postId, author);
   const [hasError, setHasError] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
 
   if (!isAuthenticated) {
     return (
@@ -67,6 +67,7 @@ export function AddCommentForm({
 
   return (
     <form
+      ref={formRef}
       id='add-comment'
       onSubmit={handleSubmit}
       className='flex scroll-mt-28 flex-col gap-y-2'
@@ -74,7 +75,7 @@ export function AddCommentForm({
       <label htmlFor='post-comment' className='sr-only'>
         Комментарий
       </label>
-      <input
+      <Input
         ref={inputRef}
         id='post-comment'
         name='comment'
@@ -83,7 +84,10 @@ export function AddCommentForm({
         onChange={(event) => onTextChange(event.target.value)}
         placeholder='Введите комментарий'
         autoComplete='off'
-        className={fieldStyles}
+        inputColor='ghost'
+        inputSize='lg'
+        actionIcon={<LuSend title='Отправить комментарий' />}
+        onActionIconClick={() => formRef.current?.requestSubmit()}
       />
       {hasError && (
         <p role='alert' className='text-red-ff text-sm'>
