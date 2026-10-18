@@ -341,6 +341,14 @@ func (s *AuthLoginUnauthorized) Validate() error {
 	return nil
 }
 
+func (s CategoriesListResponse) Validate() error {
+	alias := ([]CategoriesListResponseItem)(s)
+	if alias == nil {
+		return errors.New("nil is invalid value")
+	}
+	return nil
+}
+
 func (s *ErrorNotUnique) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer

@@ -44,6 +44,7 @@ const (
 	userUpdatePath   = "/api/user/{id}"
 	authLoginPath    = "/api/auth/login"
 	authLogoutPath   = "/api/auth/logout"
+	categoriesList   = "/api/categories"
 	postCreatePath   = "/api/posts"
 	postCommentsPath = "/api/posts/{postId}/comments"
 )

@@ -99,6 +99,25 @@ func (r *CategoryRepo) Reload(ctx context.Context) error {
 	return r.loadCacheLocked(ctx)
 }
 
+// get all categories (id, name)
+func (r *CategoryRepo) GetAllList(ctx context.Context) ([]model.Category, error) {
+	if err := r.ensureCache(ctx); err != nil {
+		return nil, err
+	}
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	categories := make([]model.Category, 0, len(r.idToName))
+	for id, name := range r.idToName {
+		categories = append(categories, model.Category{
+			ID:   id,
+			Name: name,
+		})
+	}
+	return categories, nil
+}
+
+// get categories (id, name) by list of category IDs
 func (r *CategoryRepo) GetDictByIDList(ctx context.Context, idList []int64) (map[int]model.Category, error) {
 	if err := r.ensureCache(ctx); err != nil {
 		return nil, err

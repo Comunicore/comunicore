@@ -10,6 +10,7 @@ const (
 	AnalyticsVisitBatchSubmitOperation OperationName = "AnalyticsVisitBatchSubmit"
 	AuthLoginOperation                 OperationName = "AuthLogin"
 	AuthLogoutOperation                OperationName = "AuthLogout"
+	CategoriesListOperation            OperationName = "CategoriesList"
 	MediaGetOperation                  OperationName = "MediaGet"
 	MediaUploadOperation               OperationName = "MediaUpload"
 	PostAddCommentOperation            OperationName = "PostAddComment"

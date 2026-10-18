@@ -6,13 +6,14 @@ package e2e
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 
 	"github.com/comunicore/comunicore/backend/internal/repository"
-	categoryRepo "github.com/comunicore/comunicore/backend/internal/repository/category"
+	categoryRepo "github.com/comunicore/comunicore/backend/internal/repository/categories"
 )
 
 func getTestDSN() string {
@@ -133,4 +134,22 @@ func TestCategoryRepo_ConcurrentReads(t *testing.T) {
 		}()
 	}
 	wg.Wait()
+}
+func TestAPI_CategoryList(t *testing.T) {
+	t.Run("Test AuthLogin OK", func(t *testing.T) {
+		exp := expectCreate(t, globalConfig.URL)
+
+		res := exp.GET(categoriesList).
+			Expect().
+			Status(http.StatusOK)
+
+		categories := res.JSON().Array()
+		categories.Length().Gt(0)
+		for _, cat := range categories.Iter() {
+			catObj := cat.Object()
+			catObj.Keys().ContainsOnly("id", "name")
+			catObj.Value("id").Number().Ge(0)
+			catObj.Value("name").String().NotEmpty()
+		}
+	})
 }
