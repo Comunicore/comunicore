@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
+import { isNavLinkActive } from '../model/isNavLinkActive';
 import { navLinks } from '../model/navLinks';
 
 import { AuthButtons } from './AuthButtons';
@@ -79,8 +80,7 @@ export function Header(props: HeaderProps) {
         <ScrollX className='py-2'>
           <nav className='[&_a:hover]:text-purple-67 hidden shrink gap-x-5 text-[18px] font-medium xl:flex [&_a]:transition-colors'>
             {navLinks.map(({ label, href }) => {
-              const isActive =
-                href === '/' ? pathname === href : pathname.startsWith(href);
+              const isActive = isNavLinkActive(pathname, href);
 
               return (
                 <Link
