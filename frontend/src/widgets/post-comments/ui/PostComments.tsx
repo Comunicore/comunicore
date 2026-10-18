@@ -1,10 +1,10 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 
 import { PostComment } from '../model/post-comment.types';
 
-import { CommentItem } from './CommentItem';
+import { CommentList } from './CommentList';
 
 import { AddCommentForm } from '@/features/add-comment';
 
@@ -24,7 +24,7 @@ export function PostComments({
   const [draft, setDraft] = useState('');
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  const handleReply = (comment: PostComment) => {
+  const handleReply = useCallback((comment: PostComment) => {
     const reference = createCommentReference(comment.id, comment.author.name);
 
     setDraft((current) => {
@@ -34,7 +34,7 @@ export function PostComments({
 
     inputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     inputRef.current?.focus({ preventScroll: true });
-  };
+  }, []);
 
   return (
     <>
@@ -57,15 +57,7 @@ export function PostComments({
         </h2>
 
         {comments.length > 0 ? (
-          <ul className='flex flex-col gap-y-5'>
-            {comments.map((comment) => (
-              <CommentItem
-                key={comment.id}
-                comment={comment}
-                onReply={handleReply}
-              />
-            ))}
-          </ul>
+          <CommentList comments={comments} onReply={handleReply} />
         ) : (
           <p className='text-gray-9e'>Комментариев пока нет. Будьте первым!</p>
         )}
