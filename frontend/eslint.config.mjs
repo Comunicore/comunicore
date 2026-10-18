@@ -20,6 +20,7 @@ const eslintConfig = defineConfig([
     'next-env.d.ts',
     'node_modules/**',
     '.history/**',
+    'src/shared/api/generated/**',
   ]),
   {
     plugins: {
