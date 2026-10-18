@@ -24,7 +24,7 @@ import (
 
 	analyticsRepo "github.com/comunicore/comunicore/backend/internal/repository/analytics"
 	authRepo "github.com/comunicore/comunicore/backend/internal/repository/auth"
-	categoryRepo "github.com/comunicore/comunicore/backend/internal/repository/category"
+	categoryRepo "github.com/comunicore/comunicore/backend/internal/repository/categories"
 	commentsRepo "github.com/comunicore/comunicore/backend/internal/repository/comments"
 	mediaRepo "github.com/comunicore/comunicore/backend/internal/repository/media"
 	postsRepo "github.com/comunicore/comunicore/backend/internal/repository/posts"
@@ -32,6 +32,7 @@ import (
 
 	analyticsService "github.com/comunicore/comunicore/backend/internal/service/analytics"
 	authService "github.com/comunicore/comunicore/backend/internal/service/auth"
+	categoriesService "github.com/comunicore/comunicore/backend/internal/service/categories"
 	mediaService "github.com/comunicore/comunicore/backend/internal/service/media"
 	postsService "github.com/comunicore/comunicore/backend/internal/service/posts"
 	userService "github.com/comunicore/comunicore/backend/internal/service/user"
@@ -39,28 +40,31 @@ import (
 
 // OgenHandler implements api.Handler.
 type OgenHandler struct {
-	authHandler      *AuthHandler
-	userHandler      *UserHandler
-	postsHandler     *PostsHandler
-	mediaHandler     *MediaHandler
-	analyticsHandler *AnalyticsHandler
+	authHandler       *AuthHandler
+	userHandler       *UserHandler
+	postsHandler      *PostsHandler
+	mediaHandler      *MediaHandler
+	analyticsHandler  *AnalyticsHandler
+	categoriesHandler *CategoriesHandler
 	api.UnimplementedHandler
 }
 
 func NewOgenHandler(
 	authHandler *AuthHandler,
 	userHandler *UserHandler,
+	categoriesHandler *CategoriesHandler,
 	postsHandler *PostsHandler,
 	mediaHandler *MediaHandler,
 	analyticsHandler *AnalyticsHandler,
 ) *OgenHandler {
 
 	return &OgenHandler{
-		postsHandler:     postsHandler,
-		userHandler:      userHandler,
-		authHandler:      authHandler,
-		mediaHandler:     mediaHandler,
-		analyticsHandler: analyticsHandler,
+		postsHandler:      postsHandler,
+		userHandler:       userHandler,
+		authHandler:       authHandler,
+		categoriesHandler: categoriesHandler,
+		mediaHandler:      mediaHandler,
+		analyticsHandler:  analyticsHandler,
 	}
 }
 
@@ -224,6 +228,7 @@ func RegisterOgenRoutes(mux *http.ServeMux, cfg *config.AppConfig) {
 	userS := userService.NewUserService(userR, authR)
 	mediaS := mediaService.NewMediaService(cfg.Server.BaseURL, mediaR)
 
+	categoriesS := categoriesService.NewCategoriesService(categoryR)
 	postsS := postsService.NewPostsService(categoryR, postsR, commentR, userR)
 	analyticsS := analyticsService.NewAnalyticsService(analyticsR)
 
@@ -232,9 +237,10 @@ func RegisterOgenRoutes(mux *http.ServeMux, cfg *config.AppConfig) {
 	userH := NewUserHandler(userS)
 	postsH := NewPostsHandler(postsS)
 	mediaH := NewMediaHandler(mediaS)
+	categoriesH := NewCategoriesHandler(categoriesS)
 	analyticsH := NewAnalyticsHandler(analyticsS)
 
-	ogenHandler := NewOgenHandler(authH, userH, postsH, mediaH, analyticsH)
+	ogenHandler := NewOgenHandler(authH, userH, categoriesH, postsH, mediaH, analyticsH)
 	secHandler := NewSecurityHandler(authR)
 
 	errHandler := &errorHandler{}
@@ -264,6 +270,10 @@ func (h *OgenHandler) PostAddComment(
 	api.PostAddCommentRes, error) {
 
 	return h.postsHandler.PostAddComment(ctx, req, params)
+}
+
+func (h *OgenHandler) CategoriesList(ctx context.Context) (api.CategoriesListRes, error) {
+	return h.categoriesHandler.CategoriesList(ctx)
 }
 
 func (h *OgenHandler) PostCreate(ctx context.Context, req *api.PostCreateRequest) (api.PostCreateRes, error) {

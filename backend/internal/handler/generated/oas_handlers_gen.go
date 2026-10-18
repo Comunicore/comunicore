@@ -442,6 +442,71 @@ func (s *Server) handleAuthLogoutRequest(args [0]string, argsEscaped bool, w htt
 	}
 }
 
+// handleCategoriesListRequest handles categoriesList operation.
+//
+// Get list of all categories.
+//
+// GET /api/categories
+func (s *Server) handleCategoriesListRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
+	statusWriter := &codeRecorder{ResponseWriter: w}
+	w = statusWriter
+	ctx := r.Context()
+
+	var (
+		err error
+	)
+
+	var rawBody []byte
+
+	var response CategoriesListRes
+	if m := s.cfg.Middleware; m != nil {
+		mreq := middleware.Request{
+			Context:          ctx,
+			OperationName:    CategoriesListOperation,
+			OperationSummary: "Get list of all categories",
+			OperationID:      "categoriesList",
+			Body:             nil,
+			RawBody:          rawBody,
+			Params:           middleware.Parameters{},
+			Raw:              r,
+		}
+
+		type (
+			Request  = struct{}
+			Params   = struct{}
+			Response = CategoriesListRes
+		)
+		response, err = middleware.HookMiddleware[
+			Request,
+			Params,
+			Response,
+		](
+			m,
+			mreq,
+			nil,
+			func(ctx context.Context, request Request, params Params) (response Response, err error) {
+				response, err = s.h.CategoriesList(ctx)
+				return response, err
+			},
+		)
+	} else {
+		response, err = s.h.CategoriesList(ctx)
+	}
+	if err != nil {
+		defer recordError("Internal", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+
+	if err := encodeCategoriesListResponse(response, w); err != nil {
+		defer recordError("EncodeResponse", err)
+		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+		}
+		return
+	}
+}
+
 // handleMediaGetRequest handles mediaGet operation.
 //
 // Get media file by name.

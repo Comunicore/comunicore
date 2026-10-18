@@ -159,6 +159,21 @@ paths:
       responses:
         '204':
           description: No Content
+  /api/categories:
+    get:
+      operationId: categoriesList
+      summary: Get list of all categories
+      description: Get list of all categories.
+      security: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoriesListResponse'
+        "500":
+          $ref: '#/components/responses/ErrorStringDescription'
   /api/posts:
     get:
       operationId: postsList
@@ -673,6 +688,21 @@ components:
         commentsCount: 5
         likesCount: 10
         viewsCount: 100
+    CategoriesListResponse:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+          name:
+            type: string
+        required:
+          - id
+          - name
+        example:
+          id: 1
+          name: "Программирование"
     PostListItem:
       type: object
       properties:

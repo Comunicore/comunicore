@@ -50,6 +50,15 @@ func (UnimplementedHandler) AuthLogout(ctx context.Context) error {
 	return ht.ErrNotImplemented
 }
 
+// CategoriesList implements categoriesList operation.
+//
+// Get list of all categories.
+//
+// GET /api/categories
+func (UnimplementedHandler) CategoriesList(ctx context.Context) (r CategoriesListRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // MediaGet implements mediaGet operation.
 //
 // Get media file by name.

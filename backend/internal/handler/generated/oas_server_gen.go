@@ -33,6 +33,12 @@ type Handler interface {
 	//
 	// POST /api/auth/logout
 	AuthLogout(ctx context.Context) error
+	// CategoriesList implements categoriesList operation.
+	//
+	// Get list of all categories.
+	//
+	// GET /api/categories
+	CategoriesList(ctx context.Context) (CategoriesListRes, error)
 	// MediaGet implements mediaGet operation.
 	//
 	// Get media file by name.

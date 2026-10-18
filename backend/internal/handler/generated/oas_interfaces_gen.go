@@ -13,6 +13,10 @@ type AuthLoginRes interface {
 	authLoginRes()
 }
 
+type CategoriesListRes interface {
+	categoriesListRes()
+}
+
 type MediaGetRes interface {
 	mediaGetRes()
 }

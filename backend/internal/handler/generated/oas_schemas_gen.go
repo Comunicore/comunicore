@@ -69,6 +69,7 @@ type AnalyticsMetricsGetInternalServerErrorApplicationJSON string
 func (*AnalyticsMetricsGetInternalServerErrorApplicationJSON) analyticsMetricsGetRes()       {}
 func (*AnalyticsMetricsGetInternalServerErrorApplicationJSON) analyticsVisitBatchSubmitRes() {}
 func (*AnalyticsMetricsGetInternalServerErrorApplicationJSON) authLoginRes()                 {}
+func (*AnalyticsMetricsGetInternalServerErrorApplicationJSON) categoriesListRes()            {}
 func (*AnalyticsMetricsGetInternalServerErrorApplicationJSON) mediaGetRes()                  {}
 func (*AnalyticsMetricsGetInternalServerErrorApplicationJSON) postsListRes()                 {}
 func (*AnalyticsMetricsGetInternalServerErrorApplicationJSON) userCreateRes()                {}
@@ -572,6 +573,35 @@ func (*AuthLoginUnauthorized) authLoginRes() {}
 
 // AuthLogoutNoContent is response for AuthLogout operation.
 type AuthLogoutNoContent struct{}
+
+type CategoriesListResponse []CategoriesListResponseItem
+
+func (*CategoriesListResponse) categoriesListRes() {}
+
+type CategoriesListResponseItem struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+}
+
+// GetID returns the value of ID.
+func (s *CategoriesListResponseItem) GetID() int {
+	return s.ID
+}
+
+// GetName returns the value of Name.
+func (s *CategoriesListResponseItem) GetName() string {
+	return s.Name
+}
+
+// SetID sets the value of ID.
+func (s *CategoriesListResponseItem) SetID(val int) {
+	s.ID = val
+}
+
+// SetName sets the value of Name.
+func (s *CategoriesListResponseItem) SetName(val string) {
+	s.Name = val
+}
 
 type CookieAuth struct {
 	APIKey string
