@@ -1,5 +1,7 @@
 import { ReactNode } from 'react';
 
+import { CommentText } from './CommentText';
+
 import { cn } from '@/shared/lib/classNames';
 
 interface CommentCardProps {
@@ -20,7 +22,7 @@ export function CommentCard({
       {avatar}
       <div className='flex min-w-0 flex-col gap-y-2.5'>
         <div className='flex flex-wrap items-start gap-1.5'>{author}</div>
-        <p className='leading-normal whitespace-pre-line'>{text}</p>
+        <CommentText text={text} />
       </div>
     </article>
   );

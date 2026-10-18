@@ -86,7 +86,14 @@ function ThreadComment({ comment }: CommentProps) {
         hasThread(comment) &&
           (hasReplies(comment) ? 'after:-bottom-5' : 'after:-bottom-1'),
       )}
-      avatar={<UserAvatar user={author} />}
+      avatar={
+        <Link
+          href={AppRouter.user.getRoute(author.id)}
+          className='shrink-0 transition-opacity hover:opacity-80'
+        >
+          <UserAvatar user={author} />
+        </Link>
+      }
       author={
         <>
           <Link
