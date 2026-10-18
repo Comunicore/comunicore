@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Montserrat } from 'next/font/google';
 
 import Providers from './providers/providers';
+import SiteShell from './site-shell';
 
 import './styles/globals.css';
 import './styles/utils.css';
@@ -31,7 +32,9 @@ export default function RootLayout({
   return (
     <html lang='en'>
       <body className={montserrat.variable}>
-        <Providers>{children}</Providers>
+        <Providers>
+          <SiteShell>{children}</SiteShell>
+        </Providers>
       </body>
     </html>
   );
