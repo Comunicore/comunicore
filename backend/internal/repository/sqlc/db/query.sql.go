@@ -850,6 +850,30 @@ func (q *Queries) PostTagInsert(ctx context.Context, arg PostTagInsertParams) er
 	return err
 }
 
+const postTags = `-- name: PostTags :many
+SELECT tag FROM post_tags WHERE post_id = $1
+`
+
+func (q *Queries) PostTags(ctx context.Context, postID int32) ([]string, error) {
+	rows, err := q.db.Query(ctx, postTags, postID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []string
+	for rows.Next() {
+		var tag string
+		if err := rows.Scan(&tag); err != nil {
+			return nil, err
+		}
+		items = append(items, tag)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const userCreate = `-- name: UserCreate :one
 INSERT INTO users (name, display_name, email)
 VALUES ($1, $1, $2)

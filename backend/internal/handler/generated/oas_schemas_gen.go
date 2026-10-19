@@ -1275,6 +1275,7 @@ type PostCommentItem struct {
 	ID        int           `json:"id"`
 	Author    MessageAuthor `json:"author"`
 	ContentMd string        `json:"contentMd"`
+	Tags      []string      `json:"tags"`
 	CreatedAt time.Time     `json:"createdAt"`
 	UpdatedAt OptDateTime   `json:"updatedAt"`
 }
@@ -1292,6 +1293,11 @@ func (s *PostCommentItem) GetAuthor() MessageAuthor {
 // GetContentMd returns the value of ContentMd.
 func (s *PostCommentItem) GetContentMd() string {
 	return s.ContentMd
+}
+
+// GetTags returns the value of Tags.
+func (s *PostCommentItem) GetTags() []string {
+	return s.Tags
 }
 
 // GetCreatedAt returns the value of CreatedAt.
@@ -1317,6 +1323,11 @@ func (s *PostCommentItem) SetAuthor(val MessageAuthor) {
 // SetContentMd sets the value of ContentMd.
 func (s *PostCommentItem) SetContentMd(val string) {
 	s.ContentMd = val
+}
+
+// SetTags sets the value of Tags.
+func (s *PostCommentItem) SetTags(val []string) {
+	s.Tags = val
 }
 
 // SetCreatedAt sets the value of CreatedAt.
@@ -1419,6 +1430,7 @@ type PostItem struct {
 	Title    string        `json:"title"`
 	// Post content in Markdown format.
 	ContentMd string      `json:"contentMd"`
+	Tags      []string    `json:"tags"`
 	PostStats PostStats   `json:"postStats"`
 	SeoMeta   OptSeoMeta  `json:"seoMeta"`
 	CreatedAt time.Time   `json:"createdAt"`
@@ -1448,6 +1460,11 @@ func (s *PostItem) GetTitle() string {
 // GetContentMd returns the value of ContentMd.
 func (s *PostItem) GetContentMd() string {
 	return s.ContentMd
+}
+
+// GetTags returns the value of Tags.
+func (s *PostItem) GetTags() []string {
+	return s.Tags
 }
 
 // GetPostStats returns the value of PostStats.
@@ -1495,6 +1512,11 @@ func (s *PostItem) SetContentMd(val string) {
 	s.ContentMd = val
 }
 
+// SetTags sets the value of Tags.
+func (s *PostItem) SetTags(val []string) {
+	s.Tags = val
+}
+
 // SetPostStats sets the value of PostStats.
 func (s *PostItem) SetPostStats(val PostStats) {
 	s.PostStats = val
@@ -1523,6 +1545,7 @@ type PostListItem struct {
 	Author    MessageAuthor `json:"author"`
 	Category  string        `json:"category"`
 	Title     string        `json:"title"`
+	Tags      []string      `json:"tags"`
 	PostStats PostStats     `json:"postStats"`
 	SeoMeta   OptSeoMeta    `json:"seoMeta"`
 	CreatedAt time.Time     `json:"createdAt"`
@@ -1547,6 +1570,11 @@ func (s *PostListItem) GetCategory() string {
 // GetTitle returns the value of Title.
 func (s *PostListItem) GetTitle() string {
 	return s.Title
+}
+
+// GetTags returns the value of Tags.
+func (s *PostListItem) GetTags() []string {
+	return s.Tags
 }
 
 // GetPostStats returns the value of PostStats.
@@ -1587,6 +1615,11 @@ func (s *PostListItem) SetCategory(val string) {
 // SetTitle sets the value of Title.
 func (s *PostListItem) SetTitle(val string) {
 	s.Title = val
+}
+
+// SetTags sets the value of Tags.
+func (s *PostListItem) SetTags(val []string) {
+	s.Tags = val
 }
 
 // SetPostStats sets the value of PostStats.
@@ -1708,6 +1741,7 @@ type PostWithCommentsListResponse struct {
 	Title    string        `json:"title"`
 	// Number of reply posts (rows in posts). The opening message is not included.
 	ContentMd string            `json:"contentMd"`
+	Tags      []string          `json:"tags"`
 	PostStats PostStats         `json:"postStats"`
 	SeoMeta   OptSeoMeta        `json:"seoMeta"`
 	CreatedAt time.Time         `json:"createdAt"`
@@ -1738,6 +1772,11 @@ func (s *PostWithCommentsListResponse) GetTitle() string {
 // GetContentMd returns the value of ContentMd.
 func (s *PostWithCommentsListResponse) GetContentMd() string {
 	return s.ContentMd
+}
+
+// GetTags returns the value of Tags.
+func (s *PostWithCommentsListResponse) GetTags() []string {
+	return s.Tags
 }
 
 // GetPostStats returns the value of PostStats.
@@ -1788,6 +1827,11 @@ func (s *PostWithCommentsListResponse) SetTitle(val string) {
 // SetContentMd sets the value of ContentMd.
 func (s *PostWithCommentsListResponse) SetContentMd(val string) {
 	s.ContentMd = val
+}
+
+// SetTags sets the value of Tags.
+func (s *PostWithCommentsListResponse) SetTags(val []string) {
+	s.Tags = val
 }
 
 // SetPostStats sets the value of PostStats.

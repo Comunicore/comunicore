@@ -14,6 +14,7 @@ type PostWithComments struct {
 	Author    MessageAuthor
 	Title     string
 	Content   string
+	Tags      []string
 	PostStats PostStats
 	SeoMeta   SeoMeta
 	CreatedAt time.Time
@@ -40,6 +41,7 @@ type PostRepoInfo struct {
 	Title      string
 	Content    string
 	UserID     int
+	Tags       []string
 	PostStats  PostStats
 	SeoMeta    SeoMeta
 	CreatedAt  time.Time
@@ -58,6 +60,7 @@ type PostInfoResponse struct {
 	Title     string
 	Content   string
 	Author    MessageAuthor
+	Tags      []string
 	PostStats PostStats
 	SeoMeta   SeoMeta
 	CreatedAt time.Time
@@ -78,6 +81,7 @@ type PostInfo struct {
 	Title     string
 	Content   string
 	Author    MessageAuthor
+	Tags      []string
 	PostStats PostStats
 	SeoMeta   SeoMeta
 	CreatedAt time.Time

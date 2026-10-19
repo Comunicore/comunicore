@@ -615,6 +615,10 @@ components:
         contentMd:
           type: string
           description: Post content in Markdown format.
+        tags:
+          type: array
+          items:
+            type: string
         postStats:
           $ref: '#/components/schemas/PostStats'
         seoMeta:
@@ -714,6 +718,10 @@ components:
           type: string
         title:
           type: string
+        tags:
+          type: array
+          items:
+            type: string
         postStats:
           $ref: '#/components/schemas/PostStats'
         seoMeta:
@@ -741,6 +749,11 @@ components:
           displayName: "Petr Semenov"
           avatarUrl: "https://comunicore.mooo.com/storage/media/avatar1.png"
           rank: 5
+        tags:
+          - "C++"
+          - "JavaScript"
+          - "современный Rust"
+          - "тормознутый Python"
         postStats:
           commentsCount: 5
           likesCount: 10
@@ -760,6 +773,10 @@ components:
         contentMd:
           type: string
           description: Number of reply posts (rows in posts). The opening message is not included.
+        tags:
+          type: array
+          items:
+            type: string
         postStats:
           $ref: '#/components/schemas/PostStats'
         seoMeta:
@@ -855,6 +872,10 @@ components:
           $ref: '#/components/schemas/MessageAuthor'
         contentMd:
           type: string
+        tags:
+          type: array
+          items:
+            type: string
         createdAt:
           type: string
           format: date-time
