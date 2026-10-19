@@ -71,6 +71,9 @@ ORDER BY id DESC LIMIT $2;
 -- name: PostStats :one
 SELECT comments_count, likes_count, views_count FROM posts_extras WHERE post_id = $1;
 
+-- name: PostTags :many
+SELECT tag FROM post_tags WHERE post_id = $1;
+
 -- name: GetAllCategories :many
 SELECT id, name FROM categories ORDER BY id;
 -- name: GetCategoriesByIDList :many

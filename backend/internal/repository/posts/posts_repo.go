@@ -106,6 +106,10 @@ func (r *PostsRepo) PageByPageID(ctx context.Context, page, limit int) (model.Po
 		if err == nil {
 			postRepo.PostStats = stats
 		}
+		tags, err := r.queries.PostTags(ctx, int32(postRow.ID))
+		if err == nil {
+			postRepo.Tags = tags
+		}
 		posts = append(posts, postRepo)
 	}
 	if len(posts) == 0 {
@@ -153,6 +157,10 @@ func (r *PostsRepo) PageByOffset(ctx context.Context, postId, limit int, before 
 			if err == nil {
 				postRepo.PostStats = stats
 			}
+			tags, err := r.queries.PostTags(ctx, int32(postRow.ID))
+			if err == nil {
+				postRepo.Tags = tags
+			}
 			posts = append(posts, postRepo)
 		}
 	} else {
@@ -180,6 +188,10 @@ func (r *PostsRepo) PageByOffset(ctx context.Context, postId, limit int, before 
 			// post stats for zero values will default to zero, so we can ignore the error here
 			if err == nil {
 				postRepo.PostStats = stats
+			}
+			tags, err := r.queries.PostTags(ctx, int32(postRow.ID))
+			if err == nil {
+				postRepo.Tags = tags
 			}
 			posts = append(posts, postRepo)
 		}
@@ -263,6 +275,10 @@ func (r *PostsRepo) Get(ctx context.Context, postId int) (model.PostRepoInfo, er
 	// post stats for zero values will default to zero, so we can ignore the error here
 	if err == nil {
 		post.PostStats = stats
+	}
+	tags, err := r.queries.PostTags(ctx, int32(postRow.ID))
+	if err == nil {
+		post.Tags = tags
 	}
 
 	return post, err

@@ -30,13 +30,13 @@ func (h *PostsHandler) PostAddComment(
 		res := api.PostAddCommentInternalServerError("in handler.PostAddComment() user ID is not set")
 		return &res, apperror.NewAuthenticationError("handler.PostAddComment()", nil, "user ID is not set")
 	}
-	postCreate := model.CommentCreate{
+	commentToCreate := model.CommentCreate{
 		PostID:  params.PostId,
 		UserID:  globalCtx.UserID,
 		Content: req.ContentMd,
 	}
 
-	comment, err := h.postsService.AddComment(ctx, postCreate)
+	comment, err := h.postsService.AddComment(ctx, commentToCreate)
 	if err != nil {
 		return nil, err
 	}
@@ -91,6 +91,7 @@ func (h *PostsHandler) PostCreate(
 			DisplayName: post.Author.DisplayName,
 			Rank:        float64(post.Author.Rank),
 		},
+		Tags: post.Tags,
 		PostStats: api.PostStats{
 			CommentsCount: post.PostStats.CommentsCount,
 			LikesCount:    post.PostStats.LikesCount,
@@ -162,6 +163,7 @@ func (h *PostsHandler) PostGet(ctx context.Context, params api.PostGetParams) (a
 		},
 		Title:     postWithComments.Title,
 		ContentMd: postWithComments.Content,
+		Tags:      postWithComments.Tags,
 		PostStats: api.PostStats{
 			CommentsCount: postWithComments.PostStats.CommentsCount,
 			LikesCount:    postWithComments.PostStats.LikesCount,
@@ -232,6 +234,7 @@ GOT_POST_ID:
 				DisplayName: post.Author.DisplayName,
 				Rank:        float64(post.Author.Rank),
 			},
+			Tags: post.Tags,
 			PostStats: api.PostStats{
 				CommentsCount: post.PostStats.CommentsCount,
 				LikesCount:    post.PostStats.LikesCount,
