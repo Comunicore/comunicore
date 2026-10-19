@@ -2727,6 +2727,41 @@ func (s *OptDateTime) UnmarshalJSON(data []byte) error {
 	return s.Decode(d, json.DecodeDateTime)
 }
 
+// Encode encodes int as json.
+func (o OptInt) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	e.Int(int(o.Value))
+}
+
+// Decode decodes int from json.
+func (o *OptInt) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptInt to nil")
+	}
+	o.Set = true
+	v, err := d.Int()
+	if err != nil {
+		return err
+	}
+	o.Value = int(v)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptInt) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptInt) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode encodes SeoMeta as json.
 func (o OptSeoMeta) Encode(e *jx.Encoder) {
 	if !o.Set {
@@ -2920,6 +2955,12 @@ func (s *PostCommentItem) encodeFields(e *jx.Encoder) {
 		e.Int(s.ID)
 	}
 	{
+		if s.ParentCommentId.Set {
+			e.FieldStart("parentCommentId")
+			s.ParentCommentId.Encode(e)
+		}
+	}
+	{
 		e.FieldStart("author")
 		s.Author.Encode(e)
 	}
@@ -2949,13 +2990,14 @@ func (s *PostCommentItem) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfPostCommentItem = [6]string{
+var jsonFieldsNameOfPostCommentItem = [7]string{
 	0: "id",
-	1: "author",
-	2: "contentMd",
-	3: "tags",
-	4: "createdAt",
-	5: "updatedAt",
+	1: "parentCommentId",
+	2: "author",
+	3: "contentMd",
+	4: "tags",
+	5: "createdAt",
+	6: "updatedAt",
 }
 
 // Decode decodes PostCommentItem from json.
@@ -2979,8 +3021,18 @@ func (s *PostCommentItem) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"id\"")
 			}
+		case "parentCommentId":
+			if err := func() error {
+				s.ParentCommentId.Reset()
+				if err := s.ParentCommentId.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"parentCommentId\"")
+			}
 		case "author":
-			requiredBitSet[0] |= 1 << 1
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
 				if err := s.Author.Decode(d); err != nil {
 					return err
@@ -2990,7 +3042,7 @@ func (s *PostCommentItem) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"author\"")
 			}
 		case "contentMd":
-			requiredBitSet[0] |= 1 << 2
+			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
 				v, err := d.Str()
 				s.ContentMd = string(v)
@@ -3021,7 +3073,7 @@ func (s *PostCommentItem) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"tags\"")
 			}
 		case "createdAt":
-			requiredBitSet[0] |= 1 << 4
+			requiredBitSet[0] |= 1 << 5
 			if err := func() error {
 				v, err := json.DecodeDateTime(d)
 				s.CreatedAt = v
@@ -3052,7 +3104,7 @@ func (s *PostCommentItem) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [1]uint8{
-		0b00010111,
+		0b00101101,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -3111,10 +3163,17 @@ func (s *PostCreateCommentRequest) encodeFields(e *jx.Encoder) {
 		e.FieldStart("contentMd")
 		e.Str(s.ContentMd)
 	}
+	{
+		if s.ParentCommentId.Set {
+			e.FieldStart("parentCommentId")
+			s.ParentCommentId.Encode(e)
+		}
+	}
 }
 
-var jsonFieldsNameOfPostCreateCommentRequest = [1]string{
+var jsonFieldsNameOfPostCreateCommentRequest = [2]string{
 	0: "contentMd",
+	1: "parentCommentId",
 }
 
 // Decode decodes PostCreateCommentRequest from json.
@@ -3137,6 +3196,16 @@ func (s *PostCreateCommentRequest) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"contentMd\"")
+			}
+		case "parentCommentId":
+			if err := func() error {
+				s.ParentCommentId.Reset()
+				if err := s.ParentCommentId.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"parentCommentId\"")
 			}
 		default:
 			return d.Skip()

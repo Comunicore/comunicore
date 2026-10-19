@@ -38,6 +38,7 @@ CREATE TABLE IF NOT EXISTS posts_extras (
 );
 CREATE TABLE IF NOT EXISTS comments (
     id SERIAL PRIMARY KEY,
+    parent_id INTEGER, -- parent comment id for nested comments
     post_id INTEGER NOT NULL,
     user_id INTEGER NOT NULL,
     content TEXT NOT NULL,

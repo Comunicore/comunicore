@@ -25,13 +25,19 @@ func NewCommentsRepo(dsn string) (*CommentsRepo, error) {
 
 // create comment in post
 func (r *CommentsRepo) Create(ctx context.Context, comment model.CommentCreate) (model.Comment, error) {
-	row, err := r.queries.CommentCreate(ctx, commentsDb.CommentCreateParams{
+	params := commentsDb.CommentCreateParams{
 		PostID:  int32(comment.PostID),
 		UserID:  int32(comment.UserID),
 		Content: comment.Content,
-	})
+	}
+	if comment.ParentCommentID != 0 {
+		parentId := int64(comment.ParentCommentID)
+		params.ParentID.Scan(parentId)
+	}
+	row, err := r.queries.CommentCreate(ctx, params)
 	commentRes := model.Comment{
 		ID:        int(row.ID),
+		ParentID:  int(comment.ParentCommentID),
 		PostID:    int(row.PostID),
 		UserID:    int(row.UserID),
 		Content:   row.Content,
@@ -55,6 +61,9 @@ func (r *CommentsRepo) List(ctx context.Context, postId int) ([]model.Comment, e
 			UserID:    int(row.UserID),
 			Content:   row.Content,
 			CreatedAt: row.CreatedAt.Time,
+		}
+		if row.ParentID.Valid {
+			commentRepo.ParentID = int(row.ParentID.Int32)
 		}
 		if row.UpdatedAt.Valid {
 			commentRepo.UpdatedAt = row.UpdatedAt.Time

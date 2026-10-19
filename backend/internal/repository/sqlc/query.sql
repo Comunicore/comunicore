@@ -40,10 +40,10 @@ DELETE FROM sessions WHERE user_id = $1;
 SELECT user_id FROM sessions WHERE session_id = $1;
 
 -- name: CommentCreate :one
-INSERT INTO comments (post_id, user_id, content) VALUES ($1, $2, $3)
-RETURNING id, post_id, user_id, content, created_at, updated_at;
+INSERT INTO comments (post_id, user_id, content, parent_id) VALUES ($1, $2, $3, $4)
+RETURNING id, parent_id, post_id, user_id, content, created_at, updated_at;
 -- name: CommentListByPostId :many
-SELECT id, post_id, user_id, content, created_at, updated_at FROM comments
+SELECT id, parent_id, post_id, user_id, content, created_at, updated_at FROM comments
 WHERE post_id = $1 ORDER BY created_at DESC;
 
 -- name: PostCreate :one

@@ -35,6 +35,7 @@ type Category struct {
 
 type Comment struct {
 	ID        int32
+	ParentID  pgtype.Int4
 	PostID    int32
 	UserID    int32
 	Content   string

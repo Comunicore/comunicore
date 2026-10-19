@@ -868,6 +868,9 @@ components:
       properties:
         id:
           type: integer
+        parentCommentId:
+          type: integer
+          description: Optional parent comment id for nested comments (0 - no parent)
         author:
           $ref: '#/components/schemas/MessageAuthor'
         contentMd:
@@ -926,6 +929,9 @@ components:
       properties:
         contentMd:
           type: string
+        parentCommentId:
+          type: integer
+          description: Optional parent comment id for nested comments
       required:
         - contentMd
       example:
