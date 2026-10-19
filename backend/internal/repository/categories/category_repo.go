@@ -6,7 +6,7 @@ package category
 import (
 	"context"
 	"fmt"
-	"sync"
+	"sync/atomic"
 
 	"github.com/comunicore/comunicore/backend/internal/apperror"
 	"github.com/comunicore/comunicore/backend/internal/repository"
@@ -14,12 +14,13 @@ import (
 	"github.com/comunicore/comunicore/backend/internal/service/model"
 )
 
+type dataCache struct {
+	idToName map[int]string
+	nameToID map[string]int
+}
 type CategoryRepo struct {
 	queries     *categoryDb.Queries
-	mu          sync.RWMutex
-	idToName    map[int]string
-	nameToID    map[string]int
-	initialized bool
+	atomicCache atomic.Pointer[dataCache]
 }
 
 var defaultCategory = model.Category{ID: 0, Name: "default"}
@@ -35,80 +36,81 @@ func NewCategoryRepo(dsn string) (*CategoryRepo, error) {
 	}
 
 	repo := &CategoryRepo{
-		queries:  categoryDb.New(pool),
-		idToName: make(map[int]string),
-		nameToID: make(map[string]int),
+		queries: categoryDb.New(pool),
 	}
-	if err := repo.ensureCache(context.Background()); err != nil {
+	if cache, err := repo.loadCacheFromDB(context.Background()); err != nil {
 		return nil, err
+	} else {
+		repo.atomicCache.Store(cache)
 	}
+
 	return repo, nil
 }
 
 func NewCategoryRepoWithQueries(queries *categoryDb.Queries) *CategoryRepo {
 	return &CategoryRepo{
-		queries:  queries,
-		idToName: make(map[int]string),
-		nameToID: make(map[string]int),
+		queries: queries,
 	}
 }
 
-func (r *CategoryRepo) ensureCache(ctx context.Context) error {
-	r.mu.RLock()
-	if r.initialized {
-		r.mu.RUnlock()
-		return nil
+// check cache filled or fill it if not
+func (r *CategoryRepo) ensureCache(ctx context.Context) (*dataCache, error) {
+	var cache *dataCache = r.atomicCache.Load()
+	if cache != nil {
+		return cache, nil
 	}
-	r.mu.RUnlock()
 
-	r.mu.Lock()
-	defer r.mu.Unlock()
-	if r.initialized {
-		return nil
+	cache, err := r.loadCacheFromDB(ctx)
+	if err != nil {
+		return nil, err
 	}
-	return r.loadCacheLocked(ctx)
+	r.atomicCache.Store(cache)
+
+	return cache, nil
 }
 
-func (r *CategoryRepo) loadCacheLocked(ctx context.Context) error {
+func (r *CategoryRepo) loadCacheFromDB(ctx context.Context) (*dataCache, error) {
 	rows, err := r.queries.GetAllCategories(ctx)
 	if err != nil {
-		return apperror.PgErrorToAppError(err)
+		return nil, apperror.PgErrorToAppError(err)
 	}
 
-	idToName := make(map[int]string, len(rows)+1)
-	nameToID := make(map[string]int, len(rows)+1)
+	res := &dataCache{
+		idToName: make(map[int]string, len(rows)+1),
+		nameToID: make(map[string]int, len(rows)+1),
+	}
 	for _, row := range rows {
 		id := int(row.ID)
-		idToName[id] = row.Name
-		nameToID[row.Name] = id
+		res.idToName[id] = row.Name
+		res.nameToID[row.Name] = id
 	}
-	if _, ok := idToName[defaultCategory.ID]; !ok {
-		idToName[defaultCategory.ID] = defaultCategory.Name
-		nameToID[defaultCategory.Name] = defaultCategory.ID
+	if _, ok := res.idToName[defaultCategory.ID]; !ok {
+		res.idToName[defaultCategory.ID] = defaultCategory.Name
+		res.nameToID[defaultCategory.Name] = defaultCategory.ID
 	}
 
-	r.idToName = idToName
-	r.nameToID = nameToID
-	r.initialized = true
-	return nil
+	return res, nil
 }
 
 func (r *CategoryRepo) Reload(ctx context.Context) error {
-	r.mu.Lock()
-	defer r.mu.Unlock()
-	return r.loadCacheLocked(ctx)
+	cache, err := r.loadCacheFromDB(ctx)
+	if err != nil {
+		return err
+	}
+	r.atomicCache.Store(cache)
+
+	return nil
 }
 
 // get all categories (id, name)
 func (r *CategoryRepo) GetAllList(ctx context.Context) ([]model.Category, error) {
-	if err := r.ensureCache(ctx); err != nil {
+	cache, err := r.ensureCache(ctx)
+	if err != nil {
 		return nil, err
 	}
-	r.mu.RLock()
-	defer r.mu.RUnlock()
 
-	categories := make([]model.Category, 0, len(r.idToName))
-	for id, name := range r.idToName {
+	categories := make([]model.Category, 0, len(cache.idToName))
+	for id, name := range cache.idToName {
 		categories = append(categories, model.Category{
 			ID:   id,
 			Name: name,
@@ -119,16 +121,15 @@ func (r *CategoryRepo) GetAllList(ctx context.Context) ([]model.Category, error)
 
 // get categories (id, name) by list of category IDs
 func (r *CategoryRepo) GetDictByIDList(ctx context.Context, idList []int64) (map[int]model.Category, error) {
-	if err := r.ensureCache(ctx); err != nil {
+	cache, err := r.ensureCache(ctx)
+	if err != nil {
 		return nil, err
 	}
-	r.mu.RLock()
-	defer r.mu.RUnlock()
 
 	categories := make(map[int]model.Category, len(idList))
 	for _, id := range idList {
 		intID := int(id)
-		if name, ok := r.idToName[intID]; ok {
+		if name, ok := cache.idToName[intID]; ok {
 			categories[intID] = model.Category{
 				ID:   intID,
 				Name: name,
@@ -139,14 +140,13 @@ func (r *CategoryRepo) GetDictByIDList(ctx context.Context, idList []int64) (map
 }
 
 func (r *CategoryRepo) GetCategoryByID(ctx context.Context, id int64) (model.Category, error) {
-	if err := r.ensureCache(ctx); err != nil {
+	cache, err := r.ensureCache(ctx)
+	if err != nil {
 		return model.Category{}, err
 	}
-	r.mu.RLock()
-	defer r.mu.RUnlock()
 
 	intID := int(id)
-	name, ok := r.idToName[intID]
+	name, ok := cache.idToName[intID]
 	if !ok {
 		return model.Category{}, fmt.Errorf("category with ID %d not found", intID)
 	}
@@ -157,13 +157,12 @@ func (r *CategoryRepo) GetCategoryByID(ctx context.Context, id int64) (model.Cat
 }
 
 func (r *CategoryRepo) GetCategoryByName(ctx context.Context, name string) (model.Category, error) {
-	if err := r.ensureCache(ctx); err != nil {
+	cache, err := r.ensureCache(ctx)
+	if err != nil {
 		return model.Category{}, err
 	}
-	r.mu.RLock()
-	defer r.mu.RUnlock()
 
-	id, ok := r.nameToID[name]
+	id, ok := cache.nameToID[name]
 	if !ok {
 		return model.Category{}, fmt.Errorf("category with name %s not found", name)
 	}
