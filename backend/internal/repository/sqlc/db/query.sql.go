@@ -516,21 +516,28 @@ func (q *Queries) AuthUpdatePassword(ctx context.Context, arg AuthUpdatePassword
 }
 
 const commentCreate = `-- name: CommentCreate :one
-INSERT INTO comments (post_id, user_id, content) VALUES ($1, $2, $3)
-RETURNING id, post_id, user_id, content, created_at, updated_at
+INSERT INTO comments (post_id, user_id, content, parent_id) VALUES ($1, $2, $3, $4)
+RETURNING id, parent_id, post_id, user_id, content, created_at, updated_at
 `
 
 type CommentCreateParams struct {
-	PostID  int32
-	UserID  int32
-	Content string
+	PostID   int32
+	UserID   int32
+	Content  string
+	ParentID pgtype.Int4
 }
 
 func (q *Queries) CommentCreate(ctx context.Context, arg CommentCreateParams) (Comment, error) {
-	row := q.db.QueryRow(ctx, commentCreate, arg.PostID, arg.UserID, arg.Content)
+	row := q.db.QueryRow(ctx, commentCreate,
+		arg.PostID,
+		arg.UserID,
+		arg.Content,
+		arg.ParentID,
+	)
 	var i Comment
 	err := row.Scan(
 		&i.ID,
+		&i.ParentID,
 		&i.PostID,
 		&i.UserID,
 		&i.Content,
@@ -541,7 +548,7 @@ func (q *Queries) CommentCreate(ctx context.Context, arg CommentCreateParams) (C
 }
 
 const commentListByPostId = `-- name: CommentListByPostId :many
-SELECT id, post_id, user_id, content, created_at, updated_at FROM comments
+SELECT id, parent_id, post_id, user_id, content, created_at, updated_at FROM comments
 WHERE post_id = $1 ORDER BY created_at DESC
 `
 
@@ -556,6 +563,7 @@ func (q *Queries) CommentListByPostId(ctx context.Context, postID int32) ([]Comm
 		var i Comment
 		if err := rows.Scan(
 			&i.ID,
+			&i.ParentID,
 			&i.PostID,
 			&i.UserID,
 			&i.Content,

@@ -62,8 +62,9 @@ func (s *PostsService) AddComment(ctx context.Context, comment model.CommentCrea
 		return model.CommentInfo{}, err
 	}
 	commentInfo := model.CommentInfo{
-		ID:     createdComment.ID,
-		PostID: createdComment.PostID,
+		ID:       createdComment.ID,
+		ParentID: createdComment.ParentID,
+		PostID:   createdComment.PostID,
 		Author: model.MessageAuthor{
 			ID:          createdComment.UserID,
 			Username:    userInfo.Name,
@@ -139,7 +140,8 @@ func (s *PostsService) GetPostWithComments(ctx context.Context, postId int) (mod
 			return model.PostWithComments{}, err
 		}
 		commentListItems = append(commentListItems, model.CommentListItem{
-			ID: comment.ID,
+			ID:       comment.ID,
+			ParentID: comment.ParentID,
 			Author: model.MessageAuthor{
 				ID:          userInfo.ID,
 				Username:    userInfo.Name,

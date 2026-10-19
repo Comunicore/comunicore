@@ -1272,17 +1272,24 @@ func (*PostAddCommentInternalServerError) postAddCommentRes() {}
 
 // Ref: #/components/schemas/PostCommentItem
 type PostCommentItem struct {
-	ID        int           `json:"id"`
-	Author    MessageAuthor `json:"author"`
-	ContentMd string        `json:"contentMd"`
-	Tags      []string      `json:"tags"`
-	CreatedAt time.Time     `json:"createdAt"`
-	UpdatedAt OptDateTime   `json:"updatedAt"`
+	ID int `json:"id"`
+	// Optional parent comment id for nested comments (0 - no parent).
+	ParentCommentId OptInt        `json:"parentCommentId"`
+	Author          MessageAuthor `json:"author"`
+	ContentMd       string        `json:"contentMd"`
+	Tags            []string      `json:"tags"`
+	CreatedAt       time.Time     `json:"createdAt"`
+	UpdatedAt       OptDateTime   `json:"updatedAt"`
 }
 
 // GetID returns the value of ID.
 func (s *PostCommentItem) GetID() int {
 	return s.ID
+}
+
+// GetParentCommentId returns the value of ParentCommentId.
+func (s *PostCommentItem) GetParentCommentId() OptInt {
+	return s.ParentCommentId
 }
 
 // GetAuthor returns the value of Author.
@@ -1315,6 +1322,11 @@ func (s *PostCommentItem) SetID(val int) {
 	s.ID = val
 }
 
+// SetParentCommentId sets the value of ParentCommentId.
+func (s *PostCommentItem) SetParentCommentId(val OptInt) {
+	s.ParentCommentId = val
+}
+
 // SetAuthor sets the value of Author.
 func (s *PostCommentItem) SetAuthor(val MessageAuthor) {
 	s.Author = val
@@ -1345,6 +1357,8 @@ func (*PostCommentItem) postAddCommentRes() {}
 // Ref: #/components/schemas/PostCreateCommentRequest
 type PostCreateCommentRequest struct {
 	ContentMd string `json:"contentMd"`
+	// Optional parent comment id for nested comments.
+	ParentCommentId OptInt `json:"parentCommentId"`
 }
 
 // GetContentMd returns the value of ContentMd.
@@ -1352,9 +1366,19 @@ func (s *PostCreateCommentRequest) GetContentMd() string {
 	return s.ContentMd
 }
 
+// GetParentCommentId returns the value of ParentCommentId.
+func (s *PostCreateCommentRequest) GetParentCommentId() OptInt {
+	return s.ParentCommentId
+}
+
 // SetContentMd sets the value of ContentMd.
 func (s *PostCreateCommentRequest) SetContentMd(val string) {
 	s.ContentMd = val
+}
+
+// SetParentCommentId sets the value of ParentCommentId.
+func (s *PostCreateCommentRequest) SetParentCommentId(val OptInt) {
+	s.ParentCommentId = val
 }
 
 type PostCreateInternalServerError AnalyticsMetricsGetInternalServerErrorApplicationJSON

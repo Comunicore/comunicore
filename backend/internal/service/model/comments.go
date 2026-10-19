@@ -7,6 +7,7 @@ import "time"
 
 type Comment struct {
 	ID        int
+	ParentID  int
 	PostID    int
 	UserID    int
 	Content   string
@@ -16,6 +17,7 @@ type Comment struct {
 
 type CommentInfo struct {
 	ID        int
+	ParentID  int
 	PostID    int
 	Author    MessageAuthor
 	Content   string
@@ -24,6 +26,7 @@ type CommentInfo struct {
 }
 type CommentListItem struct {
 	ID        int
+	ParentID  int
 	Author    MessageAuthor
 	Content   string
 	CreatedAt time.Time
@@ -31,7 +34,8 @@ type CommentListItem struct {
 }
 
 type CommentCreate struct {
-	PostID  int
-	UserID  int
-	Content string
+	PostID          int
+	ParentCommentID int
+	UserID          int
+	Content         string
 }

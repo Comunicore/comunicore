@@ -5,6 +5,7 @@ package handler
 
 import (
 	"context"
+	"slices"
 
 	"github.com/comunicore/comunicore/backend/internal/apperror"
 	api "github.com/comunicore/comunicore/backend/internal/handler/generated"
@@ -35,12 +36,15 @@ func (h *PostsHandler) PostAddComment(
 		UserID:  globalCtx.UserID,
 		Content: req.ContentMd,
 	}
+	if req.ParentCommentId.IsSet() {
+		commentToCreate.ParentCommentID = req.ParentCommentId.Value
+	}
 
 	comment, err := h.postsService.AddComment(ctx, commentToCreate)
 	if err != nil {
 		return nil, err
 	}
-	apiPost := &api.PostCommentItem{
+	apiComment := &api.PostCommentItem{
 		ID: comment.ID,
 		Author: api.MessageAuthor{
 			ID:          comment.Author.ID,
@@ -51,13 +55,16 @@ func (h *PostsHandler) PostAddComment(
 		ContentMd: comment.Content,
 		CreatedAt: comment.CreatedAt,
 	}
+	if comment.ParentID != 0 {
+		apiComment.ParentCommentId.SetTo(comment.ParentID)
+	}
 	if !comment.UpdatedAt.IsZero() {
-		apiPost.UpdatedAt.SetTo(comment.UpdatedAt)
+		apiComment.UpdatedAt.SetTo(comment.UpdatedAt)
 	}
 	if comment.Author.AvatarUrl != nil {
-		apiPost.Author.AvatarUrl.SetTo(*comment.Author.AvatarUrl)
+		apiComment.Author.AvatarUrl.SetTo(*comment.Author.AvatarUrl)
 	}
-	return apiPost, nil
+	return apiComment, nil
 }
 
 func (h *PostsHandler) PostCreate(
@@ -144,6 +151,9 @@ func (h *PostsHandler) PostGet(ctx context.Context, params api.PostGetParams) (a
 			ContentMd: commentModel.Content,
 			CreatedAt: commentModel.CreatedAt,
 		}
+		if commentModel.ParentID != 0 {
+			apiComment.ParentCommentId.SetTo(commentModel.ParentID)
+		}
 		if !commentModel.UpdatedAt.IsZero() {
 			apiComment.UpdatedAt.SetTo(commentModel.UpdatedAt)
 		}
@@ -152,6 +162,9 @@ func (h *PostsHandler) PostGet(ctx context.Context, params api.PostGetParams) (a
 		}
 		comments = append(comments, apiComment)
 	}
+	slices.SortFunc(comments, func(a, b api.PostCommentItem) int {
+		return a.CreatedAt.Compare(b.CreatedAt)
+	})
 	apiPost := &api.PostWithCommentsListResponse{
 		ID:       postWithComments.ID,
 		Category: postWithComments.Category,
