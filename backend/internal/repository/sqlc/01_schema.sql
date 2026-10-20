@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS sessions (
 );
 CREATE TABLE IF NOT EXISTS posts (
     id SERIAL PRIMARY KEY,
+    uuid UUID NOT NULL DEFAULT gen_random_uuid(),
     category_id INTEGER NOT NULL DEFAULT 0,
     title TEXT NOT NULL,
     content TEXT NOT NULL,

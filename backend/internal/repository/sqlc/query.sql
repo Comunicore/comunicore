@@ -48,22 +48,22 @@ WHERE post_id = $1 ORDER BY created_at DESC;
 
 -- name: PostCreate :one
 INSERT INTO posts (category_id, title, content, user_id) VALUES ($1, $2, $3, $4)
-RETURNING id, category_id, title, content, user_id, seo_meta, created_at, updated_at;
+RETURNING id, uuid, category_id, title, content, user_id, seo_meta, created_at, updated_at;
 -- name: PostGetById :one
-SELECT id, category_id, title, content, user_id, seo_meta, created_at, updated_at
+SELECT id, uuid, category_id, title, content, user_id, seo_meta, created_at, updated_at
 FROM posts
 WHERE id = $1;
 -- name: PostPageByPageID :many
-SELECT id, category_id, title, content, user_id, seo_meta, created_at, updated_at
+SELECT id, uuid, category_id, title, content, user_id, seo_meta, created_at, updated_at
 FROM posts
 ORDER BY id DESC LIMIT $1 OFFSET $2;
 -- name: PostPagesBeforePostID :many
-SELECT id, category_id, title, content, user_id, seo_meta, created_at, updated_at
+SELECT id, uuid, category_id, title, content, user_id, seo_meta, created_at, updated_at
 FROM posts
 WHERE id < $1
 ORDER BY id DESC LIMIT $2;
 -- name: PostPagesAfterPostID :many
-SELECT id, category_id, title, content, user_id, seo_meta, created_at, updated_at
+SELECT id, uuid, category_id, title, content, user_id, seo_meta, created_at, updated_at
 FROM posts
 WHERE id > $1
 ORDER BY id DESC LIMIT $2;

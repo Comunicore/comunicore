@@ -6,10 +6,13 @@ package model
 import (
 	"net/url"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type PostWithComments struct {
 	ID        int
+	UUID      uuid.UUID
 	Category  string
 	Author    MessageAuthor
 	Title     string
@@ -37,6 +40,7 @@ type PostCreateRepo struct {
 }
 type PostRepoInfo struct {
 	ID         int
+	UUID       uuid.UUID
 	CategoryID int
 	Title      string
 	Content    string
@@ -56,6 +60,7 @@ type PostListRepo struct {
 }
 type PostInfoResponse struct {
 	ID        int
+	UUID      uuid.UUID
 	Category  string
 	Title     string
 	Content   string
@@ -77,6 +82,7 @@ type PostListResponse struct {
 
 type PostInfo struct {
 	ID        int
+	UUID      uuid.UUID
 	Category  string
 	Title     string
 	Content   string

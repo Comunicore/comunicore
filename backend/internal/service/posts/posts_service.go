@@ -105,6 +105,7 @@ func (s *PostsService) Create(ctx context.Context, post model.PostCreateService)
 	}
 	postInfo := model.PostInfo{
 		ID:       createdPost.ID,
+		UUID:     createdPost.UUID,
 		Category: category.Name,
 		Title:    createdPost.Title,
 		Content:  createdPost.Content,
@@ -164,6 +165,7 @@ func (s *PostsService) GetPostWithComments(ctx context.Context, postId int) (mod
 	}
 	postWithComments := model.PostWithComments{
 		ID:       postInfo.ID,
+		UUID:     postInfo.UUID,
 		Category: category.Name,
 		Author: model.MessageAuthor{
 			ID:          userInfo.ID,
@@ -221,6 +223,7 @@ func (s *PostsService) convertPostListRepoToResponse(
 		}
 		postInfoResponse := model.PostInfoResponse{
 			ID:       post.ID,
+			UUID:     post.UUID,
 			Category: categories[post.CategoryID].Name,
 			Title:    post.Title,
 			Content:  post.Content,

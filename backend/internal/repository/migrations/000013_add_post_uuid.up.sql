@@ -1,0 +1,1 @@
+ALTER TABLE posts ADD COLUMN IF NOT EXISTS uuid UUID NOT NULL DEFAULT gen_random_uuid();

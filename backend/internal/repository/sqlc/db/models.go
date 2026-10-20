@@ -45,6 +45,7 @@ type Comment struct {
 
 type Post struct {
 	ID         int32
+	Uuid       pgtype.UUID
 	CategoryID int32
 	Title      string
 	Content    string
