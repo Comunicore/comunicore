@@ -3589,6 +3589,10 @@ func (s *PostItem) encodeFields(e *jx.Encoder) {
 		e.Int(s.ID)
 	}
 	{
+		e.FieldStart("uuid")
+		json.EncodeUUID(e, s.UUID)
+	}
+	{
 		e.FieldStart("author")
 		s.Author.Encode(e)
 	}
@@ -3636,17 +3640,18 @@ func (s *PostItem) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfPostItem = [10]string{
-	0: "id",
-	1: "author",
-	2: "category",
-	3: "title",
-	4: "contentMd",
-	5: "tags",
-	6: "postStats",
-	7: "seoMeta",
-	8: "createdAt",
-	9: "updatedAt",
+var jsonFieldsNameOfPostItem = [11]string{
+	0:  "id",
+	1:  "uuid",
+	2:  "author",
+	3:  "category",
+	4:  "title",
+	5:  "contentMd",
+	6:  "tags",
+	7:  "postStats",
+	8:  "seoMeta",
+	9:  "createdAt",
+	10: "updatedAt",
 }
 
 // Decode decodes PostItem from json.
@@ -3670,8 +3675,20 @@ func (s *PostItem) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"id\"")
 			}
-		case "author":
+		case "uuid":
 			requiredBitSet[0] |= 1 << 1
+			if err := func() error {
+				v, err := json.DecodeUUID(d)
+				s.UUID = v
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"uuid\"")
+			}
+		case "author":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
 				if err := s.Author.Decode(d); err != nil {
 					return err
@@ -3681,7 +3698,7 @@ func (s *PostItem) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"author\"")
 			}
 		case "category":
-			requiredBitSet[0] |= 1 << 2
+			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
 				v, err := d.Str()
 				s.Category = string(v)
@@ -3693,7 +3710,7 @@ func (s *PostItem) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"category\"")
 			}
 		case "title":
-			requiredBitSet[0] |= 1 << 3
+			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
 				v, err := d.Str()
 				s.Title = string(v)
@@ -3705,7 +3722,7 @@ func (s *PostItem) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"title\"")
 			}
 		case "contentMd":
-			requiredBitSet[0] |= 1 << 4
+			requiredBitSet[0] |= 1 << 5
 			if err := func() error {
 				v, err := d.Str()
 				s.ContentMd = string(v)
@@ -3715,6 +3732,265 @@ func (s *PostItem) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"contentMd\"")
+			}
+		case "tags":
+			if err := func() error {
+				s.Tags = make([]string, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem string
+					v, err := d.Str()
+					elem = string(v)
+					if err != nil {
+						return err
+					}
+					s.Tags = append(s.Tags, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"tags\"")
+			}
+		case "postStats":
+			requiredBitSet[0] |= 1 << 7
+			if err := func() error {
+				if err := s.PostStats.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"postStats\"")
+			}
+		case "seoMeta":
+			if err := func() error {
+				s.SeoMeta.Reset()
+				if err := s.SeoMeta.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"seoMeta\"")
+			}
+		case "createdAt":
+			requiredBitSet[1] |= 1 << 1
+			if err := func() error {
+				v, err := json.DecodeDateTime(d)
+				s.CreatedAt = v
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"createdAt\"")
+			}
+		case "updatedAt":
+			if err := func() error {
+				s.UpdatedAt.Reset()
+				if err := s.UpdatedAt.Decode(d, json.DecodeDateTime); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"updatedAt\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode PostItem")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [2]uint8{
+		0b10111111,
+		0b00000010,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfPostItem) {
+					name = jsonFieldsNameOfPostItem[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *PostItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *PostItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *PostListItem) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *PostListItem) encodeFields(e *jx.Encoder) {
+	{
+		e.FieldStart("id")
+		e.Int(s.ID)
+	}
+	{
+		e.FieldStart("uuid")
+		json.EncodeUUID(e, s.UUID)
+	}
+	{
+		e.FieldStart("author")
+		s.Author.Encode(e)
+	}
+	{
+		e.FieldStart("category")
+		e.Str(s.Category)
+	}
+	{
+		e.FieldStart("title")
+		e.Str(s.Title)
+	}
+	{
+		if s.Tags != nil {
+			e.FieldStart("tags")
+			e.ArrStart()
+			for _, elem := range s.Tags {
+				e.Str(elem)
+			}
+			e.ArrEnd()
+		}
+	}
+	{
+		e.FieldStart("postStats")
+		s.PostStats.Encode(e)
+	}
+	{
+		if s.SeoMeta.Set {
+			e.FieldStart("seoMeta")
+			s.SeoMeta.Encode(e)
+		}
+	}
+	{
+		e.FieldStart("createdAt")
+		json.EncodeDateTime(e, s.CreatedAt)
+	}
+	{
+		if s.UpdatedAt.Set {
+			e.FieldStart("updatedAt")
+			s.UpdatedAt.Encode(e, json.EncodeDateTime)
+		}
+	}
+}
+
+var jsonFieldsNameOfPostListItem = [10]string{
+	0: "id",
+	1: "uuid",
+	2: "author",
+	3: "category",
+	4: "title",
+	5: "tags",
+	6: "postStats",
+	7: "seoMeta",
+	8: "createdAt",
+	9: "updatedAt",
+}
+
+// Decode decodes PostListItem from json.
+func (s *PostListItem) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode PostListItem to nil")
+	}
+	var requiredBitSet [2]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "id":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				v, err := d.Int()
+				s.ID = int(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"id\"")
+			}
+		case "uuid":
+			requiredBitSet[0] |= 1 << 1
+			if err := func() error {
+				v, err := json.DecodeUUID(d)
+				s.UUID = v
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"uuid\"")
+			}
+		case "author":
+			requiredBitSet[0] |= 1 << 2
+			if err := func() error {
+				if err := s.Author.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"author\"")
+			}
+		case "category":
+			requiredBitSet[0] |= 1 << 3
+			if err := func() error {
+				v, err := d.Str()
+				s.Category = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"category\"")
+			}
+		case "title":
+			requiredBitSet[0] |= 1 << 4
+			if err := func() error {
+				v, err := d.Str()
+				s.Title = string(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"title\"")
 			}
 		case "tags":
 			if err := func() error {
@@ -3782,255 +4058,13 @@ func (s *PostItem) Decode(d *jx.Decoder) error {
 		}
 		return nil
 	}); err != nil {
-		return errors.Wrap(err, "decode PostItem")
+		return errors.Wrap(err, "decode PostListItem")
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [2]uint8{
 		0b01011111,
 		0b00000001,
-	} {
-		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
-			// Mask only required fields and check equality to mask using XOR.
-			//
-			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
-			// Bits of fields which would be set are actually bits of missed fields.
-			missed := bits.OnesCount8(result)
-			for bitN := 0; bitN < missed; bitN++ {
-				bitIdx := bits.TrailingZeros8(result)
-				fieldIdx := i*8 + bitIdx
-				var name string
-				if fieldIdx < len(jsonFieldsNameOfPostItem) {
-					name = jsonFieldsNameOfPostItem[fieldIdx]
-				} else {
-					name = strconv.Itoa(fieldIdx)
-				}
-				failures = append(failures, validate.FieldError{
-					Name:  name,
-					Error: validate.ErrFieldRequired,
-				})
-				// Reset bit.
-				result &^= 1 << bitIdx
-			}
-		}
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *PostItem) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *PostItem) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *PostListItem) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *PostListItem) encodeFields(e *jx.Encoder) {
-	{
-		e.FieldStart("id")
-		e.Int(s.ID)
-	}
-	{
-		e.FieldStart("author")
-		s.Author.Encode(e)
-	}
-	{
-		e.FieldStart("category")
-		e.Str(s.Category)
-	}
-	{
-		e.FieldStart("title")
-		e.Str(s.Title)
-	}
-	{
-		if s.Tags != nil {
-			e.FieldStart("tags")
-			e.ArrStart()
-			for _, elem := range s.Tags {
-				e.Str(elem)
-			}
-			e.ArrEnd()
-		}
-	}
-	{
-		e.FieldStart("postStats")
-		s.PostStats.Encode(e)
-	}
-	{
-		if s.SeoMeta.Set {
-			e.FieldStart("seoMeta")
-			s.SeoMeta.Encode(e)
-		}
-	}
-	{
-		e.FieldStart("createdAt")
-		json.EncodeDateTime(e, s.CreatedAt)
-	}
-	{
-		if s.UpdatedAt.Set {
-			e.FieldStart("updatedAt")
-			s.UpdatedAt.Encode(e, json.EncodeDateTime)
-		}
-	}
-}
-
-var jsonFieldsNameOfPostListItem = [9]string{
-	0: "id",
-	1: "author",
-	2: "category",
-	3: "title",
-	4: "tags",
-	5: "postStats",
-	6: "seoMeta",
-	7: "createdAt",
-	8: "updatedAt",
-}
-
-// Decode decodes PostListItem from json.
-func (s *PostListItem) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode PostListItem to nil")
-	}
-	var requiredBitSet [2]uint8
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "id":
-			requiredBitSet[0] |= 1 << 0
-			if err := func() error {
-				v, err := d.Int()
-				s.ID = int(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"id\"")
-			}
-		case "author":
-			requiredBitSet[0] |= 1 << 1
-			if err := func() error {
-				if err := s.Author.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"author\"")
-			}
-		case "category":
-			requiredBitSet[0] |= 1 << 2
-			if err := func() error {
-				v, err := d.Str()
-				s.Category = string(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"category\"")
-			}
-		case "title":
-			requiredBitSet[0] |= 1 << 3
-			if err := func() error {
-				v, err := d.Str()
-				s.Title = string(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"title\"")
-			}
-		case "tags":
-			if err := func() error {
-				s.Tags = make([]string, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem string
-					v, err := d.Str()
-					elem = string(v)
-					if err != nil {
-						return err
-					}
-					s.Tags = append(s.Tags, elem)
-					return nil
-				}); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"tags\"")
-			}
-		case "postStats":
-			requiredBitSet[0] |= 1 << 5
-			if err := func() error {
-				if err := s.PostStats.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"postStats\"")
-			}
-		case "seoMeta":
-			if err := func() error {
-				s.SeoMeta.Reset()
-				if err := s.SeoMeta.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"seoMeta\"")
-			}
-		case "createdAt":
-			requiredBitSet[0] |= 1 << 7
-			if err := func() error {
-				v, err := json.DecodeDateTime(d)
-				s.CreatedAt = v
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"createdAt\"")
-			}
-		case "updatedAt":
-			if err := func() error {
-				s.UpdatedAt.Reset()
-				if err := s.UpdatedAt.Decode(d, json.DecodeDateTime); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"updatedAt\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode PostListItem")
-	}
-	// Validate required fields.
-	var failures []validate.FieldError
-	for i, mask := range [2]uint8{
-		0b10101111,
-		0b00000000,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -4377,6 +4411,10 @@ func (s *PostWithCommentsListResponse) encodeFields(e *jx.Encoder) {
 		e.Int(s.ID)
 	}
 	{
+		e.FieldStart("uuid")
+		json.EncodeUUID(e, s.UUID)
+	}
+	{
 		e.FieldStart("category")
 		e.Str(s.Category)
 	}
@@ -4432,18 +4470,19 @@ func (s *PostWithCommentsListResponse) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfPostWithCommentsListResponse = [11]string{
+var jsonFieldsNameOfPostWithCommentsListResponse = [12]string{
 	0:  "id",
-	1:  "category",
-	2:  "author",
-	3:  "title",
-	4:  "contentMd",
-	5:  "tags",
-	6:  "postStats",
-	7:  "seoMeta",
-	8:  "createdAt",
-	9:  "updatedAt",
-	10: "comments",
+	1:  "uuid",
+	2:  "category",
+	3:  "author",
+	4:  "title",
+	5:  "contentMd",
+	6:  "tags",
+	7:  "postStats",
+	8:  "seoMeta",
+	9:  "createdAt",
+	10: "updatedAt",
+	11: "comments",
 }
 
 // Decode decodes PostWithCommentsListResponse from json.
@@ -4467,8 +4506,20 @@ func (s *PostWithCommentsListResponse) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"id\"")
 			}
-		case "category":
+		case "uuid":
 			requiredBitSet[0] |= 1 << 1
+			if err := func() error {
+				v, err := json.DecodeUUID(d)
+				s.UUID = v
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"uuid\"")
+			}
+		case "category":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
 				v, err := d.Str()
 				s.Category = string(v)
@@ -4480,7 +4531,7 @@ func (s *PostWithCommentsListResponse) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"category\"")
 			}
 		case "author":
-			requiredBitSet[0] |= 1 << 2
+			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
 				if err := s.Author.Decode(d); err != nil {
 					return err
@@ -4490,7 +4541,7 @@ func (s *PostWithCommentsListResponse) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"author\"")
 			}
 		case "title":
-			requiredBitSet[0] |= 1 << 3
+			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
 				v, err := d.Str()
 				s.Title = string(v)
@@ -4502,7 +4553,7 @@ func (s *PostWithCommentsListResponse) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"title\"")
 			}
 		case "contentMd":
-			requiredBitSet[0] |= 1 << 4
+			requiredBitSet[0] |= 1 << 5
 			if err := func() error {
 				v, err := d.Str()
 				s.ContentMd = string(v)
@@ -4533,7 +4584,7 @@ func (s *PostWithCommentsListResponse) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"tags\"")
 			}
 		case "postStats":
-			requiredBitSet[0] |= 1 << 6
+			requiredBitSet[0] |= 1 << 7
 			if err := func() error {
 				if err := s.PostStats.Decode(d); err != nil {
 					return err
@@ -4553,7 +4604,7 @@ func (s *PostWithCommentsListResponse) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"seoMeta\"")
 			}
 		case "createdAt":
-			requiredBitSet[1] |= 1 << 0
+			requiredBitSet[1] |= 1 << 1
 			if err := func() error {
 				v, err := json.DecodeDateTime(d)
 				s.CreatedAt = v
@@ -4575,7 +4626,7 @@ func (s *PostWithCommentsListResponse) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"updatedAt\"")
 			}
 		case "comments":
-			requiredBitSet[1] |= 1 << 2
+			requiredBitSet[1] |= 1 << 3
 			if err := func() error {
 				s.Comments = make([]PostCommentItem, 0)
 				if err := d.Arr(func(d *jx.Decoder) error {
@@ -4602,8 +4653,8 @@ func (s *PostWithCommentsListResponse) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [2]uint8{
-		0b01011111,
-		0b00000101,
+		0b10111111,
+		0b00001010,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.

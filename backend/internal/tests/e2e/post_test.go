@@ -40,6 +40,7 @@ type PostStats struct {
 }
 type PostItem struct {
 	ID        int    `json:"id"`
+	UUID      string `json:"uuid"`
 	Category  string `json:"category"`
 	Author    MessageAuthor
 	Title     string    `json:"title"`
@@ -66,10 +67,11 @@ func testPostCreateOk(t *testing.T, baseURL string, cookie *http.Cookie) PostIte
 			Status(http.StatusCreated).JSON().Object()
 
 		res.Keys().ContainsOnly(
-			"id", "category", "author", "title",
+			"id", "uuid", "category", "author", "title",
 			"contentMd", "postStats", "createdAt",
 		)
 		res.Value("id").Number().Gt(0)
+		res.Value("uuid").String().NotEmpty()
 		res.Value("category").String().NotEmpty()
 		// res.Value("authorAvatarUrl").String().NotEmpty()
 		res.Value("title").String().HasPrefix("Test Post ")
@@ -150,8 +152,9 @@ func testPostGet(t *testing.T, baseURL string,
 			Status(http.StatusOK).JSON().Object()
 
 		res.Keys().ContainsOnly(
-			"id", "category", "author", "title", "contentMd", "postStats", "createdAt", "comments")
+			"id", "uuid", "category", "author", "title", "contentMd", "postStats", "createdAt", "comments")
 		res.Value("id").Number().IsEqual(expectedPost.ID)
+		res.Value("uuid").String().IsEqual(expectedPost.UUID)
 		res.Value("category").String().IsEqual(expectedPost.Category)
 		res.Value("title").String().IsEqual(expectedPost.Title)
 		res.Value("contentMd").String().IsEqual(expectedPost.ContentMd)

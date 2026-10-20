@@ -12,6 +12,7 @@ import (
 	"github.com/comunicore/comunicore/backend/internal/repository"
 	postdDb "github.com/comunicore/comunicore/backend/internal/repository/sqlc/db"
 	"github.com/comunicore/comunicore/backend/internal/service/model"
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -41,6 +42,7 @@ func (r *PostsRepo) Create(ctx context.Context, post model.PostCreateRepo) (mode
 	}
 	postRepo := model.PostRepoInfo{
 		ID:         int(row.ID),
+		UUID:       uuid.UUID(row.Uuid.Bytes),
 		CategoryID: int(row.CategoryID),
 		UserID:     int(row.UserID),
 		Title:      row.Title,
@@ -90,6 +92,7 @@ func (r *PostsRepo) PageByPageID(ctx context.Context, page, limit int) (model.Po
 	for _, postRow := range rows {
 		postRepo := model.PostRepoInfo{
 			ID:         int(postRow.ID),
+			UUID:       uuid.UUID(postRow.Uuid.Bytes),
 			CategoryID: int(postRow.CategoryID),
 			UserID:     int(postRow.UserID),
 			Title:      postRow.Title,
@@ -142,6 +145,7 @@ func (r *PostsRepo) PageByOffset(ctx context.Context, postId, limit int, before 
 		for _, postRow := range rows {
 			postRepo := model.PostRepoInfo{
 				ID:        int(postRow.ID),
+				UUID:      uuid.UUID(postRow.Uuid.Bytes),
 				UserID:    int(postRow.UserID),
 				Title:     postRow.Title,
 				Content:   postRow.Content,
@@ -174,6 +178,7 @@ func (r *PostsRepo) PageByOffset(ctx context.Context, postId, limit int, before 
 		for _, postRow := range rows {
 			postRepo := model.PostRepoInfo{
 				ID:        int(postRow.ID),
+				UUID:      uuid.UUID(postRow.Uuid.Bytes),
 				UserID:    int(postRow.UserID),
 				Title:     postRow.Title,
 				Content:   postRow.Content,
@@ -260,6 +265,7 @@ func (r *PostsRepo) Get(ctx context.Context, postId int) (model.PostRepoInfo, er
 
 	post := model.PostRepoInfo{
 		ID:         int(postRow.ID),
+		UUID:       uuid.UUID(postRow.Uuid.Bytes),
 		UserID:     int(postRow.UserID),
 		CategoryID: int(postRow.CategoryID),
 		Title:      postRow.Title,

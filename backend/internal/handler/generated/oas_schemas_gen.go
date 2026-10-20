@@ -1449,6 +1449,7 @@ func (*PostGetInternalServerError) postGetRes() {}
 // Ref: #/components/schemas/PostItem
 type PostItem struct {
 	ID       int           `json:"id"`
+	UUID     uuid.UUID     `json:"uuid"`
 	Author   MessageAuthor `json:"author"`
 	Category string        `json:"category"`
 	Title    string        `json:"title"`
@@ -1464,6 +1465,11 @@ type PostItem struct {
 // GetID returns the value of ID.
 func (s *PostItem) GetID() int {
 	return s.ID
+}
+
+// GetUUID returns the value of UUID.
+func (s *PostItem) GetUUID() uuid.UUID {
+	return s.UUID
 }
 
 // GetAuthor returns the value of Author.
@@ -1516,6 +1522,11 @@ func (s *PostItem) SetID(val int) {
 	s.ID = val
 }
 
+// SetUUID sets the value of UUID.
+func (s *PostItem) SetUUID(val uuid.UUID) {
+	s.UUID = val
+}
+
 // SetAuthor sets the value of Author.
 func (s *PostItem) SetAuthor(val MessageAuthor) {
 	s.Author = val
@@ -1566,6 +1577,7 @@ func (*PostItem) postCreateRes() {}
 // Ref: #/components/schemas/PostListItem
 type PostListItem struct {
 	ID        int           `json:"id"`
+	UUID      uuid.UUID     `json:"uuid"`
 	Author    MessageAuthor `json:"author"`
 	Category  string        `json:"category"`
 	Title     string        `json:"title"`
@@ -1579,6 +1591,11 @@ type PostListItem struct {
 // GetID returns the value of ID.
 func (s *PostListItem) GetID() int {
 	return s.ID
+}
+
+// GetUUID returns the value of UUID.
+func (s *PostListItem) GetUUID() uuid.UUID {
+	return s.UUID
 }
 
 // GetAuthor returns the value of Author.
@@ -1624,6 +1641,11 @@ func (s *PostListItem) GetUpdatedAt() OptDateTime {
 // SetID sets the value of ID.
 func (s *PostListItem) SetID(val int) {
 	s.ID = val
+}
+
+// SetUUID sets the value of UUID.
+func (s *PostListItem) SetUUID(val uuid.UUID) {
+	s.UUID = val
 }
 
 // SetAuthor sets the value of Author.
@@ -1760,6 +1782,7 @@ func (s *PostStats) SetViewsCount(val int) {
 // Ref: #/components/schemas/PostWithCommentsListResponse
 type PostWithCommentsListResponse struct {
 	ID       int           `json:"id"`
+	UUID     uuid.UUID     `json:"uuid"`
 	Category string        `json:"category"`
 	Author   MessageAuthor `json:"author"`
 	Title    string        `json:"title"`
@@ -1776,6 +1799,11 @@ type PostWithCommentsListResponse struct {
 // GetID returns the value of ID.
 func (s *PostWithCommentsListResponse) GetID() int {
 	return s.ID
+}
+
+// GetUUID returns the value of UUID.
+func (s *PostWithCommentsListResponse) GetUUID() uuid.UUID {
+	return s.UUID
 }
 
 // GetCategory returns the value of Category.
@@ -1831,6 +1859,11 @@ func (s *PostWithCommentsListResponse) GetComments() []PostCommentItem {
 // SetID sets the value of ID.
 func (s *PostWithCommentsListResponse) SetID(val int) {
 	s.ID = val
+}
+
+// SetUUID sets the value of UUID.
+func (s *PostWithCommentsListResponse) SetUUID(val uuid.UUID) {
+	s.UUID = val
 }
 
 // SetCategory sets the value of Category.

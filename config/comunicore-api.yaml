@@ -606,6 +606,9 @@ components:
       properties:
         id:
           type: integer
+        uuid:
+          type: string
+          format: uuid
         author:
           $ref: '#/components/schemas/MessageAuthor'
         category:
@@ -631,6 +634,7 @@ components:
           format: date-time
       required:
         - id
+        - uuid
         - author
         - category
         - title
@@ -640,6 +644,7 @@ components:
         - createdAt
       example:
         id: 1
+        uuid: "123e4567-e89b-12d3-a456-426614174000"
         category: "Программирование"
         title: "First post"
         contentMd: "This is the content of the first post."
@@ -712,6 +717,9 @@ components:
       properties:
         id:
           type: integer
+        uuid:
+          type: string
+          format: uuid
         author:
           $ref: '#/components/schemas/MessageAuthor'
         category:
@@ -734,6 +742,7 @@ components:
           format: date-time
       required:
         - id
+        - uuid
         - author
         - category
         - title
@@ -741,6 +750,7 @@ components:
         - createdAt
       example:
         id: 1
+        uuid: "123e4567-e89b-12d3-a456-426614174000"
         title: "First post"
         category: "Программирование"
         author:
@@ -764,6 +774,9 @@ components:
       properties:
         id:
           type: integer
+        uuid:
+          type: string
+          format: uuid
         category:
           type: string
         author:
@@ -793,6 +806,7 @@ components:
             $ref: '#/components/schemas/PostCommentItem'
       required:
         - id
+        - uuid
         - category
         - author
         - title
@@ -802,6 +816,7 @@ components:
         - comments
       example:
         id: 1
+        uuid: "123e4567-e89b-12d3-a456-426614174000"
         category: "Программирование"
         title: "First post"
         contentMd: "This is the content of the first post."
