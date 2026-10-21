@@ -87,6 +87,7 @@ func (s *PostsService) Create(ctx context.Context, post model.PostCreateService)
 		CategoryID: category.ID,
 		Title:      post.Title,
 		Content:    post.Content,
+		Files:      post.Files,
 		UserID:     post.UserID,
 		Tags:       post.Tags,
 	})
@@ -109,6 +110,7 @@ func (s *PostsService) Create(ctx context.Context, post model.PostCreateService)
 		Category: category.Name,
 		Title:    createdPost.Title,
 		Content:  createdPost.Content,
+		Files:    createdPost.Files,
 		Author: model.MessageAuthor{
 			ID:          userInfo.ID,
 			Username:    userInfo.Name,
@@ -176,6 +178,7 @@ func (s *PostsService) GetPostWithComments(ctx context.Context, postId int) (mod
 		},
 		Title:     postInfo.Title,
 		Content:   postInfo.Content,
+		Files:     postInfo.Files,
 		Tags:      postInfo.Tags,
 		PostStats: postInfo.PostStats,
 		SeoMeta:   postInfo.SeoMeta,
@@ -227,6 +230,7 @@ func (s *PostsService) convertPostListRepoToResponse(
 			Category: categories[post.CategoryID].Name,
 			Title:    post.Title,
 			Content:  post.Content,
+			Files:    post.Files,
 			Author: model.MessageAuthor{
 				ID:          userInfo.ID,
 				Username:    userInfo.Name,

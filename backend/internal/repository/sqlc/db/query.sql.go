@@ -651,8 +651,8 @@ func (q *Queries) GetCategoryByName(ctx context.Context, name string) (Category,
 }
 
 const postCreate = `-- name: PostCreate :one
-INSERT INTO posts (category_id, title, content, user_id) VALUES ($1, $2, $3, $4)
-RETURNING id, uuid, category_id, title, content, user_id, seo_meta, created_at, updated_at
+INSERT INTO posts (category_id, title, content, user_id, files) VALUES ($1, $2, $3, $4, $5)
+RETURNING id, uuid, category_id, title, content, user_id, seo_meta, files, created_at, updated_at
 `
 
 type PostCreateParams struct {
@@ -660,6 +660,7 @@ type PostCreateParams struct {
 	Title      string
 	Content    string
 	UserID     int32
+	Files      []byte
 }
 
 func (q *Queries) PostCreate(ctx context.Context, arg PostCreateParams) (Post, error) {
@@ -668,6 +669,7 @@ func (q *Queries) PostCreate(ctx context.Context, arg PostCreateParams) (Post, e
 		arg.Title,
 		arg.Content,
 		arg.UserID,
+		arg.Files,
 	)
 	var i Post
 	err := row.Scan(
@@ -678,6 +680,7 @@ func (q *Queries) PostCreate(ctx context.Context, arg PostCreateParams) (Post, e
 		&i.Content,
 		&i.UserID,
 		&i.SeoMeta,
+		&i.Files,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -685,7 +688,7 @@ func (q *Queries) PostCreate(ctx context.Context, arg PostCreateParams) (Post, e
 }
 
 const postGetById = `-- name: PostGetById :one
-SELECT id, uuid, category_id, title, content, user_id, seo_meta, created_at, updated_at
+SELECT id, uuid, category_id, title, content, user_id, seo_meta, files, created_at, updated_at
 FROM posts
 WHERE id = $1
 `
@@ -701,6 +704,7 @@ func (q *Queries) PostGetById(ctx context.Context, id int32) (Post, error) {
 		&i.Content,
 		&i.UserID,
 		&i.SeoMeta,
+		&i.Files,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
@@ -708,7 +712,7 @@ func (q *Queries) PostGetById(ctx context.Context, id int32) (Post, error) {
 }
 
 const postPageByPageID = `-- name: PostPageByPageID :many
-SELECT id, uuid, category_id, title, content, user_id, seo_meta, created_at, updated_at
+SELECT id, uuid, category_id, title, content, user_id, seo_meta, files, created_at, updated_at
 FROM posts
 ORDER BY id DESC LIMIT $1 OFFSET $2
 `
@@ -735,6 +739,7 @@ func (q *Queries) PostPageByPageID(ctx context.Context, arg PostPageByPageIDPara
 			&i.Content,
 			&i.UserID,
 			&i.SeoMeta,
+			&i.Files,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -749,7 +754,7 @@ func (q *Queries) PostPageByPageID(ctx context.Context, arg PostPageByPageIDPara
 }
 
 const postPagesAfterPostID = `-- name: PostPagesAfterPostID :many
-SELECT id, uuid, category_id, title, content, user_id, seo_meta, created_at, updated_at
+SELECT id, uuid, category_id, title, content, user_id, seo_meta, files, created_at, updated_at
 FROM posts
 WHERE id > $1
 ORDER BY id DESC LIMIT $2
@@ -777,6 +782,7 @@ func (q *Queries) PostPagesAfterPostID(ctx context.Context, arg PostPagesAfterPo
 			&i.Content,
 			&i.UserID,
 			&i.SeoMeta,
+			&i.Files,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {
@@ -791,7 +797,7 @@ func (q *Queries) PostPagesAfterPostID(ctx context.Context, arg PostPagesAfterPo
 }
 
 const postPagesBeforePostID = `-- name: PostPagesBeforePostID :many
-SELECT id, uuid, category_id, title, content, user_id, seo_meta, created_at, updated_at
+SELECT id, uuid, category_id, title, content, user_id, seo_meta, files, created_at, updated_at
 FROM posts
 WHERE id < $1
 ORDER BY id DESC LIMIT $2
@@ -819,6 +825,7 @@ func (q *Queries) PostPagesBeforePostID(ctx context.Context, arg PostPagesBefore
 			&i.Content,
 			&i.UserID,
 			&i.SeoMeta,
+			&i.Files,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {

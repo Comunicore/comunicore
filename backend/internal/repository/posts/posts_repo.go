@@ -14,6 +14,7 @@ import (
 	"github.com/comunicore/comunicore/backend/internal/service/model"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/samber/mo"
 )
 
 type PostsRepo struct {
@@ -29,14 +30,30 @@ func NewPostsRepo(dsn string) (*PostsRepo, error) {
 	return &PostsRepo{dbpool: pool, queries: postdDb.New(pool)}, nil
 }
 
+func optionUrlsToJsonbArray(optUrls mo.Option[[]url.URL]) ([]byte, error) {
+	if !optUrls.IsPresent() {
+		return nil, nil
+	}
+	urls, _ := optUrls.Get()
+	if len(urls) == 0 {
+		return nil, nil
+	}
+	return json.Marshal(urls)
+}
+
 // create post
 func (r *PostsRepo) Create(ctx context.Context, post model.PostCreateRepo) (model.PostRepoInfo, error) {
-	row, err := r.queries.PostCreate(ctx, postdDb.PostCreateParams{
+	params := postdDb.PostCreateParams{
 		CategoryID: int32(post.CategoryID),
 		Title:      post.Title,
 		Content:    post.Content,
 		UserID:     int32(post.UserID),
-	})
+	}
+	jsonArray, err := optionUrlsToJsonbArray(post.Files)
+	if err == nil {
+		params.Files = jsonArray
+	}
+	row, err := r.queries.PostCreate(ctx, params)
 	if err != nil {
 		return model.PostRepoInfo{}, err
 	}
@@ -49,6 +66,9 @@ func (r *PostsRepo) Create(ctx context.Context, post model.PostCreateRepo) (mode
 		Content:    row.Content,
 		SeoMeta:    extractSeoMeta(row.SeoMeta),
 		CreatedAt:  row.CreatedAt.Time,
+	}
+	if jsonbToUrls, err := jsonbToUrls(row.Files); err == nil {
+		postRepo.Files = mo.Some(jsonbToUrls)
 	}
 	if row.UpdatedAt.Valid {
 		postRepo.UpdatedAt = row.UpdatedAt.Time
@@ -99,6 +119,9 @@ func (r *PostsRepo) PageByPageID(ctx context.Context, page, limit int) (model.Po
 			Content:    postRow.Content,
 			SeoMeta:    extractSeoMeta(postRow.SeoMeta),
 			CreatedAt:  postRow.CreatedAt.Time,
+		}
+		if jsonbToUrls, err := jsonbToUrls(postRow.Files); err == nil {
+			postRepo.Files = mo.Some(jsonbToUrls)
 		}
 		if postRow.UpdatedAt.Valid {
 			postRepo.UpdatedAt = postRow.UpdatedAt.Time
@@ -152,6 +175,9 @@ func (r *PostsRepo) PageByOffset(ctx context.Context, postId, limit int, before 
 				SeoMeta:   extractSeoMeta(postRow.SeoMeta),
 				CreatedAt: postRow.CreatedAt.Time,
 			}
+			if jsonbToUrls, err := jsonbToUrls(postRow.Files); err == nil {
+				postRepo.Files = mo.Some(jsonbToUrls)
+			}
 			if postRow.UpdatedAt.Valid {
 				postRepo.UpdatedAt = postRow.UpdatedAt.Time
 			}
@@ -184,6 +210,9 @@ func (r *PostsRepo) PageByOffset(ctx context.Context, postId, limit int, before 
 				Content:   postRow.Content,
 				SeoMeta:   extractSeoMeta(postRow.SeoMeta),
 				CreatedAt: postRow.CreatedAt.Time,
+			}
+			if jsonbToUrls, err := jsonbToUrls(postRow.Files); err == nil {
+				postRepo.Files = mo.Some(jsonbToUrls)
 			}
 			if postRow.UpdatedAt.Valid {
 				postRepo.UpdatedAt = postRow.UpdatedAt.Time
@@ -273,6 +302,9 @@ func (r *PostsRepo) Get(ctx context.Context, postId int) (model.PostRepoInfo, er
 		SeoMeta:    extractSeoMeta(postRow.SeoMeta),
 		CreatedAt:  postRow.CreatedAt.Time,
 	}
+	if filesUrls, err := jsonbToUrls(postRow.Files); err == nil {
+		post.Files = mo.Some(filesUrls)
+	}
 	if postRow.UpdatedAt.Valid {
 		post.UpdatedAt = postRow.UpdatedAt.Time
 	}
@@ -288,6 +320,24 @@ func (r *PostsRepo) Get(ctx context.Context, postId int) (model.PostRepoInfo, er
 	}
 
 	return post, err
+}
+
+func jsonbToUrls(jsonb []byte) ([]url.URL, error) {
+	if jsonb == nil {
+		return nil, nil
+	}
+	urlStrings := make([]string, 0)
+	if err := json.Unmarshal(jsonb, &urlStrings); err != nil {
+		return nil, err
+	}
+	urls := make([]url.URL, 0, len(urlStrings))
+	for _, s := range urlStrings {
+		parsedUrl, err := url.Parse(s)
+		if err == nil {
+			urls = append(urls, *parsedUrl)
+		}
+	}
+	return urls, nil
 }
 
 func extractSeoMeta(seoJsonb []byte) model.SeoMeta {

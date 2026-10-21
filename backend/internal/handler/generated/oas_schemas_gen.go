@@ -1392,6 +1392,8 @@ type PostCreateRequest struct {
 	ContentMd string `json:"contentMd"`
 	// Optional tags for analytics (normalized to lowercase on server).
 	Tags []string `json:"tags"`
+	// Optional list of file URLs (uploaded via /api/media) to attach to the post.
+	Files []url.URL `json:"files"`
 }
 
 // GetCategory returns the value of Category.
@@ -1414,6 +1416,11 @@ func (s *PostCreateRequest) GetTags() []string {
 	return s.Tags
 }
 
+// GetFiles returns the value of Files.
+func (s *PostCreateRequest) GetFiles() []url.URL {
+	return s.Files
+}
+
 // SetCategory sets the value of Category.
 func (s *PostCreateRequest) SetCategory(val string) {
 	s.Category = val
@@ -1432,6 +1439,11 @@ func (s *PostCreateRequest) SetContentMd(val string) {
 // SetTags sets the value of Tags.
 func (s *PostCreateRequest) SetTags(val []string) {
 	s.Tags = val
+}
+
+// SetFiles sets the value of Files.
+func (s *PostCreateRequest) SetFiles(val []url.URL) {
+	s.Files = val
 }
 
 type PostCreateUnauthorized AnalyticsMetricsGetInternalServerErrorApplicationJSON
@@ -1456,6 +1468,7 @@ type PostItem struct {
 	// Post content in Markdown format.
 	ContentMd string      `json:"contentMd"`
 	Tags      []string    `json:"tags"`
+	Files     []url.URL   `json:"files"`
 	PostStats PostStats   `json:"postStats"`
 	SeoMeta   OptSeoMeta  `json:"seoMeta"`
 	CreatedAt time.Time   `json:"createdAt"`
@@ -1495,6 +1508,11 @@ func (s *PostItem) GetContentMd() string {
 // GetTags returns the value of Tags.
 func (s *PostItem) GetTags() []string {
 	return s.Tags
+}
+
+// GetFiles returns the value of Files.
+func (s *PostItem) GetFiles() []url.URL {
+	return s.Files
 }
 
 // GetPostStats returns the value of PostStats.
@@ -1552,6 +1570,11 @@ func (s *PostItem) SetTags(val []string) {
 	s.Tags = val
 }
 
+// SetFiles sets the value of Files.
+func (s *PostItem) SetFiles(val []url.URL) {
+	s.Files = val
+}
+
 // SetPostStats sets the value of PostStats.
 func (s *PostItem) SetPostStats(val PostStats) {
 	s.PostStats = val
@@ -1582,6 +1605,7 @@ type PostListItem struct {
 	Category  string        `json:"category"`
 	Title     string        `json:"title"`
 	Tags      []string      `json:"tags"`
+	Files     []url.URL     `json:"files"`
 	PostStats PostStats     `json:"postStats"`
 	SeoMeta   OptSeoMeta    `json:"seoMeta"`
 	CreatedAt time.Time     `json:"createdAt"`
@@ -1616,6 +1640,11 @@ func (s *PostListItem) GetTitle() string {
 // GetTags returns the value of Tags.
 func (s *PostListItem) GetTags() []string {
 	return s.Tags
+}
+
+// GetFiles returns the value of Files.
+func (s *PostListItem) GetFiles() []url.URL {
+	return s.Files
 }
 
 // GetPostStats returns the value of PostStats.
@@ -1666,6 +1695,11 @@ func (s *PostListItem) SetTitle(val string) {
 // SetTags sets the value of Tags.
 func (s *PostListItem) SetTags(val []string) {
 	s.Tags = val
+}
+
+// SetFiles sets the value of Files.
+func (s *PostListItem) SetFiles(val []url.URL) {
+	s.Files = val
 }
 
 // SetPostStats sets the value of PostStats.
@@ -1789,6 +1823,7 @@ type PostWithCommentsListResponse struct {
 	// Number of reply posts (rows in posts). The opening message is not included.
 	ContentMd string            `json:"contentMd"`
 	Tags      []string          `json:"tags"`
+	Files     []url.URL         `json:"files"`
 	PostStats PostStats         `json:"postStats"`
 	SeoMeta   OptSeoMeta        `json:"seoMeta"`
 	CreatedAt time.Time         `json:"createdAt"`
@@ -1829,6 +1864,11 @@ func (s *PostWithCommentsListResponse) GetContentMd() string {
 // GetTags returns the value of Tags.
 func (s *PostWithCommentsListResponse) GetTags() []string {
 	return s.Tags
+}
+
+// GetFiles returns the value of Files.
+func (s *PostWithCommentsListResponse) GetFiles() []url.URL {
+	return s.Files
 }
 
 // GetPostStats returns the value of PostStats.
@@ -1889,6 +1929,11 @@ func (s *PostWithCommentsListResponse) SetContentMd(val string) {
 // SetTags sets the value of Tags.
 func (s *PostWithCommentsListResponse) SetTags(val []string) {
 	s.Tags = val
+}
+
+// SetFiles sets the value of Files.
+func (s *PostWithCommentsListResponse) SetFiles(val []url.URL) {
+	s.Files = val
 }
 
 // SetPostStats sets the value of PostStats.

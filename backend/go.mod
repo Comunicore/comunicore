@@ -12,6 +12,7 @@ require (
 	github.com/ogen-go/ogen v1.24.0
 	github.com/pelletier/go-toml/v2 v2.4.3
 	github.com/rs/cors v1.11.1
+	github.com/samber/mo v1.17.0
 	github.com/stretchr/testify v1.12.1
 	github.com/testcontainers/testcontainers-go v0.44.0
 	github.com/testcontainers/testcontainers-go/modules/postgres v0.44.0
