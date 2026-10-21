@@ -112,6 +112,11 @@ type PostStats struct {
 	LikesCount    int
 	ViewsCount    int
 }
+
+func (stats *PostStats) IsEmpty() bool {
+	return stats.CommentsCount == 0 && stats.LikesCount == 0 && stats.ViewsCount == 0
+}
+
 type SeoMeta struct {
 	Description string
 	OgImageUrl  *url.URL

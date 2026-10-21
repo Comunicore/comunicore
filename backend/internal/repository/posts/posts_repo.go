@@ -1,14 +1,18 @@
 // SPDX-License-Identifier: MIT
 // Copyright 2026 Alex Syrnikov <alex19srv@gmail.com>
 
-package posts
+package posts_repo
 
 import (
 	"context"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"net/url"
+	"strconv"
 	"strings"
 
+	"github.com/comunicore/comunicore/backend/internal/apperror"
 	"github.com/comunicore/comunicore/backend/internal/repository"
 	postdDb "github.com/comunicore/comunicore/backend/internal/repository/sqlc/db"
 	"github.com/comunicore/comunicore/backend/internal/service/model"
@@ -292,9 +296,11 @@ type SeoMeta struct {
 }
 
 func (r *PostsRepo) Get(ctx context.Context, postId int) (model.PostRepoInfo, error) {
+	op := "PostRepo.Get(), postId " + strconv.Itoa(postId)
 	postRow, err := r.queries.PostGetById(ctx, int32(postId))
 	if err != nil {
-		return model.PostRepoInfo{}, err
+		return model.PostRepoInfo{},
+			fmt.Errorf("error in %s, query PostGetById returned %w", op, apperror.AppErrorFromPgError(err))
 	}
 
 	post := model.PostRepoInfo{
@@ -366,13 +372,21 @@ func extractSeoMeta(seoJsonb []byte) model.SeoMeta {
 }
 
 func (r *PostsRepo) stats(ctx context.Context, postId int) (model.PostStats, error) {
+	op := "(*PostRepo).stats(), postId: " + strconv.Itoa(postId)
 	row, err := r.queries.PostStats(ctx, int32(postId))
-	if err != nil {
-		return model.PostStats{}, err
+	if err == nil {
+		return model.PostStats{
+			CommentsCount: int(row.CommentsCount),
+			LikesCount:    int(row.LikesCount),
+			ViewsCount:    int(row.ViewsCount),
+		}, nil
 	}
-	return model.PostStats{
-		CommentsCount: int(row.CommentsCount),
-		LikesCount:    int(row.LikesCount),
-		ViewsCount:    int(row.ViewsCount),
-	}, nil
+
+	err = apperror.AppErrorFromPgError(err)
+	if errors.Is(err, apperror.NotFoundError) {
+		return model.PostStats{}, nil
+	}
+
+	return model.PostStats{},
+		fmt.Errorf("error in %s, query PostStats returned %w", op, err)
 }
