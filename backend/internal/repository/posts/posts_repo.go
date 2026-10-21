@@ -45,6 +45,7 @@ func optionUrlsToJsonbArray(optUrls mo.Option[[]url.URL]) ([]byte, error) {
 func (r *PostsRepo) Create(ctx context.Context, post model.PostCreateRepo) (model.PostRepoInfo, error) {
 	params := postdDb.PostCreateParams{
 		CategoryID: int32(post.CategoryID),
+		Type:       post.Type,
 		Title:      post.Title,
 		Content:    post.Content,
 		UserID:     int32(post.UserID),
@@ -61,6 +62,7 @@ func (r *PostsRepo) Create(ctx context.Context, post model.PostCreateRepo) (mode
 		ID:         int(row.ID),
 		UUID:       uuid.UUID(row.Uuid.Bytes),
 		CategoryID: int(row.CategoryID),
+		Type:       row.Type,
 		UserID:     int(row.UserID),
 		Title:      row.Title,
 		Content:    row.Content,
@@ -114,6 +116,7 @@ func (r *PostsRepo) PageByPageID(ctx context.Context, page, limit int) (model.Po
 			ID:         int(postRow.ID),
 			UUID:       uuid.UUID(postRow.Uuid.Bytes),
 			CategoryID: int(postRow.CategoryID),
+			Type:       postRow.Type,
 			UserID:     int(postRow.UserID),
 			Title:      postRow.Title,
 			Content:    postRow.Content,
@@ -169,6 +172,7 @@ func (r *PostsRepo) PageByOffset(ctx context.Context, postId, limit int, before 
 			postRepo := model.PostRepoInfo{
 				ID:        int(postRow.ID),
 				UUID:      uuid.UUID(postRow.Uuid.Bytes),
+				Type:      postRow.Type,
 				UserID:    int(postRow.UserID),
 				Title:     postRow.Title,
 				Content:   postRow.Content,
@@ -205,6 +209,7 @@ func (r *PostsRepo) PageByOffset(ctx context.Context, postId, limit int, before 
 			postRepo := model.PostRepoInfo{
 				ID:        int(postRow.ID),
 				UUID:      uuid.UUID(postRow.Uuid.Bytes),
+				Type:      postRow.Type,
 				UserID:    int(postRow.UserID),
 				Title:     postRow.Title,
 				Content:   postRow.Content,
@@ -297,6 +302,7 @@ func (r *PostsRepo) Get(ctx context.Context, postId int) (model.PostRepoInfo, er
 		UUID:       uuid.UUID(postRow.Uuid.Bytes),
 		UserID:     int(postRow.UserID),
 		CategoryID: int(postRow.CategoryID),
+		Type:       postRow.Type,
 		Title:      postRow.Title,
 		Content:    postRow.Content,
 		SeoMeta:    extractSeoMeta(postRow.SeoMeta),

@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS posts (
     id SERIAL PRIMARY KEY,
     uuid UUID NOT NULL DEFAULT gen_random_uuid(),
     category_id INTEGER NOT NULL DEFAULT 0,
+    type TEXT NOT NULL DEFAULT 'Обсуждение',
     title TEXT NOT NULL,
     content TEXT NOT NULL,
     user_id INTEGER NOT NULL,

@@ -15,6 +15,7 @@ type PostWithComments struct {
 	ID        int
 	UUID      uuid.UUID
 	Category  string
+	Type      string
 	Author    MessageAuthor
 	Title     string
 	Content   string
@@ -28,6 +29,7 @@ type PostWithComments struct {
 }
 type PostCreateService struct {
 	Category string
+	Type     string
 	Title    string
 	Content  string
 	Files    mo.Option[[]url.URL]
@@ -36,6 +38,7 @@ type PostCreateService struct {
 }
 type PostCreateRepo struct {
 	CategoryID int
+	Type       string
 	Title      string
 	Content    string
 	Files      mo.Option[[]url.URL]
@@ -46,6 +49,7 @@ type PostRepoInfo struct {
 	ID         int
 	UUID       uuid.UUID
 	CategoryID int
+	Type       string
 	Title      string
 	Content    string
 	Files      mo.Option[[]url.URL]
@@ -67,6 +71,7 @@ type PostInfoResponse struct {
 	ID        int
 	UUID      uuid.UUID
 	Category  string
+	Type      string
 	Title     string
 	Content   string
 	Files     mo.Option[[]url.URL]
@@ -90,6 +95,7 @@ type PostInfo struct {
 	ID        int
 	UUID      uuid.UUID
 	Category  string
+	Type      string
 	Title     string
 	Content   string
 	Files     mo.Option[[]url.URL]

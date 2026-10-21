@@ -499,6 +499,42 @@ func (s *PostCommentItem) Validate() error {
 	return nil
 }
 
+func (s *PostCreateRequest) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if err := s.Type.Validate(); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "type",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s PostCreateRequestType) Validate() error {
+	switch s {
+	case "Обсуждение":
+		return nil
+	case "Вопрос":
+		return nil
+	case "Гайд":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
 func (s *PostItem) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer

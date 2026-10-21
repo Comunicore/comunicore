@@ -47,6 +47,7 @@ type Post struct {
 	ID         int32
 	Uuid       pgtype.UUID
 	CategoryID int32
+	Type       string
 	Title      string
 	Content    string
 	UserID     int32

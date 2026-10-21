@@ -45,6 +45,7 @@ type PostItem struct {
 	Author    MessageAuthor
 	Title     string    `json:"title"`
 	ContentMd string    `json:"contentMd"`
+	Type      string    `json:"type"`
 	PostStats PostStats `json:"postStats"`
 	CreatedAt time.Time `json:"createdAt"`
 }
@@ -62,6 +63,7 @@ func testPostCreateOk(t *testing.T, baseURL string, cookie *http.Cookie) PostIte
 				"category":  "Программирование",
 				"title":     "Test Post " + tests.RandomString(8),
 				"contentMd": "This is a test post content " + tests.RandomString(20),
+				"type":      "Обсуждение",
 			}).
 			Expect().
 			Status(http.StatusCreated).JSON().Object()
@@ -152,10 +154,11 @@ func testPostGet(t *testing.T, baseURL string,
 			Status(http.StatusOK).JSON().Object()
 
 		res.Keys().ContainsOnly(
-			"id", "uuid", "category", "author", "title", "contentMd", "postStats", "createdAt", "comments")
+			"id", "uuid", "category", "type", "author", "title", "contentMd", "postStats", "createdAt", "comments")
 		res.Value("id").Number().IsEqual(expectedPost.ID)
 		res.Value("uuid").String().IsEqual(expectedPost.UUID)
 		res.Value("category").String().IsEqual(expectedPost.Category)
+		res.Value("type").String().IsEqual(expectedPost.Type)
 		res.Value("title").String().IsEqual(expectedPost.Title)
 		res.Value("contentMd").String().IsEqual(expectedPost.ContentMd)
 		res.Value("createdAt").String().NotEmpty()
