@@ -46,6 +46,7 @@ export type PostListResponse = {
 
 export type PostItem = {
     id: number;
+    uuid: string;
     author: MessageAuthor;
     category: string;
     title: string;
@@ -53,6 +54,12 @@ export type PostItem = {
      * Post content in Markdown format.
      */
     contentMd: string;
+    /**
+     * Type of post ("Обсуждение", "Вопрос" или "Гайд")
+     */
+    type: string;
+    tags?: Array<string>;
+    files?: Array<string>;
     postStats: PostStats;
     seoMeta?: SeoMeta;
     createdAt: string;
@@ -80,11 +87,23 @@ export type PostStats = {
     viewsCount: number;
 };
 
+export type CategoriesListResponse = Array<{
+    id: number;
+    name: string;
+}>;
+
 export type PostListItem = {
     id: number;
+    uuid: string;
     author: MessageAuthor;
     category: string;
     title: string;
+    /**
+     * Type of post ("Обсуждение", "Вопрос" или "Гайд")
+     */
+    type: string;
+    tags?: Array<string>;
+    files?: Array<string>;
     postStats: PostStats;
     seoMeta?: SeoMeta;
     createdAt: string;
@@ -93,6 +112,7 @@ export type PostListItem = {
 
 export type PostWithCommentsListResponse = {
     id: number;
+    uuid: string;
     category: string;
     author: MessageAuthor;
     title: string;
@@ -100,6 +120,12 @@ export type PostWithCommentsListResponse = {
      * Number of reply posts (rows in posts). The opening message is not included.
      */
     contentMd: string;
+    /**
+     * Type of post ("Обсуждение", "Вопрос" или "Гайд")
+     */
+    type: string;
+    tags?: Array<string>;
+    files?: Array<string>;
     postStats: PostStats;
     seoMeta?: SeoMeta;
     createdAt: string;
@@ -117,8 +143,13 @@ export type MessageAuthor = {
 
 export type PostCommentItem = {
     id: number;
+    /**
+     * Optional parent comment id for nested comments (0 - no parent)
+     */
+    parentCommentId?: number;
     author: MessageAuthor;
     contentMd: string;
+    tags?: Array<string>;
     createdAt: string;
     updatedAt?: string;
 };
@@ -126,15 +157,27 @@ export type PostCommentItem = {
 export type PostCreateRequest = {
     category: string;
     title: string;
+    /**
+     * Type of post ("Обсуждение", "Вопрос" или "Гайд")
+     */
+    type: 'Обсуждение' | 'Вопрос' | 'Гайд';
     contentMd: string;
     /**
      * Optional tags for analytics (normalized to lowercase on server)
      */
     tags?: Array<string>;
+    /**
+     * Optional list of file URLs (uploaded via /api/media) to attach to the post
+     */
+    files?: Array<string>;
 };
 
 export type PostCreateCommentRequest = {
     contentMd: string;
+    /**
+     * Optional parent comment id for nested comments
+     */
+    parentCommentId?: number;
 };
 
 export type MediaUploadRequest = {
@@ -459,6 +502,31 @@ export type AuthLogoutResponses = {
 };
 
 export type AuthLogoutResponse = AuthLogoutResponses[keyof AuthLogoutResponses];
+
+export type CategoriesListData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/categories';
+};
+
+export type CategoriesListErrors = {
+    /**
+     * Error in request with string description (for log, not for user).
+     */
+    500: string;
+};
+
+export type CategoriesListError = CategoriesListErrors[keyof CategoriesListErrors];
+
+export type CategoriesListResponses = {
+    /**
+     * OK
+     */
+    200: CategoriesListResponse;
+};
+
+export type CategoriesListResponse2 = CategoriesListResponses[keyof CategoriesListResponses];
 
 export type PostsListData = {
     body?: never;

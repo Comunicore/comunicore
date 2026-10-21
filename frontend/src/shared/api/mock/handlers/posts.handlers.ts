@@ -66,7 +66,8 @@ const mockComments: PostCommentItem[] = [
   },
 ];
 
-const mockPost: Omit<PostWithCommentsListResponse, 'id'> = {
+const mockPost: Omit<PostWithCommentsListResponse, 'id' | 'uuid'> = {
+  type: 'Обсуждение',
   category: 'Программирование',
   author: mockAuthor(1, 'CodeMaster'),
   title: 'Java или C# в 2026: Что выбрать новичку?',
@@ -96,7 +97,13 @@ export const postsHandlers = [
       return HttpResponse.json('invalid post id', { status: 400 });
     }
 
-    return HttpResponse.json({ ...mockPost, id: postId });
+    const post: PostWithCommentsListResponse = {
+      ...mockPost,
+      id: postId,
+      uuid: `00000000-0000-4000-8000-${String(postId).padStart(12, '0')}`,
+    };
+
+    return HttpResponse.json(post);
   }),
 
   http.post<{ postId: string }, PostCreateCommentRequest>(
