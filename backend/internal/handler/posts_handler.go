@@ -79,6 +79,7 @@ func (h *PostsHandler) PostCreate(
 	}
 	modelPostCreate := model.PostCreateService{
 		Category: req.Category,
+		Type:     string(req.Type),
 		Title:    req.Title,
 		Content:  req.ContentMd,
 		Files:    mo.None[[]url.URL](),
@@ -97,6 +98,7 @@ func (h *PostsHandler) PostCreate(
 		ID:        post.ID,
 		UUID:      post.UUID,
 		Category:  post.Category,
+		Type:      post.Type,
 		Title:     post.Title,
 		ContentMd: post.Content,
 		Author: api.MessageAuthor{
@@ -179,6 +181,7 @@ func (h *PostsHandler) PostGet(ctx context.Context, params api.PostGetParams) (a
 		ID:       postWithComments.ID,
 		UUID:     postWithComments.UUID,
 		Category: postWithComments.Category,
+		Type:     postWithComments.Type,
 		Author: api.MessageAuthor{
 			ID:          postWithComments.Author.ID,
 			Username:    postWithComments.Author.Username,
@@ -255,6 +258,7 @@ GOT_POST_ID:
 			ID:       post.ID,
 			UUID:     post.UUID,
 			Category: post.Category,
+			Type:     post.Type,
 			Title:    post.Title,
 			Author: api.MessageAuthor{
 				ID:          post.Author.ID,

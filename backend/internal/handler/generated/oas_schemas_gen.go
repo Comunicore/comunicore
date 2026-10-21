@@ -1387,9 +1387,11 @@ func (*PostCreateInternalServerError) postCreateRes() {}
 
 // Ref: #/components/schemas/PostCreateRequest
 type PostCreateRequest struct {
-	Category  string `json:"category"`
-	Title     string `json:"title"`
-	ContentMd string `json:"contentMd"`
+	Category string `json:"category"`
+	Title    string `json:"title"`
+	// Type of post ("Обсуждение", "Вопрос" или "Гайд").
+	Type      PostCreateRequestType `json:"type"`
+	ContentMd string                `json:"contentMd"`
 	// Optional tags for analytics (normalized to lowercase on server).
 	Tags []string `json:"tags"`
 	// Optional list of file URLs (uploaded via /api/media) to attach to the post.
@@ -1404,6 +1406,11 @@ func (s *PostCreateRequest) GetCategory() string {
 // GetTitle returns the value of Title.
 func (s *PostCreateRequest) GetTitle() string {
 	return s.Title
+}
+
+// GetType returns the value of Type.
+func (s *PostCreateRequest) GetType() PostCreateRequestType {
+	return s.Type
 }
 
 // GetContentMd returns the value of ContentMd.
@@ -1431,6 +1438,11 @@ func (s *PostCreateRequest) SetTitle(val string) {
 	s.Title = val
 }
 
+// SetType sets the value of Type.
+func (s *PostCreateRequest) SetType(val PostCreateRequestType) {
+	s.Type = val
+}
+
 // SetContentMd sets the value of ContentMd.
 func (s *PostCreateRequest) SetContentMd(val string) {
 	s.ContentMd = val
@@ -1444,6 +1456,55 @@ func (s *PostCreateRequest) SetTags(val []string) {
 // SetFiles sets the value of Files.
 func (s *PostCreateRequest) SetFiles(val []url.URL) {
 	s.Files = val
+}
+
+// Type of post ("Обсуждение", "Вопрос" или "Гайд").
+type PostCreateRequestType string
+
+const (
+	PostCreateRequestType_0 PostCreateRequestType = "Обсуждение"
+	PostCreateRequestType_1 PostCreateRequestType = "Вопрос"
+	PostCreateRequestType_2 PostCreateRequestType = "Гайд"
+)
+
+// AllValues returns all PostCreateRequestType values.
+func (PostCreateRequestType) AllValues() []PostCreateRequestType {
+	return []PostCreateRequestType{
+		PostCreateRequestType_0,
+		PostCreateRequestType_1,
+		PostCreateRequestType_2,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s PostCreateRequestType) MarshalText() ([]byte, error) {
+	switch s {
+	case PostCreateRequestType_0:
+		return []byte(s), nil
+	case PostCreateRequestType_1:
+		return []byte(s), nil
+	case PostCreateRequestType_2:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *PostCreateRequestType) UnmarshalText(data []byte) error {
+	switch PostCreateRequestType(data) {
+	case PostCreateRequestType_0:
+		*s = PostCreateRequestType_0
+		return nil
+	case PostCreateRequestType_1:
+		*s = PostCreateRequestType_1
+		return nil
+	case PostCreateRequestType_2:
+		*s = PostCreateRequestType_2
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
 }
 
 type PostCreateUnauthorized AnalyticsMetricsGetInternalServerErrorApplicationJSON
@@ -1466,7 +1527,9 @@ type PostItem struct {
 	Category string        `json:"category"`
 	Title    string        `json:"title"`
 	// Post content in Markdown format.
-	ContentMd string      `json:"contentMd"`
+	ContentMd string `json:"contentMd"`
+	// Type of post ("Обсуждение", "Вопрос" или "Гайд").
+	Type      string      `json:"type"`
 	Tags      []string    `json:"tags"`
 	Files     []url.URL   `json:"files"`
 	PostStats PostStats   `json:"postStats"`
@@ -1503,6 +1566,11 @@ func (s *PostItem) GetTitle() string {
 // GetContentMd returns the value of ContentMd.
 func (s *PostItem) GetContentMd() string {
 	return s.ContentMd
+}
+
+// GetType returns the value of Type.
+func (s *PostItem) GetType() string {
+	return s.Type
 }
 
 // GetTags returns the value of Tags.
@@ -1565,6 +1633,11 @@ func (s *PostItem) SetContentMd(val string) {
 	s.ContentMd = val
 }
 
+// SetType sets the value of Type.
+func (s *PostItem) SetType(val string) {
+	s.Type = val
+}
+
 // SetTags sets the value of Tags.
 func (s *PostItem) SetTags(val []string) {
 	s.Tags = val
@@ -1599,17 +1672,19 @@ func (*PostItem) postCreateRes() {}
 
 // Ref: #/components/schemas/PostListItem
 type PostListItem struct {
-	ID        int           `json:"id"`
-	UUID      uuid.UUID     `json:"uuid"`
-	Author    MessageAuthor `json:"author"`
-	Category  string        `json:"category"`
-	Title     string        `json:"title"`
-	Tags      []string      `json:"tags"`
-	Files     []url.URL     `json:"files"`
-	PostStats PostStats     `json:"postStats"`
-	SeoMeta   OptSeoMeta    `json:"seoMeta"`
-	CreatedAt time.Time     `json:"createdAt"`
-	UpdatedAt OptDateTime   `json:"updatedAt"`
+	ID       int           `json:"id"`
+	UUID     uuid.UUID     `json:"uuid"`
+	Author   MessageAuthor `json:"author"`
+	Category string        `json:"category"`
+	Title    string        `json:"title"`
+	// Type of post ("Обсуждение", "Вопрос" или "Гайд").
+	Type      string      `json:"type"`
+	Tags      []string    `json:"tags"`
+	Files     []url.URL   `json:"files"`
+	PostStats PostStats   `json:"postStats"`
+	SeoMeta   OptSeoMeta  `json:"seoMeta"`
+	CreatedAt time.Time   `json:"createdAt"`
+	UpdatedAt OptDateTime `json:"updatedAt"`
 }
 
 // GetID returns the value of ID.
@@ -1635,6 +1710,11 @@ func (s *PostListItem) GetCategory() string {
 // GetTitle returns the value of Title.
 func (s *PostListItem) GetTitle() string {
 	return s.Title
+}
+
+// GetType returns the value of Type.
+func (s *PostListItem) GetType() string {
+	return s.Type
 }
 
 // GetTags returns the value of Tags.
@@ -1690,6 +1770,11 @@ func (s *PostListItem) SetCategory(val string) {
 // SetTitle sets the value of Title.
 func (s *PostListItem) SetTitle(val string) {
 	s.Title = val
+}
+
+// SetType sets the value of Type.
+func (s *PostListItem) SetType(val string) {
+	s.Type = val
 }
 
 // SetTags sets the value of Tags.
@@ -1821,7 +1906,9 @@ type PostWithCommentsListResponse struct {
 	Author   MessageAuthor `json:"author"`
 	Title    string        `json:"title"`
 	// Number of reply posts (rows in posts). The opening message is not included.
-	ContentMd string            `json:"contentMd"`
+	ContentMd string `json:"contentMd"`
+	// Type of post ("Обсуждение", "Вопрос" или "Гайд").
+	Type      string            `json:"type"`
 	Tags      []string          `json:"tags"`
 	Files     []url.URL         `json:"files"`
 	PostStats PostStats         `json:"postStats"`
@@ -1859,6 +1946,11 @@ func (s *PostWithCommentsListResponse) GetTitle() string {
 // GetContentMd returns the value of ContentMd.
 func (s *PostWithCommentsListResponse) GetContentMd() string {
 	return s.ContentMd
+}
+
+// GetType returns the value of Type.
+func (s *PostWithCommentsListResponse) GetType() string {
+	return s.Type
 }
 
 // GetTags returns the value of Tags.
@@ -1924,6 +2016,11 @@ func (s *PostWithCommentsListResponse) SetTitle(val string) {
 // SetContentMd sets the value of ContentMd.
 func (s *PostWithCommentsListResponse) SetContentMd(val string) {
 	s.ContentMd = val
+}
+
+// SetType sets the value of Type.
+func (s *PostWithCommentsListResponse) SetType(val string) {
+	s.Type = val
 }
 
 // SetTags sets the value of Tags.

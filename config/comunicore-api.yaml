@@ -618,6 +618,9 @@ components:
         contentMd:
           type: string
           description: Post content in Markdown format.
+        type:
+          type: string
+          description: Type of post ("Обсуждение", "Вопрос" или "Гайд")
         tags:
           type: array
           items:
@@ -644,6 +647,7 @@ components:
         - category
         - title
         - contentMd
+        - type
         - postsCount
         - postStats
         - createdAt
@@ -653,6 +657,7 @@ components:
         category: "Программирование"
         title: "First post"
         contentMd: "This is the content of the first post."
+        type: "Обсуждение"
         author:
           id: 42
           username: "booblick"
@@ -734,6 +739,9 @@ components:
           type: string
         title:
           type: string
+        type:
+          type: string
+          description: Type of post ("Обсуждение", "Вопрос" или "Гайд")
         tags:
           type: array
           items:
@@ -759,6 +767,7 @@ components:
         - author
         - category
         - title
+        - type
         - postStats
         - createdAt
       example:
@@ -766,6 +775,7 @@ components:
         uuid: "123e4567-e89b-12d3-a456-426614174000"
         title: "First post"
         category: "Программирование"
+        type: "Обсуждение"
         author:
           id: 42
           username: "booblick"
@@ -802,6 +812,9 @@ components:
         contentMd:
           type: string
           description: Number of reply posts (rows in posts). The opening message is not included.
+        type:
+          type: string
+          description: Type of post ("Обсуждение", "Вопрос" или "Гайд")
         tags:
           type: array
           items:
@@ -832,6 +845,7 @@ components:
         - author
         - title
         - contentMd
+        - type
         - postStats
         - createdAt
         - comments
@@ -841,6 +855,7 @@ components:
         category: "Программирование"
         title: "First post"
         contentMd: "This is the content of the first post."
+        type: "Обсуждение"
         author:
           id: 42
           username: "booblick"
@@ -945,6 +960,13 @@ components:
           type: string
         title:
           type: string
+        type:
+          type: string
+          enum:
+            - "Обсуждение"
+            - "Вопрос"
+            - "Гайд"
+          description: Type of post ("Обсуждение", "Вопрос" или "Гайд")
         contentMd:
           type: string
         tags:
@@ -961,10 +983,12 @@ components:
       required:
         - category
         - title
+        - type
         - contentMd
       example:
         category: "Программирование"
         title: "How to learn Go?"
+        type: "Обсуждение"
         contentMd: "I want to learn Go, but I don't know where to start. Any advice?"
         files:
           - "https://comunicore.mooo.com/storage/media/file1.png"

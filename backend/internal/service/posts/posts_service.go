@@ -85,6 +85,7 @@ func (s *PostsService) Create(ctx context.Context, post model.PostCreateService)
 	}
 	createdPost, err := s.postsRepo.Create(ctx, model.PostCreateRepo{
 		CategoryID: category.ID,
+		Type:       post.Type,
 		Title:      post.Title,
 		Content:    post.Content,
 		Files:      post.Files,
@@ -108,6 +109,7 @@ func (s *PostsService) Create(ctx context.Context, post model.PostCreateService)
 		ID:       createdPost.ID,
 		UUID:     createdPost.UUID,
 		Category: category.Name,
+		Type:     createdPost.Type,
 		Title:    createdPost.Title,
 		Content:  createdPost.Content,
 		Files:    createdPost.Files,
@@ -169,6 +171,7 @@ func (s *PostsService) GetPostWithComments(ctx context.Context, postId int) (mod
 		ID:       postInfo.ID,
 		UUID:     postInfo.UUID,
 		Category: category.Name,
+		Type:     postInfo.Type,
 		Author: model.MessageAuthor{
 			ID:          userInfo.ID,
 			Username:    userInfo.Name,
@@ -228,6 +231,7 @@ func (s *PostsService) convertPostListRepoToResponse(
 			ID:       post.ID,
 			UUID:     post.UUID,
 			Category: categories[post.CategoryID].Name,
+			Type:     post.Type,
 			Title:    post.Title,
 			Content:  post.Content,
 			Files:    post.Files,

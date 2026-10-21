@@ -47,23 +47,23 @@ SELECT id, parent_id, post_id, user_id, content, created_at, updated_at FROM com
 WHERE post_id = $1 ORDER BY created_at DESC;
 
 -- name: PostCreate :one
-INSERT INTO posts (category_id, title, content, user_id, files) VALUES ($1, $2, $3, $4, $5)
-RETURNING id, uuid, category_id, title, content, user_id, seo_meta, files, created_at, updated_at;
+INSERT INTO posts (category_id, type, title, content, user_id, files) VALUES ($1, $2, $3, $4, $5, $6)
+RETURNING id, uuid, category_id, type, title, content, user_id, seo_meta, files, created_at, updated_at;
 -- name: PostGetById :one
-SELECT id, uuid, category_id, title, content, user_id, seo_meta, files, created_at, updated_at
+SELECT id, uuid, category_id, type, title, content, user_id, seo_meta, files, created_at, updated_at
 FROM posts
 WHERE id = $1;
 -- name: PostPageByPageID :many
-SELECT id, uuid, category_id, title, content, user_id, seo_meta, files, created_at, updated_at
+SELECT id, uuid, category_id, type, title, content, user_id, seo_meta, files, created_at, updated_at
 FROM posts
 ORDER BY id DESC LIMIT $1 OFFSET $2;
 -- name: PostPagesBeforePostID :many
-SELECT id, uuid, category_id, title, content, user_id, seo_meta, files, created_at, updated_at
+SELECT id, uuid, category_id, type, title, content, user_id, seo_meta, files, created_at, updated_at
 FROM posts
 WHERE id < $1
 ORDER BY id DESC LIMIT $2;
 -- name: PostPagesAfterPostID :many
-SELECT id, uuid, category_id, title, content, user_id, seo_meta, files, created_at, updated_at
+SELECT id, uuid, category_id, type, title, content, user_id, seo_meta, files, created_at, updated_at
 FROM posts
 WHERE id > $1
 ORDER BY id DESC LIMIT $2;
