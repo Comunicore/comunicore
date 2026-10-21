@@ -51,6 +51,7 @@ type Post struct {
 	Content    string
 	UserID     int32
 	SeoMeta    []byte
+	Files      []byte
 	CreatedAt  pgtype.Timestamptz
 	UpdatedAt  pgtype.Timestamptz
 }

@@ -4,6 +4,7 @@ package api
 
 import (
 	"math/bits"
+	"net/url"
 	"strconv"
 	"time"
 
@@ -3332,13 +3333,24 @@ func (s *PostCreateRequest) encodeFields(e *jx.Encoder) {
 			e.ArrEnd()
 		}
 	}
+	{
+		if s.Files != nil {
+			e.FieldStart("files")
+			e.ArrStart()
+			for _, elem := range s.Files {
+				json.EncodeURI(e, elem)
+			}
+			e.ArrEnd()
+		}
+	}
 }
 
-var jsonFieldsNameOfPostCreateRequest = [4]string{
+var jsonFieldsNameOfPostCreateRequest = [5]string{
 	0: "category",
 	1: "title",
 	2: "contentMd",
 	3: "tags",
+	4: "files",
 }
 
 // Decode decodes PostCreateRequest from json.
@@ -3404,6 +3416,25 @@ func (s *PostCreateRequest) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"tags\"")
+			}
+		case "files":
+			if err := func() error {
+				s.Files = make([]url.URL, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem url.URL
+					v, err := json.DecodeURI(d)
+					elem = v
+					if err != nil {
+						return err
+					}
+					s.Files = append(s.Files, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"files\"")
 			}
 		default:
 			return d.Skip()
@@ -3619,6 +3650,16 @@ func (s *PostItem) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
+		if s.Files != nil {
+			e.FieldStart("files")
+			e.ArrStart()
+			for _, elem := range s.Files {
+				json.EncodeURI(e, elem)
+			}
+			e.ArrEnd()
+		}
+	}
+	{
 		e.FieldStart("postStats")
 		s.PostStats.Encode(e)
 	}
@@ -3640,7 +3681,7 @@ func (s *PostItem) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfPostItem = [11]string{
+var jsonFieldsNameOfPostItem = [12]string{
 	0:  "id",
 	1:  "uuid",
 	2:  "author",
@@ -3648,10 +3689,11 @@ var jsonFieldsNameOfPostItem = [11]string{
 	4:  "title",
 	5:  "contentMd",
 	6:  "tags",
-	7:  "postStats",
-	8:  "seoMeta",
-	9:  "createdAt",
-	10: "updatedAt",
+	7:  "files",
+	8:  "postStats",
+	9:  "seoMeta",
+	10: "createdAt",
+	11: "updatedAt",
 }
 
 // Decode decodes PostItem from json.
@@ -3752,8 +3794,27 @@ func (s *PostItem) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"tags\"")
 			}
+		case "files":
+			if err := func() error {
+				s.Files = make([]url.URL, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem url.URL
+					v, err := json.DecodeURI(d)
+					elem = v
+					if err != nil {
+						return err
+					}
+					s.Files = append(s.Files, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"files\"")
+			}
 		case "postStats":
-			requiredBitSet[0] |= 1 << 7
+			requiredBitSet[1] |= 1 << 0
 			if err := func() error {
 				if err := s.PostStats.Decode(d); err != nil {
 					return err
@@ -3773,7 +3834,7 @@ func (s *PostItem) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"seoMeta\"")
 			}
 		case "createdAt":
-			requiredBitSet[1] |= 1 << 1
+			requiredBitSet[1] |= 1 << 2
 			if err := func() error {
 				v, err := json.DecodeDateTime(d)
 				s.CreatedAt = v
@@ -3804,8 +3865,8 @@ func (s *PostItem) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [2]uint8{
-		0b10111111,
-		0b00000010,
+		0b00111111,
+		0b00000101,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -3891,6 +3952,16 @@ func (s *PostListItem) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
+		if s.Files != nil {
+			e.FieldStart("files")
+			e.ArrStart()
+			for _, elem := range s.Files {
+				json.EncodeURI(e, elem)
+			}
+			e.ArrEnd()
+		}
+	}
+	{
 		e.FieldStart("postStats")
 		s.PostStats.Encode(e)
 	}
@@ -3912,17 +3983,18 @@ func (s *PostListItem) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfPostListItem = [10]string{
-	0: "id",
-	1: "uuid",
-	2: "author",
-	3: "category",
-	4: "title",
-	5: "tags",
-	6: "postStats",
-	7: "seoMeta",
-	8: "createdAt",
-	9: "updatedAt",
+var jsonFieldsNameOfPostListItem = [11]string{
+	0:  "id",
+	1:  "uuid",
+	2:  "author",
+	3:  "category",
+	4:  "title",
+	5:  "tags",
+	6:  "files",
+	7:  "postStats",
+	8:  "seoMeta",
+	9:  "createdAt",
+	10: "updatedAt",
 }
 
 // Decode decodes PostListItem from json.
@@ -4011,8 +4083,27 @@ func (s *PostListItem) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"tags\"")
 			}
+		case "files":
+			if err := func() error {
+				s.Files = make([]url.URL, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem url.URL
+					v, err := json.DecodeURI(d)
+					elem = v
+					if err != nil {
+						return err
+					}
+					s.Files = append(s.Files, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"files\"")
+			}
 		case "postStats":
-			requiredBitSet[0] |= 1 << 6
+			requiredBitSet[0] |= 1 << 7
 			if err := func() error {
 				if err := s.PostStats.Decode(d); err != nil {
 					return err
@@ -4032,7 +4123,7 @@ func (s *PostListItem) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"seoMeta\"")
 			}
 		case "createdAt":
-			requiredBitSet[1] |= 1 << 0
+			requiredBitSet[1] |= 1 << 1
 			if err := func() error {
 				v, err := json.DecodeDateTime(d)
 				s.CreatedAt = v
@@ -4063,8 +4154,8 @@ func (s *PostListItem) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [2]uint8{
-		0b01011111,
-		0b00000001,
+		0b10011111,
+		0b00000010,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.
@@ -4441,6 +4532,16 @@ func (s *PostWithCommentsListResponse) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
+		if s.Files != nil {
+			e.FieldStart("files")
+			e.ArrStart()
+			for _, elem := range s.Files {
+				json.EncodeURI(e, elem)
+			}
+			e.ArrEnd()
+		}
+	}
+	{
 		e.FieldStart("postStats")
 		s.PostStats.Encode(e)
 	}
@@ -4470,7 +4571,7 @@ func (s *PostWithCommentsListResponse) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfPostWithCommentsListResponse = [12]string{
+var jsonFieldsNameOfPostWithCommentsListResponse = [13]string{
 	0:  "id",
 	1:  "uuid",
 	2:  "category",
@@ -4478,11 +4579,12 @@ var jsonFieldsNameOfPostWithCommentsListResponse = [12]string{
 	4:  "title",
 	5:  "contentMd",
 	6:  "tags",
-	7:  "postStats",
-	8:  "seoMeta",
-	9:  "createdAt",
-	10: "updatedAt",
-	11: "comments",
+	7:  "files",
+	8:  "postStats",
+	9:  "seoMeta",
+	10: "createdAt",
+	11: "updatedAt",
+	12: "comments",
 }
 
 // Decode decodes PostWithCommentsListResponse from json.
@@ -4583,8 +4685,27 @@ func (s *PostWithCommentsListResponse) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"tags\"")
 			}
+		case "files":
+			if err := func() error {
+				s.Files = make([]url.URL, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem url.URL
+					v, err := json.DecodeURI(d)
+					elem = v
+					if err != nil {
+						return err
+					}
+					s.Files = append(s.Files, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"files\"")
+			}
 		case "postStats":
-			requiredBitSet[0] |= 1 << 7
+			requiredBitSet[1] |= 1 << 0
 			if err := func() error {
 				if err := s.PostStats.Decode(d); err != nil {
 					return err
@@ -4604,7 +4725,7 @@ func (s *PostWithCommentsListResponse) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"seoMeta\"")
 			}
 		case "createdAt":
-			requiredBitSet[1] |= 1 << 1
+			requiredBitSet[1] |= 1 << 2
 			if err := func() error {
 				v, err := json.DecodeDateTime(d)
 				s.CreatedAt = v
@@ -4626,7 +4747,7 @@ func (s *PostWithCommentsListResponse) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"updatedAt\"")
 			}
 		case "comments":
-			requiredBitSet[1] |= 1 << 3
+			requiredBitSet[1] |= 1 << 4
 			if err := func() error {
 				s.Comments = make([]PostCommentItem, 0)
 				if err := d.Arr(func(d *jx.Decoder) error {
@@ -4653,8 +4774,8 @@ func (s *PostWithCommentsListResponse) Decode(d *jx.Decoder) error {
 	// Validate required fields.
 	var failures []validate.FieldError
 	for i, mask := range [2]uint8{
-		0b10111111,
-		0b00001010,
+		0b00111111,
+		0b00010101,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.

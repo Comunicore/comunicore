@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/samber/mo"
 )
 
 type PostWithComments struct {
@@ -17,6 +18,7 @@ type PostWithComments struct {
 	Author    MessageAuthor
 	Title     string
 	Content   string
+	Files     mo.Option[[]url.URL]
 	Tags      []string
 	PostStats PostStats
 	SeoMeta   SeoMeta
@@ -28,6 +30,7 @@ type PostCreateService struct {
 	Category string
 	Title    string
 	Content  string
+	Files    mo.Option[[]url.URL]
 	UserID   int
 	Tags     []string
 }
@@ -35,6 +38,7 @@ type PostCreateRepo struct {
 	CategoryID int
 	Title      string
 	Content    string
+	Files      mo.Option[[]url.URL]
 	UserID     int
 	Tags       []string
 }
@@ -44,6 +48,7 @@ type PostRepoInfo struct {
 	CategoryID int
 	Title      string
 	Content    string
+	Files      mo.Option[[]url.URL]
 	UserID     int
 	Tags       []string
 	PostStats  PostStats
@@ -64,6 +69,7 @@ type PostInfoResponse struct {
 	Category  string
 	Title     string
 	Content   string
+	Files     mo.Option[[]url.URL]
 	Author    MessageAuthor
 	Tags      []string
 	PostStats PostStats
@@ -86,6 +92,7 @@ type PostInfo struct {
 	Category  string
 	Title     string
 	Content   string
+	Files     mo.Option[[]url.URL]
 	Author    MessageAuthor
 	Tags      []string
 	PostStats PostStats

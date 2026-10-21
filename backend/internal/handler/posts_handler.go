@@ -5,12 +5,14 @@ package handler
 
 import (
 	"context"
+	"net/url"
 	"slices"
 
 	"github.com/comunicore/comunicore/backend/internal/apperror"
 	api "github.com/comunicore/comunicore/backend/internal/handler/generated"
 	"github.com/comunicore/comunicore/backend/internal/service/model"
 	postsService "github.com/comunicore/comunicore/backend/internal/service/posts"
+	"github.com/samber/mo"
 )
 
 type PostsHandler struct {
@@ -79,8 +81,12 @@ func (h *PostsHandler) PostCreate(
 		Category: req.Category,
 		Title:    req.Title,
 		Content:  req.ContentMd,
+		Files:    mo.None[[]url.URL](),
 		UserID:   globalCtx.UserID,
 		Tags:     req.Tags,
+	}
+	if len(req.Files) > 0 {
+		modelPostCreate.Files = mo.Some(req.Files)
 	}
 
 	post, err := h.postsService.Create(ctx, modelPostCreate)
@@ -115,6 +121,9 @@ func (h *PostsHandler) PostCreate(
 	}
 	if !post.SeoMeta.IsEmpty() {
 		apiPost.SeoMeta.SetTo(apiSeoMetaFromModel(&post.SeoMeta))
+	}
+	if files, ok := post.Files.Get(); ok {
+		apiPost.Files = files
 	}
 	return apiPost, nil
 }
@@ -196,6 +205,9 @@ func (h *PostsHandler) PostGet(ctx context.Context, params api.PostGetParams) (a
 	if !postWithComments.SeoMeta.IsEmpty() {
 		apiPost.SeoMeta.SetTo(apiSeoMetaFromModel(&postWithComments.SeoMeta))
 	}
+	if files, ok := postWithComments.Files.Get(); ok {
+		apiPost.Files = files
+	}
 
 	return apiPost, nil
 }
@@ -266,6 +278,9 @@ GOT_POST_ID:
 		}
 		if !post.SeoMeta.IsEmpty() {
 			resPosts[i].SeoMeta.SetTo(apiSeoMetaFromModel(&post.SeoMeta))
+		}
+		if files, ok := post.Files.Get(); ok {
+			resPosts[i].Files = files
 		}
 	}
 	return &api.PostListResponse{

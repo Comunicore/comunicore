@@ -622,6 +622,11 @@ components:
           type: array
           items:
             type: string
+        files:
+          type: array
+          items:
+            type: string
+            format: uri
         postStats:
           $ref: '#/components/schemas/PostStats'
         seoMeta:
@@ -659,6 +664,9 @@ components:
           commentsCount: 5
           likesCount: 10
           viewsCount: 100
+        files:
+          - "https://comunicore.mooo.com/storage/media/file1.png"
+          - "https://comunicore.mooo.com/storage/media/file2.png"
         createdAt: "2024-01-01T12:00:00Z"
     SeoMeta:
       type: object
@@ -730,6 +738,11 @@ components:
           type: array
           items:
             type: string
+        files:
+          type: array
+          items:
+            type: string
+            format: uri
         postStats:
           $ref: '#/components/schemas/PostStats'
         seoMeta:
@@ -764,6 +777,9 @@ components:
           - "JavaScript"
           - "современный Rust"
           - "тормознутый Python"
+        files:
+          - "https://comunicore.mooo.com/storage/media/file1.png"
+          - "https://comunicore.mooo.com/storage/media/file2.png"
         postStats:
           commentsCount: 5
           likesCount: 10
@@ -790,6 +806,11 @@ components:
           type: array
           items:
             type: string
+        files:
+          type: array
+          items:
+            type: string
+            format: uri
         postStats:
           $ref: '#/components/schemas/PostStats'
         seoMeta:
@@ -931,6 +952,12 @@ components:
           items:
             type: string
           description: Optional tags for analytics (normalized to lowercase on server)
+        files:
+          type: array
+          items:
+            type: string
+            format: uri
+          description: Optional list of file URLs (uploaded via /api/media) to attach to the post
       required:
         - category
         - title
@@ -939,6 +966,9 @@ components:
         category: "Программирование"
         title: "How to learn Go?"
         contentMd: "I want to learn Go, but I don't know where to start. Any advice?"
+        files:
+          - "https://comunicore.mooo.com/storage/media/file1.png"
+          - "https://comunicore.mooo.com/storage/media/file2.png"
     PostCreateCommentRequest:
       type: object
       properties:
