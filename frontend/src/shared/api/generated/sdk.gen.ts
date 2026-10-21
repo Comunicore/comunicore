@@ -2,7 +2,7 @@
 
 import { type Client, formDataBodySerializer, type Options as Options2, type TDataShape } from './client';
 import { client } from './client.gen';
-import type { AnalyticsMetricsGetData, AnalyticsMetricsGetErrors, AnalyticsMetricsGetResponses, AnalyticsVisitBatchSubmitData, AnalyticsVisitBatchSubmitErrors, AnalyticsVisitBatchSubmitResponses, AuthLoginData, AuthLoginErrors, AuthLoginResponses, AuthLogoutData, AuthLogoutResponses, MediaGetData, MediaGetErrors, MediaGetResponses, MediaUploadData, MediaUploadErrors, MediaUploadResponses, PostAddCommentData, PostAddCommentErrors, PostAddCommentResponses, PostCreateData, PostCreateErrors, PostCreateResponses, PostGetData, PostGetErrors, PostGetResponses, PostsListData, PostsListErrors, PostsListResponses, UserCreateData, UserCreateErrors, UserCreateResponses, UserDeleteData, UserDeleteResponses, UserGetData, UserGetErrors, UserGetResponses, UserMeData, UserMeErrors, UserMeResponses, UserUpdateData, UserUpdateResponses } from './types.gen';
+import type { AnalyticsMetricsGetData, AnalyticsMetricsGetErrors, AnalyticsMetricsGetResponses, AnalyticsVisitBatchSubmitData, AnalyticsVisitBatchSubmitErrors, AnalyticsVisitBatchSubmitResponses, AuthLoginData, AuthLoginErrors, AuthLoginResponses, AuthLogoutData, AuthLogoutResponses, CategoriesListData, CategoriesListErrors, CategoriesListResponses, MediaGetData, MediaGetErrors, MediaGetResponses, MediaUploadData, MediaUploadErrors, MediaUploadResponses, PostAddCommentData, PostAddCommentErrors, PostAddCommentResponses, PostCreateData, PostCreateErrors, PostCreateResponses, PostGetData, PostGetErrors, PostGetResponses, PostsListData, PostsListErrors, PostsListResponses, UserCreateData, UserCreateErrors, UserCreateResponses, UserDeleteData, UserDeleteResponses, UserGetData, UserGetErrors, UserGetResponses, UserMeData, UserMeErrors, UserMeResponses, UserUpdateData, UserUpdateResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -115,6 +115,13 @@ export const authLogout = <ThrowOnError extends boolean = false>(options?: Optio
 });
 
 /**
+ * Get list of all categories
+ *
+ * Get list of all categories.
+ */
+export const categoriesList = <ThrowOnError extends boolean = false>(options?: Options<CategoriesListData, ThrowOnError>) => (options?.client ?? client).get<CategoriesListResponses, CategoriesListErrors, ThrowOnError>({ url: '/api/categories', ...options });
+
+/**
  * Get list of posts with pagination
  *
  * Получить список постов с пагинацией. Можно использовать либо постраничную пагинацию (page + limit),
@@ -161,15 +168,7 @@ export const postCreate = <ThrowOnError extends boolean = false>(options: Option
 /**
  * Get single post with all comments by post id
  */
-export const postGet = <ThrowOnError extends boolean = false>(options: Options<PostGetData, ThrowOnError>) => (options.client ?? client).get<PostGetResponses, PostGetErrors, ThrowOnError>({
-    security: [{
-            in: 'cookie',
-            name: 'sid',
-            type: 'apiKey'
-        }],
-    url: '/api/posts/{postId}',
-    ...options
-});
+export const postGet = <ThrowOnError extends boolean = false>(options: Options<PostGetData, ThrowOnError>) => (options.client ?? client).get<PostGetResponses, PostGetErrors, ThrowOnError>({ url: '/api/posts/{postId}', ...options });
 
 /**
  * Add a new comment to post

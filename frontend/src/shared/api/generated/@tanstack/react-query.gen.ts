@@ -3,8 +3,8 @@
 import { type DefaultError, type InfiniteData, infiniteQueryOptions, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { analyticsMetricsGet, analyticsVisitBatchSubmit, authLogin, authLogout, mediaGet, mediaUpload, type Options, postAddComment, postCreate, postGet, postsList, userCreate, userDelete, userGet, userMe, userUpdate } from '../sdk.gen';
-import type { AnalyticsMetricsGetData, AnalyticsMetricsGetError, AnalyticsMetricsGetResponse, AnalyticsVisitBatchSubmitData, AnalyticsVisitBatchSubmitError, AnalyticsVisitBatchSubmitResponse, AuthLoginData, AuthLoginError, AuthLoginResponse, AuthLogoutData, AuthLogoutResponse, MediaGetData, MediaGetError, MediaGetResponse, MediaUploadData, MediaUploadError, MediaUploadResponse2, PostAddCommentData, PostAddCommentError, PostAddCommentResponse, PostCreateData, PostCreateError, PostCreateResponse, PostGetData, PostGetError, PostGetResponse, PostsListData, PostsListError, PostsListResponse, UserCreateData, UserCreateError, UserCreateResponse2, UserDeleteData, UserDeleteResponse, UserGetData, UserGetError, UserGetResponse2, UserMeData, UserMeError, UserMeResponse, UserUpdateData, UserUpdateResponse } from '../types.gen';
+import { analyticsMetricsGet, analyticsVisitBatchSubmit, authLogin, authLogout, categoriesList, mediaGet, mediaUpload, type Options, postAddComment, postCreate, postGet, postsList, userCreate, userDelete, userGet, userMe, userUpdate } from '../sdk.gen';
+import type { AnalyticsMetricsGetData, AnalyticsMetricsGetError, AnalyticsMetricsGetResponse, AnalyticsVisitBatchSubmitData, AnalyticsVisitBatchSubmitError, AnalyticsVisitBatchSubmitResponse, AuthLoginData, AuthLoginError, AuthLoginResponse, AuthLogoutData, AuthLogoutResponse, CategoriesListData, CategoriesListError, CategoriesListResponse2, MediaGetData, MediaGetError, MediaGetResponse, MediaUploadData, MediaUploadError, MediaUploadResponse2, PostAddCommentData, PostAddCommentError, PostAddCommentResponse, PostCreateData, PostCreateError, PostCreateResponse, PostGetData, PostGetError, PostGetResponse, PostsListData, PostsListError, PostsListResponse, UserCreateData, UserCreateError, UserCreateResponse2, UserDeleteData, UserDeleteResponse, UserGetData, UserGetError, UserGetResponse2, UserMeData, UserMeError, UserMeResponse, UserUpdateData, UserUpdateResponse } from '../types.gen';
 
 /**
  * Create a new user
@@ -162,6 +162,26 @@ export const authLogoutMutation = (options?: Partial<Options<AuthLogoutData>>): 
     };
     return mutationOptions;
 };
+
+export const categoriesListQueryKey = (options?: Options<CategoriesListData>) => createQueryKey('categoriesList', options);
+
+/**
+ * Get list of all categories
+ *
+ * Get list of all categories.
+ */
+export const categoriesListOptions = (options?: Options<CategoriesListData>) => queryOptions<CategoriesListResponse2, CategoriesListError, CategoriesListResponse2, ReturnType<typeof categoriesListQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await categoriesList({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: categoriesListQueryKey(options)
+});
 
 export const postsListQueryKey = (options?: Options<PostsListData>) => createQueryKey('postsList', options);
 
