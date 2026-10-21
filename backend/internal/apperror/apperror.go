@@ -51,12 +51,6 @@ func appErrorStringChain(err appError) string {
 	return res.String()
 }
 
-type NotFoundError struct {
-	BaseError
-	Type string
-	Name string
-}
-
 type ValidationError struct {
 	BaseError
 	Message string
@@ -64,23 +58,6 @@ type ValidationError struct {
 type AuthenticationError struct {
 	BaseError
 	Message string
-}
-
-func NewErrNotFound(op string, cause error, typeName, name string) error {
-	return &NotFoundError{
-		BaseError: BaseError{
-			opName: op,
-			cause:  cause,
-		},
-		Type: typeName,
-		Name: name,
-	}
-}
-func (e *NotFoundError) ErrorString() string {
-	return fmt.Sprintf("Op: %s\n%s with name %s not found", e.opName, e.Type, e.Name)
-}
-func (e *NotFoundError) Error() string {
-	return appErrorStringChain(e)
 }
 
 func NewErrValidation(op string, cause error, msg string) error {

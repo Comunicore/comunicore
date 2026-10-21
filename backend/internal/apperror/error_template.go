@@ -3,6 +3,8 @@
 
 package apperror
 
+import "errors"
+
 // error handling algorythm:
 //
 //	if err != nil {
@@ -55,3 +57,5 @@ func NewEmailNotUniqueError(email string) *EmailNotUniqueError {
 func (e *EmailNotUniqueError) Error() string {
 	return "EmailNotUniqueError for email: " + e.email
 }
+
+var NotFoundError = errors.New("NotFoundError")
