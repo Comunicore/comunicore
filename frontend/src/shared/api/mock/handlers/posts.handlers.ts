@@ -4,11 +4,8 @@ import type {
   MessageAuthor,
   PostCommentItem,
   PostCreateCommentRequest,
-  PostListItem,
-  PostListResponse,
   PostWithCommentsListResponse,
 } from '../../generated';
-import { mockPostSummaries, MockPostSummary } from '../posts.data';
 
 import { getUserByAccessToken } from './auth.handlers';
 
@@ -85,22 +82,6 @@ const mockPost: Omit<PostWithCommentsListResponse, 'id' | 'uuid'> = {
   comments: mockComments,
 };
 
-const toListItem = ({
-  id,
-  title,
-  category,
-  createdAt,
-}: MockPostSummary): PostListItem => ({
-  id,
-  uuid: `00000000-0000-4000-8000-${String(id).padStart(12, '0')}`,
-  author: mockPost.author,
-  category,
-  title,
-  type: mockPost.type,
-  postStats: mockPost.postStats,
-  createdAt,
-});
-
 const toNumericId = (value: string) =>
   [...value].reduce(
     (hash, char) => (hash * 31 + char.charCodeAt(0)) % 100000,
@@ -108,36 +89,18 @@ const toNumericId = (value: string) =>
   );
 
 export const postsHandlers = [
-  http.get(`${BASE}/posts`, async ({ request }) => {
-    await delay();
-
-    const url = new URL(request.url);
-    const limit = Number(url.searchParams.get('limit')) || 20;
-    const page = Number(url.searchParams.get('page')) || 1;
-    const start = (page - 1) * limit;
-
-    const response: PostListResponse = {
-      posts: mockPostSummaries.slice(start, start + limit).map(toListItem),
-      totalCountEstimated: mockPostSummaries.length,
-      havePrev: page > 1,
-      haveNext: start + limit < mockPostSummaries.length,
-    };
-
-    return HttpResponse.json(response);
-  }),
-
   http.get(`${BASE}/posts/:postId`, async ({ params }) => {
     await delay();
 
     const postId = Number(params.postId);
-    const summary = mockPostSummaries.find(({ id }) => id === postId);
-    if (!summary) {
-      return HttpResponse.json('post not found', { status: 404 });
+    if (!Number.isInteger(postId) || postId <= 0) {
+      return HttpResponse.json('invalid post id', { status: 400 });
     }
 
     const post: PostWithCommentsListResponse = {
       ...mockPost,
-      ...toListItem(summary),
+      id: postId,
+      uuid: `00000000-0000-4000-8000-${String(postId).padStart(12, '0')}`,
     };
 
     return HttpResponse.json(post);
