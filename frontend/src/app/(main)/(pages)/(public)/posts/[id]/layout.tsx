@@ -1,16 +1,11 @@
 import { ReactNode } from 'react';
 
-import { mockPostIds } from './model/mock-post';
+import getPostIds from './model/getPostIds';
 
-import { postsList } from '@/widgets/posts-section';
+export async function generateStaticParams() {
+  const ids = await getPostIds();
 
-export function generateStaticParams() {
-  const ids = new Set([
-    ...mockPostIds,
-    ...postsList.map(({ id }) => String(id)),
-  ]);
-
-  return [...ids].map((id) => ({ id }));
+  return ids.map((id) => ({ id }));
 }
 
 export default function PostLayout({ children }: { children: ReactNode }) {
