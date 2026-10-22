@@ -90,11 +90,6 @@ export default function PostSidebar({
         <h2 className='text-xl leading-normal font-medium'>
           Другие посты из категории
         </h2>
-        {!relatedPosts.length && (
-          <p className='text-gray-9e'>
-            Других постов в этой категории пока нет.
-          </p>
-        )}
         <ul className='flex flex-col gap-y-5'>
           {relatedPosts.map(({ id, title, position, commentsCount, views }) => (
             <li

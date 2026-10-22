@@ -2,8 +2,8 @@
 
 import { use } from 'react';
 
+import { mockRelatedPosts } from './model/mock-post';
 import { isValidPostId, usePostDetails } from './model/usePostDetails';
-import useRelatedPosts from './model/useRelatedPosts';
 import PostActions from './ui/PostActions';
 import PostArticle from './ui/PostArticle';
 import PostSidebar from './ui/PostSidebar';
@@ -21,7 +21,6 @@ interface PostPageProps {
 export default function PostPage({ params }: PostPageProps) {
   const postId = Number(use(params).id);
   const { data: post, isPending, isError } = usePostDetails(postId);
-  const { data: relatedPosts = [] } = useRelatedPosts(postId, post?.category);
 
   if (isValidPostId(postId) && isPending) {
     return (
@@ -71,7 +70,7 @@ export default function PostPage({ params }: PostPageProps) {
         viewsCount={post.viewsCount}
         createdAt={post.createdAt}
         lastCommentAt={post.lastCommentAt}
-        relatedPosts={relatedPosts}
+        relatedPosts={mockRelatedPosts}
       />
     </Container>
   );
