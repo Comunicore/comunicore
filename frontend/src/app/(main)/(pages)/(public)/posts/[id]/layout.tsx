@@ -1,16 +1,9 @@
 import { ReactNode } from 'react';
 
-import { mockPostIds } from './model/mock-post';
-
-import { postsList } from '@/widgets/posts-section';
+import { POST_ID_PLACEHOLDER } from './model/post-route';
 
 export function generateStaticParams() {
-  const ids = new Set([
-    ...mockPostIds,
-    ...postsList.map(({ id }) => String(id)),
-  ]);
-
-  return [...ids].map((id) => ({ id }));
+  return [{ id: POST_ID_PLACEHOLDER }];
 }
 
 export default function PostLayout({ children }: { children: ReactNode }) {
