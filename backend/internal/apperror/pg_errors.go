@@ -17,7 +17,7 @@ import (
 func PgErrorToAppError(err error) error {
 	if pgErr, ok := err.(*pgconn.PgError); ok {
 		if pgErr.Code == "23505" { // unique_violation
-			return fmt.Errorf("error: %w\n caused by: %w", NewNotUniqueError(), err)
+			return fmt.Errorf("error: %w\n caused by: %w", NotUniqueError, err)
 		}
 		fmt.Printf("PostgreSQL unknown error code: %s, message: %s\n error struct %+v\n",
 			pgErr.Code, pgErr.Message, *pgErr)
@@ -32,7 +32,7 @@ func AppErrorFromPgError(err error) error {
 	}
 	if pgErr, ok := err.(*pgconn.PgError); ok {
 		if pgErr.Code == "23505" { // unique_violation
-			return fmt.Errorf("error: %w\n caused by: %w", NewNotUniqueError(), err)
+			return fmt.Errorf("error: %w\n caused by: %w", NotUniqueError, err)
 		}
 		fmt.Printf("PostgreSQL unknown error code: %s, message: %s\n error struct %+v\n",
 			pgErr.Code, pgErr.Message, *pgErr)

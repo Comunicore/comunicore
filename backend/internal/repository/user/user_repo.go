@@ -62,10 +62,9 @@ func (r *UserRepo) Create(ctx context.Context, name, email string) (model.UserRe
 	}
 	// some db error, probubly unique constraint violation on name or email,
 	// will check what exactly not unique
-	err = apperror.PgErrorToAppError(err)
-	notUniqueError, ok := errors.AsType[*apperror.NotUniqueError](err)
-	if !ok {
-		return model.UserRepo{}, fmt.Errorf("UserRepo error creating user: %w", err)
+	userCreateError := apperror.PgErrorToAppError(err)
+	if errors.Is(err, apperror.NotUniqueError) {
+		return model.UserRepo{}, fmt.Errorf("UserRepo error creating user: %w", userCreateError)
 	}
 	// figure out what exactly not unique
 	var nameNotUniqueError error
@@ -89,17 +88,20 @@ func (r *UserRepo) Create(ctx context.Context, name, email string) (model.UserRe
 		}
 		if nameNotUniqueError != nil && emailNotUniqueError != nil {
 			return model.UserRepo{}, fmt.Errorf("UserRepo error: %w %w %w",
-				nameNotUniqueError, emailNotUniqueError, notUniqueError)
+				nameNotUniqueError, emailNotUniqueError, userCreateError)
 		} else if nameNotUniqueError != nil {
-			return model.UserRepo{}, fmt.Errorf("UserRepo error: %w %w", nameNotUniqueError, notUniqueError)
+			return model.UserRepo{}, fmt.Errorf("UserRepo error: %w %w", nameNotUniqueError, userCreateError)
 		} else if emailNotUniqueError != nil {
-			return model.UserRepo{}, fmt.Errorf("UserRepo error: %w %w", emailNotUniqueError, notUniqueError)
+			return model.UserRepo{}, fmt.Errorf("UserRepo error: %w %w", emailNotUniqueError, userCreateError)
 		}
 	} else {
-		return model.UserRepo{}, fmt.Errorf("UserRepo error: error checking unique constraints: %w %w", err, notUniqueError)
+		return model.UserRepo{},
+			fmt.Errorf("UserRepo error: error checking unique constraints: %w %w", err, userCreateError)
 	}
 
-	return model.UserRepo{}, fmt.Errorf("UserRepo error: unique constraint violation but failed to check what exactly not unique: %w", notUniqueError)
+	return model.UserRepo{},
+		fmt.Errorf("UserRepo error: unique constraint violation but failed to check what exactly not unique: %w",
+			userCreateError)
 }
 
 func (r *UserRepo) Update(ctx context.Context, userId int, name, email string) (model.UserRepo, error) {
