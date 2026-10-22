@@ -116,7 +116,7 @@ export function PostsFiltration(props: FormHTMLAttributes<HTMLFormElement>) {
         <h2 className='hidden xl:col-auto xl:inline xl:text-lg xl:font-bold'>
           Фильтры
         </h2>
-        <Label title='Сортировка'>
+        <Label title='Сортировка' className='flex flex-col gap-y-2'>
           <span>Сортировка</span>
           <Controller
             name='sortBy'
@@ -142,7 +142,7 @@ export function PostsFiltration(props: FormHTMLAttributes<HTMLFormElement>) {
             )}
           />
         </Label>
-        <Label title='Период'>
+        <Label title='Период' className='flex flex-col gap-y-2'>
           <span>Период</span>
           <Controller
             name='period'
@@ -169,7 +169,7 @@ export function PostsFiltration(props: FormHTMLAttributes<HTMLFormElement>) {
           />
         </Label>
         <Label
-          className='flex-row items-center gap-x-3 [&:has(input:focus-visible)]:rounded-sm [&:has(input:focus-visible)]:ring-1 [&:has(input:focus-visible)]:ring-white'
+          className='flex gap-x-3 [&:has(input:focus-visible)]:rounded-sm [&:has(input:focus-visible)]:ring-1 [&:has(input:focus-visible)]:ring-white'
           htmlFor='sort-checkbox'
         >
           <Checkbox {...register('withoutComments')} id='sort-checkbox' />
