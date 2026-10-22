@@ -3,14 +3,14 @@
 import { LuChevronDown } from 'react-icons/lu';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
-import { filterTags } from '../model/tags-data';
+import filterTags from '../_model/tags-data';
 
 import { AppRouter } from '@/shared/config/app-router';
 import { Button } from '@/shared/ui';
 
 const CATEGORY_QUERY_KEY = 'category';
 
-export function PostsHeader() {
+export default function PostsHeader() {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const router = useRouter();

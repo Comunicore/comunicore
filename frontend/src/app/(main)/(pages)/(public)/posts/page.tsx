@@ -1,19 +1,14 @@
-import { Suspense } from 'react';
+import PostsHeader from './_ui/PostsHeader';
 
 import { PostsSection } from '@/widgets/posts-section';
 
-import { Container } from '@/shared/ui';
-
-const PostsFallback = () => (
-  <Container>
-    <p>Loading...</p>
-  </Container>
-);
+import { containerClassName } from '@/shared/ui/Container';
 
 export default function PostsPage() {
   return (
-    <Suspense fallback={<PostsFallback />}>
+    <section className={`${containerClassName} grid gap-y-18.5 py-21.25`}>
+      <PostsHeader />
       <PostsSection />
-    </Suspense>
+    </section>
   );
 }

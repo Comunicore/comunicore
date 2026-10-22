@@ -6,6 +6,8 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import { Button } from './Button';
 
+const SKIP_BUTTON_LABEL = '...';
+
 export const getPaginationRange = (currentPage: number, totalPages: number) => {
   if (totalPages <= 5) {
     return Array.from({ length: totalPages }, (_, i) => i + 1);
@@ -14,15 +16,23 @@ export const getPaginationRange = (currentPage: number, totalPages: number) => {
   const range: (number | string)[] = [];
 
   if (currentPage < 3) {
-    range.push(1, 2, 3, '...', totalPages);
+    range.push(1, 2, 3, SKIP_BUTTON_LABEL, totalPages);
   } else if (currentPage >= totalPages - 2) {
-    range.push(1, '...', totalPages - 2, totalPages - 1, totalPages);
+    range.push(
+      1,
+      SKIP_BUTTON_LABEL,
+      totalPages - 2,
+      totalPages - 1,
+      totalPages,
+    );
   } else {
     range.push(
+      1,
+      SKIP_BUTTON_LABEL,
       currentPage - 1,
       currentPage,
       currentPage + 1,
-      '...',
+      SKIP_BUTTON_LABEL,
       totalPages,
     );
   }
@@ -67,13 +77,13 @@ export function Pagination({ totalPages }: PaginationProps) {
         aria-label='Prev page'
         size='square'
         color='bordered'
-        title='Previos page'
+        title='Previous page'
         disabled={currentPage <= 1}
       >
         <LuChevronLeft size={20} className='min-w-5' role='img' aria-hidden />
       </Button>
       {paginationRange.map((page, index) => {
-        if (page === '...') {
+        if (page === SKIP_BUTTON_LABEL) {
           return (
             <Button
               key={`dots-${index}`}
