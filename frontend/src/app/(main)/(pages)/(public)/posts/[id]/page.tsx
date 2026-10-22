@@ -1,9 +1,11 @@
 'use client';
 
 import { use } from 'react';
+import { usePathname } from 'next/navigation';
 
-import { mockRelatedPosts } from './model/mock-post';
+import { POST_ID_PLACEHOLDER, resolvePostId } from './model/post-route';
 import { isValidPostId, usePostDetails } from './model/usePostDetails';
+import useRelatedPosts from './model/useRelatedPosts';
 import PostActions from './ui/PostActions';
 import PostArticle from './ui/PostArticle';
 import PostSidebar from './ui/PostSidebar';
@@ -19,10 +21,16 @@ interface PostPageProps {
 }
 
 export default function PostPage({ params }: PostPageProps) {
-  const postId = Number(use(params).id);
+  const { id: routeId } = use(params);
+  const pathname = usePathname();
+  const postId = resolvePostId(pathname, routeId);
+  const isPostIdValid = isValidPostId(postId);
   const { data: post, isPending, isError } = usePostDetails(postId);
+  const { data: relatedPosts = [] } = useRelatedPosts(postId, post?.category);
 
-  if (isValidPostId(postId) && isPending) {
+  const isResolvingRoute = routeId === POST_ID_PLACEHOLDER && !isPostIdValid;
+
+  if (isResolvingRoute || (isPostIdValid && isPending)) {
     return (
       <Container className='flex justify-center py-24'>
         <Loader />
@@ -70,7 +78,7 @@ export default function PostPage({ params }: PostPageProps) {
         viewsCount={post.viewsCount}
         createdAt={post.createdAt}
         lastCommentAt={post.lastCommentAt}
-        relatedPosts={mockRelatedPosts}
+        relatedPosts={relatedPosts}
       />
     </Container>
   );
