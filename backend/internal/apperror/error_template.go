@@ -14,6 +14,9 @@ import "errors"
 // here Error() with text description will go from Errorf,
 // and NewNotUniqueError() will be used to create typed error that can be checked with errors.Is or errors.As
 
+var NotFoundError = errors.New("NotFoundError")
+var NotUniqueError = errors.New("NotUniqueError")
+
 // deprecated error, user fmt.Errorf with %w and New...Error() instead
 type UnspecifiedError struct {
 	msg string
@@ -24,16 +27,6 @@ func NewUnspecifiedError(msg string) *UnspecifiedError {
 }
 func (e *UnspecifiedError) Error() string {
 	return "Unspecified error: " + e.msg
-}
-
-type NotUniqueError struct {
-}
-
-func NewNotUniqueError(name ...string) *NotUniqueError {
-	return &NotUniqueError{}
-}
-func (e *NotUniqueError) Error() string {
-	return "NotUniqueError"
 }
 
 type NameNotUniqueError struct {
@@ -57,5 +50,3 @@ func NewEmailNotUniqueError(email string) *EmailNotUniqueError {
 func (e *EmailNotUniqueError) Error() string {
 	return "EmailNotUniqueError for email: " + e.email
 }
-
-var NotFoundError = errors.New("NotFoundError")
