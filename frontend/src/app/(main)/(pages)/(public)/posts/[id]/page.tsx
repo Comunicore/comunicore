@@ -26,7 +26,7 @@ export default function PostPage({ params }: PostPageProps) {
   if (isValidPostId(postId) && isPending) {
     return (
       <Container className='flex justify-center py-24'>
-        <Loader fullScreen />
+        <Loader />
       </Container>
     );
   }
