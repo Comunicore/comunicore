@@ -33,7 +33,7 @@ export default function PostPage({ params }: PostPageProps) {
   if (isResolvingRoute || (isPostIdValid && isPending)) {
     return (
       <Container className='flex justify-center py-24'>
-        <Loader />
+        <Loader fullScreen />
       </Container>
     );
   }
