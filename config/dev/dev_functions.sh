@@ -30,3 +30,7 @@ function deploy_copy_files() {
 
     popd > /dev/null
 }
+
+function comunicore_source_tar_create() {
+    git archive --format=tar.gz -o ../comunicore.tar.gz --prefix=comunicore/ HEAD
+}

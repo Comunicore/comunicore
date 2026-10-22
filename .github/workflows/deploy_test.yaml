@@ -1,0 +1,82 @@
+name: Deploy (test) to comunicore.mooo.com
+permissions:
+  contents: read
+
+on:
+  push:
+    branches: [ "deploy_test" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    # build frontend
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: 'npm'
+          cache-dependency-path: ./frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: ESLint
+        working-directory: ./frontend
+        run: npm run lint
+        continue-on-error: true
+
+      - name: Stylelint
+        working-directory: ./frontend
+        run: npx stylelint "**/*.{css,scss}"
+        continue-on-error: true
+
+      - name: Build Production
+        working-directory: ./frontend
+        run: npm run build
+        env:
+          NEXT_PUBLIC_API_URL: https://comunicore.mooo.com
+        continue-on-error: false
+
+      # build backend
+      - name: Setup Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: '1.27'
+          cache-dependency-path: ./backend/go.sum
+
+      - name: Download dependencies
+        working-directory: ./backend
+        run: go mod download
+
+      - name: Setup just
+        uses: extractions/setup-just@v3
+
+      - name: Build
+        working-directory: ./backend
+        run: |
+          just build
+
+      - name: Package for deployment
+        run: |
+          TMP_DIR="$(mktemp -d ./tmp.XXXXXXXX)"
+          trap 'rm -rf -- "$TMP_DIR"' EXIT
+
+          mkdir -p "$TMP_DIR"/comunicore
+
+          . ./config/dev/dev_functions.sh
+          deploy_copy_files "$TMP_DIR"/comunicore
+
+          tar cf ./comunicore.tar.xz --xz -C "$TMP_DIR" comunicore
+
+      - name: Deploy archive to server
+        run: |
+          echo "$DEPLOY_SSH_KEY" > ./deploy_key
+          chmod 600 ./deploy_key
+          ssh -i ./deploy_key -o StrictHostKeychecking=no comunicore@comunicore.mooo.com test < ./comunicore.tar.xz
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
