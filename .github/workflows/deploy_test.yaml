@@ -1,10 +1,16 @@
 name: Deploy (test) to comunicore.mooo.com
 permissions:
-  contents: read
+  contents: write
 
 on:
   push:
-    branches: [ "deploy_test" ]
+    branches: [ "deploy_test", "deploy_barbaris", "deploy_narzan" ]
+
+env:
+  INSTANCE_NAME: >-
+    ${{ github.ref_name == 'deploy_test' && 'test' ||
+        github.ref_name == 'deploy_barbaris' && 'barbaris' ||
+        'narzan' }}
 
 jobs:
   build:
@@ -39,7 +45,10 @@ jobs:
         working-directory: ./frontend
         run: npm run build
         env:
-          NEXT_PUBLIC_API_URL: https://test-comunicore.mooo.com/
+          NEXT_PUBLIC_API_URL: >-
+            ${{ env.INSTANCE_NAME == 'test'     && 'https://test-comunicore.mooo.com' ||
+                env.INSTANCE_NAME == 'barbaris' && 'https://barbaris-comunicore.mooo.com' ||
+                'https://narzan-comunicore.mooo.com' }}
         continue-on-error: false
 
       # build backend
@@ -77,6 +86,12 @@ jobs:
         run: |
           echo "$DEPLOY_SSH_KEY" > ./deploy_key
           chmod 600 ./deploy_key
-          ssh -i ./deploy_key -o StrictHostKeychecking=no comunicore@comunicore.mooo.com test < ./comunicore.tar.xz
+          ssh -i ./deploy_key -o StrictHostKeychecking=no comunicore@comunicore.mooo.com ${INSTANCE_NAME} < ./comunicore.tar.xz
         env:
           DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+
+      - name: Delete current branch
+        if: github.ref_name != 'main' && github.ref_name != 'master'
+        run: git push origin --delete "$BRANCH_NAME"
+        env:
+          BRANCH_NAME: ${{ github.ref_name }}
