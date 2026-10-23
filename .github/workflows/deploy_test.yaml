@@ -39,7 +39,7 @@ jobs:
         working-directory: ./frontend
         run: npm run build
         env:
-          NEXT_PUBLIC_API_URL: https://comunicore.mooo.com
+          NEXT_PUBLIC_API_URL: https://test-comunicore.mooo.com/
         continue-on-error: false
 
       # build backend
