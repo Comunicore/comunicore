@@ -38,7 +38,7 @@ jobs:
           echo "$DEPLOY_SSH_KEY" > ./deploy_key
           chmod 600 ./deploy_key
           ssh -i ./deploy_key -o StrictHostKeychecking=no \
-              comunicore@comunicore.mooo.com ${INSTANCE_NAME} < ./comunicore.tar.xz
+              comunicore@comunicore.mooo.com ${INSTANCE_NAME} < ./comunicore_bin.tar.xz
         env:
           DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
 
