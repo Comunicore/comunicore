@@ -1,0 +1,46 @@
+name: Deploy to comunicore.mooo.com
+permissions:
+  contents: write
+  actions: write
+
+on:
+  push:
+    branches: [ "main", "deploy" ]
+
+jobs:
+  build:
+    # this will call the reusable workflow to build frontend and backend and upload the build artifacts
+    uses: ./.github/workflows/build_job.yaml
+    with:
+      site_url: 'https://comunicore.mooo.com'
+      run_build: true
+      run_tests: true
+      run_lint:  true
+
+  deploy:
+    # this will use the build artifacts from the reusable workflow
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download build
+        uses: actions/download-artifact@v4
+        with:
+          name: comunicore_bin
+
+      - name: Deploy archive to server
+        run: |
+          echo "$DEPLOY_SSH_KEY" > ./deploy_key
+          chmod 600 ./deploy_key
+          ssh -i ./deploy_key -o StrictHostKeychecking=no comunicore@comunicore.mooo.com cat < ./comunicore.tar.xz
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+
+      - name: Delete deploy branch
+        # this will delete the deploy branch after the deployment is done
+        if: github.event_name == 'push' && github.ref_name == 'deploy'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: ${{ github.ref_name }}
+          REPO: ${{ github.repository }}
+        run: |
+          gh api --method DELETE "repos/$REPO/git/refs/heads/$BRANCH"

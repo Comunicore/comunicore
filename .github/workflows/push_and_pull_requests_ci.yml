@@ -1,7 +1,7 @@
-# .github/workflows/ci.yml
-name: CI Checks
+name: CI Checks without Deployment
 permissions:
-  contents: read
+  contents: write
+  actions: write
 
 on:
   push:
@@ -10,68 +10,25 @@ on:
     branches: [ "main" ]
 
 jobs:
-  frontend:
-    name: Frontend (Next.js)
+  build:
+    # this will call the reusable workflow to build frontend and backend
+    uses: ./.github/workflows/build_job.yaml
+    with:
+      site_url: http://localhost:8080
+      run_build: true
+      upload_build_artifacts: false
+      run_tests: true
+      run_lint: true
+
+  remove_run_ci_branch:
+    needs: build
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: '24'
-          cache: 'npm'
-          cache-dependency-path: ./frontend/package-lock.json
-
-      - name: Install dependencies
-        working-directory: ./frontend
-        run: npm ci
-
-      - name: ESLint
-        working-directory: ./frontend
-        run: npm run lint
-        continue-on-error: true
-
-      - name: Stylelint
-        working-directory: ./frontend
-        run: npx stylelint "**/*.{css,scss}"
-        continue-on-error: true
-
-      - name: Build Next.js
-        working-directory: ./frontend
-        run: npm run build
+      - name: Delete run-ci branch
+        if: github.event_name == 'push' && github.ref_name == 'run-ci'
         env:
-          NEXT_PUBLIC_API_URL: http://localhost:8080
-
-  backend:
-    name: Backend (Go)
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-
-      - name: Setup Go
-        uses: actions/setup-go@v6
-        with:
-          go-version: '1.27'
-          cache-dependency-path: ./backend/go.sum
-
-      - name: Download dependencies
-        working-directory: ./backend
-        run: go mod download
-
-      - name: Setup just
-        uses: extractions/setup-just@v3
-
-      - name: Build
-        working-directory: ./backend
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: ${{ github.ref_name }}
+          REPO: ${{ github.repository }}
         run: |
-          just build
-
-      - name: Run e2e tests
-        working-directory: ./backend
-        run: |
-          just test_e2e
+          gh api --method DELETE "repos/$REPO/git/refs/heads/$BRANCH"
