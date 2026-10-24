@@ -1,0 +1,52 @@
+name: Deploy to testing environment
+permissions:
+  contents: write
+  actions: write
+
+on:
+  push:
+    branches: [ "deploy_test", "deploy_barbaris", "deploy_narzan" ]
+
+env:
+  INSTANCE_NAME: >-
+    ${{ github.ref_name == 'deploy_test' && 'test' ||
+        github.ref_name == 'deploy_barbaris' && 'barbaris' ||
+        'narzan' }}
+
+jobs:
+  build_reusable:
+    # this will call the reusable workflow to build frontend and backend and upload the build artifacts
+    uses: ./.github/workflows/build_job.yaml
+    with:
+      site_url: ${{ github.ref_name == 'deploy_test' && 'https://test-comunicore.mooo.com' || github.ref_name == 'deploy_barbaris' && 'https://barbaris-comunicore.mooo.com' || 'https://narzan-comunicore.mooo.com' }}
+      run_build: true
+      run_tests: true
+      run_lint:  true
+
+  deploy:
+    # this will use the build artifacts from the reusable workflow
+    needs: build_reusable
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download build
+        uses: actions/download-artifact@v4
+        with:
+          name: comunicore_bin
+
+      - name: Deploy archive to server
+        run: |
+          echo "$DEPLOY_SSH_KEY" > ./deploy_key
+          chmod 600 ./deploy_key
+          ssh -i ./deploy_key -o StrictHostKeychecking=no \
+              comunicore@comunicore.mooo.com ${INSTANCE_NAME} < ./comunicore.tar.xz
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+
+      - name: Delete deploy branch
+        if: github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: ${{ github.ref_name }}
+          REPO: ${{ github.repository }}
+        run: |
+          gh api --method DELETE "repos/$REPO/git/refs/heads/$BRANCH"
