@@ -279,30 +279,27 @@ export const postsListInfiniteQueryKey = (options?: Options<PostsListData>): Que
  * а более новым (after) - больший id. И при этом не важно, удалены эти сообщения или нет.
  *
  */
-export const postsListInfiniteOptions = (options?: Options<PostsListData>) => {
-    const opts = infiniteQueryOptions<PostsListResponse, PostsListError, InfiniteData<PostsListResponse>, QueryKey<Options<PostsListData>>, number | Pick<QueryKey<Options<PostsListData>>[0], 'body' | 'headers' | 'path' | 'query'>>(
-    // @ts-ignore
-    {
-        queryFn: async ({ pageParam, queryKey, signal }) => {
-            // @ts-ignore
-            const page: Pick<QueryKey<Options<PostsListData>>[0], 'body' | 'headers' | 'path' | 'query'> = typeof pageParam === 'object' ? pageParam : {
-                query: {
-                    page: pageParam
-                }
-            };
-            const params = createInfiniteParams(queryKey, page);
-            const { data } = await postsList({
-                ...options,
-                ...params,
-                signal,
-                throwOnError: true
-            });
-            return data;
-        },
-        queryKey: postsListInfiniteQueryKey(options)
-    });
-    return opts as Omit<typeof opts, 'initialData'>;
-};
+export const postsListInfiniteOptions = (options?: Options<PostsListData>) => infiniteQueryOptions<PostsListResponse, PostsListError, InfiniteData<PostsListResponse>, QueryKey<Options<PostsListData>>, number | Pick<QueryKey<Options<PostsListData>>[0], 'body' | 'headers' | 'path' | 'query'>>(
+// @ts-ignore
+{
+    queryFn: async ({ pageParam, queryKey, signal }) => {
+        // @ts-ignore
+        const page: Pick<QueryKey<Options<PostsListData>>[0], 'body' | 'headers' | 'path' | 'query'> = typeof pageParam === 'object' ? pageParam : {
+            query: {
+                page: pageParam
+            }
+        };
+        const params = createInfiniteParams(queryKey, page);
+        const { data } = await postsList({
+            ...options,
+            ...params,
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: postsListInfiniteQueryKey(options)
+});
 
 /**
  * Create a new post
