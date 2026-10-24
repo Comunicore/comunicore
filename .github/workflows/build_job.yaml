@@ -105,7 +105,7 @@ jobs:
           mkdir -p "$TMP_DIR"/comunicore
           . ./config/dev/dev_functions.sh
           frontend_copy_files "$TMP_DIR"/comunicore .
-          tar cf ./comunicore_bin_frontend.tar.xz --xz -C "$TMP_DIR" comunicore
+          tar cf ./comunicore_bin_frontend.tar -C "$TMP_DIR" comunicore
 
       - name: Upload frontend build artifacts
         id: upload_frontend
@@ -113,7 +113,7 @@ jobs:
         uses: actions/upload-artifact@v6
         with:
           name: comunicore_bin_frontend
-          path: ./comunicore_bin_frontend.tar.xz
+          path: ./comunicore_bin_frontend.tar
           if-no-files-found: error
           retention-days: 1
           compression-level: 0
@@ -162,7 +162,7 @@ jobs:
           mkdir -p "$TMP_DIR"/comunicore
           . ./config/dev/dev_functions.sh
           backend_copy_files "$TMP_DIR"/comunicore .
-          tar cf ./comunicore_bin_backend.tar.xz --xz -C "$TMP_DIR" comunicore
+          tar cf ./comunicore_bin_backend.tar -C "$TMP_DIR" comunicore
 
       - name: Upload backend build artifacts
         id: upload_backend
@@ -170,7 +170,7 @@ jobs:
         uses: actions/upload-artifact@v6
         with:
           name: comunicore_bin_backend
-          path: ./comunicore_bin_backend.tar.xz
+          path: ./comunicore_bin_backend.tar
           if-no-files-found: error
           retention-days: 1
           compression-level: 0
@@ -201,8 +201,8 @@ jobs:
           TMP_DIR="$(mktemp -d ./tmp.XXXXXXXX)"
           trap 'rm -rf -- "$TMP_DIR"' EXIT
           mkdir -p "$TMP_DIR"/comunicore
-          tar xf ./comunicore_bin_frontend.tar.xz -C "$TMP_DIR"
-          tar xf ./comunicore_bin_backend.tar.xz -C "$TMP_DIR"
+          tar xf ./comunicore_bin_frontend.tar -C "$TMP_DIR"
+          tar xf ./comunicore_bin_backend.tar -C "$TMP_DIR"
           tar cf ./comunicore_bin.tar.xz --xz -C "$TMP_DIR" comunicore
 
       - name: Upload combined build artifacts
