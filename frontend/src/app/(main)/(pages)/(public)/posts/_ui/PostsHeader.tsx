@@ -1,34 +1,29 @@
 'use client';
 
 import { LuChevronDown } from 'react-icons/lu';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 
-import { filterTags } from '../model/tags-data';
+import filterTags from '../_model/tags-data';
+
+import { filtrationQueryKeys, parsePostsParams } from '@/entities/post';
 
 import { AppRouter } from '@/shared/config/app-router';
+import { useUpdateSearchParams } from '@/shared/hooks/useUpdateSearchParams';
 import { Button } from '@/shared/ui';
 
-const CATEGORY_QUERY_KEY = 'category';
-
-export function PostsHeader() {
+export default function PostsHeader() {
   const searchParams = useSearchParams();
-  const pathname = usePathname();
-  const router = useRouter();
+  const setParams = useUpdateSearchParams();
 
-  const currentCategory = searchParams.get(CATEGORY_QUERY_KEY) || 'all';
+  const { category: currentCategory } = parsePostsParams(searchParams);
 
   const handleFilterChange = (id: string) => {
-    const params = new URLSearchParams(searchParams.toString());
-    switch (id) {
-      case currentCategory:
-        return;
-      case 'all':
-        params.delete(CATEGORY_QUERY_KEY);
-        break;
-      default:
-        params.set(CATEGORY_QUERY_KEY, id);
-    }
-    router.replace(`${pathname}?${params.toString()}`);
+    if (id === currentCategory) return;
+
+    setParams({
+      [filtrationQueryKeys.category]: id === 'all' ? undefined : id,
+      [filtrationQueryKeys.page]: undefined,
+    });
   };
   return (
     <header className='grid gap-y-5 md:gap-y-7.5'>
@@ -50,6 +45,7 @@ export function PostsHeader() {
         </Button>
       </div>
       <ul className='flex flex-wrap gap-4.25'>
+        {/* make fetching from API */}
         {filterTags.map(({ icon, label, id }, index) => {
           const Icon = icon;
           const tagActive = currentCategory === id;
