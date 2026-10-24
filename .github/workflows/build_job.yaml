@@ -1,0 +1,228 @@
+name: Build frontend and backend reusable Job
+permissions:
+  contents: read
+# reusable workflow for building frontend and backend
+# and upload build artifacts to be used in other workflows
+# build artifact name is comunicore_bin (file comunicore_bin.tar.xz)
+#
+# to use this workflow, call it from another workflow as job
+# example:
+# jobs:
+#   build_reusable:
+#     # this will call the reusable workflow to build frontend and backend and upload the build artifacts
+#     uses: ./.github/workflows/build_job.yaml
+#     with:
+#       site_url: 'https://comunicore.mooo.com'
+#       run_build: true
+#       upload_build_artifacts: true
+#       run_tests: false
+#       run_lint: false
+#       ignore_lint_errors: true
+#   use_results:
+#     # this will use the build artifacts from the reusable workflow
+#     needs: build_reusable
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Download build
+#         uses: actions/download-artifact@v4
+#         with:
+#           name: comunicore_bin
+#       - name: extract build
+#         run: |
+#           tar xf ./comunicore_bin.tar.xz
+
+on:
+  workflow_call:
+    inputs:
+      site_url:
+        type: string
+        default: 'https://comunicore.mooo.com'
+      run_build:
+        type: boolean
+        default: true
+      upload_build_artifacts:
+        type: boolean
+        default: true
+      run_tests:
+        type: boolean
+        default: false
+      run_lint:
+        type: boolean
+        default: false
+      ignore_lint_errors:
+        type: boolean
+        default: true
+env:
+  COMUNICORE_GO_VERSION: "1.27"
+  COMUNICORE_NODE_VERSION: "24"
+
+jobs:
+  build_frontend:
+    outputs:
+      artifact_id: ${{ steps.upload_frontend.outputs.artifact-id }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout frontend code
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ env.COMUNICORE_NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: ./frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: ESLint
+        if: inputs.run_lint
+        working-directory: ./frontend
+        run: npm run lint
+        continue-on-error: ${{ inputs.ignore_lint_errors }}
+
+      - name: Stylelint
+        if: inputs.run_lint
+        working-directory: ./frontend
+        run: npx stylelint "**/*.{css,scss}"
+        continue-on-error: ${{ inputs.ignore_lint_errors }}
+
+      - name: Build Production
+        if: inputs.run_build
+        working-directory: ./frontend
+        run: npm run build
+        env:
+          NEXT_PUBLIC_API_URL: ${{ inputs.site_url }}
+        continue-on-error: false
+
+      - name: archive frontend build files
+        if: inputs.run_build && inputs.upload_build_artifacts
+        run: |
+          TMP_DIR="$(mktemp -d ./tmp.XXXXXXXX)"
+          trap 'rm -rf -- "$TMP_DIR"' EXIT
+
+          mkdir -p "$TMP_DIR"/comunicore
+          . ./config/dev/dev_functions.sh
+          frontend_copy_files "$TMP_DIR"/comunicore .
+          tar cf ./comunicore_bin_frontend.tar.xz --xz -C "$TMP_DIR" comunicore
+
+      - name: Upload frontend build artifacts
+        id: upload_frontend
+        if: inputs.run_build && inputs.upload_build_artifacts
+        uses: actions/upload-artifact@v6
+        with:
+          name: comunicore_bin_frontend
+          path: ./comunicore_bin_frontend.tar.xz
+          if-no-files-found: error
+          retention-days: 1
+          compression-level: 0
+          overwrite: true
+
+  build_backend:
+    outputs:
+      artifact_id: ${{ steps.upload_backend.outputs.artifact-id }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout backend code
+        uses: actions/checkout@v6
+
+      - name: Setup Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: ${{ env.COMUNICORE_GO_VERSION }}
+          cache-dependency-path: ./backend/go.sum
+
+      - name: Download go dependencies
+        working-directory: ./backend
+        run: go mod download
+
+      - name: Setup just
+        if: inputs.run_build || inputs.run_tests
+        uses: extractions/setup-just@v3
+
+      - name: Build backend
+        if: inputs.run_build
+        working-directory: ./backend
+        run: |
+          just build
+
+      - name: test backend
+        if: inputs.run_tests
+        working-directory: ./backend
+        run: |
+          just test_e2e
+
+      - name: archive backend build files
+        if: inputs.run_build && inputs.upload_build_artifacts
+        run: |
+          TMP_DIR="$(mktemp -d ./tmp.XXXXXXXX)"
+          trap 'rm -rf -- "$TMP_DIR"' EXIT
+
+          mkdir -p "$TMP_DIR"/comunicore
+          . ./config/dev/dev_functions.sh
+          backend_copy_files "$TMP_DIR"/comunicore .
+          tar cf ./comunicore_bin_backend.tar.xz --xz -C "$TMP_DIR" comunicore
+
+      - name: Upload backend build artifacts
+        id: upload_backend
+        if: inputs.run_build && inputs.upload_build_artifacts
+        uses: actions/upload-artifact@v6
+        with:
+          name: comunicore_bin_backend
+          path: ./comunicore_bin_backend.tar.xz
+          if-no-files-found: error
+          retention-days: 1
+          compression-level: 0
+          overwrite: true
+
+  join_frontend_and_backend:
+    runs-on: ubuntu-latest
+    needs: [build_frontend, build_backend]
+    permissions:
+      actions: write
+      contents: read
+    steps:
+      - name: Download frontend build artifacts
+        if: inputs.run_build && inputs.upload_build_artifacts
+        uses: actions/download-artifact@v6
+        with:
+          name: comunicore_bin_frontend
+
+      - name: Download backend build artifacts
+        if: inputs.run_build && inputs.upload_build_artifacts
+        uses: actions/download-artifact@v6
+        with:
+          name: comunicore_bin_backend
+
+      - name: Join frontend and backend build artifacts
+        if: inputs.run_build && inputs.upload_build_artifacts
+        run: |
+          TMP_DIR="$(mktemp -d ./tmp.XXXXXXXX)"
+          trap 'rm -rf -- "$TMP_DIR"' EXIT
+          mkdir -p "$TMP_DIR"/comunicore
+          tar xf ./comunicore_bin_frontend.tar.xz -C "$TMP_DIR"
+          tar xf ./comunicore_bin_backend.tar.xz -C "$TMP_DIR"
+          tar cf ./comunicore_bin.tar.xz --xz -C "$TMP_DIR" comunicore
+
+      - name: Upload combined build artifacts
+        if: inputs.run_build && inputs.upload_build_artifacts
+        uses: actions/upload-artifact@v6
+        with:
+          name: comunicore_bin
+          path: ./comunicore_bin.tar.xz
+          if-no-files-found: error
+          retention-days: 1
+          compression-level: 0
+          overwrite: true
+
+      - name: Delete intermediate build artifacts
+        if: inputs.run_build && inputs.upload_build_artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          FRONTEND_ARTIFACT_ID: ${{ needs.build_frontend.outputs.artifact_id }}
+          BACKEND_ARTIFACT_ID: ${{ needs.build_backend.outputs.artifact_id }}
+        run: |
+          gh api --method DELETE "repos/$REPO/actions/artifacts/$FRONTEND_ARTIFACT_ID"
+          gh api --method DELETE "repos/$REPO/actions/artifacts/$BACKEND_ARTIFACT_ID"
