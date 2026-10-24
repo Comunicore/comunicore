@@ -1,25 +1,52 @@
+'use client';
+
 import { Suspense } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
+import { LuServerCrash } from 'react-icons/lu';
+import { QueryErrorResetBoundary } from '@tanstack/react-query';
 
 import PostsHeader from './_ui/PostsHeader';
+import PostsHeaderSkeleton from './_ui/PostsHeaderSkeleton';
+import PostsSectionSkeleton from './_ui/PostsSectionsSkeleton';
 
 import { PostsSection } from '@/widgets/posts-section';
 
+import { Button, StatePlaceholder } from '@/shared/ui';
 import { containerClassName } from '@/shared/ui/Container';
-import { Loader } from '@/shared/ui/Loader';
 
 export default function PostsPage() {
   return (
-    <Suspense
-      fallback={
-        <div className='flex h-svh flex-col items-center gap-y-4 pt-[10svh]'>
-          <Loader size='sm' />
-        </div>
-      }
-    >
-      <section className={`${containerClassName} grid gap-y-18.5 py-21.25`}>
+    <section className={`${containerClassName} grid gap-y-18.5 py-21.25`}>
+      {/* Create header skeleton */}
+      <Suspense fallback={<PostsHeaderSkeleton />}>
         <PostsHeader />
-        <PostsSection />
-      </section>
-    </Suspense>
+      </Suspense>
+
+      {/* create PsostSection Skeleton */}
+      <QueryErrorResetBoundary>
+        {({ reset }) => (
+          <ErrorBoundary
+            onReset={reset}
+            fallbackRender={({ resetErrorBoundary }) => (
+              <StatePlaceholder
+                tone='error'
+                icon={<LuServerCrash size={28} />}
+                title='Не удалось загрузить посты'
+                description='Попробуйте обновить список.'
+                actions={
+                  <Button size='sm' color='purple' onClick={resetErrorBoundary}>
+                    Попробовать снова
+                  </Button>
+                }
+              />
+            )}
+          >
+            <Suspense fallback={<PostsSectionSkeleton />}>
+              <PostsSection />
+            </Suspense>
+          </ErrorBoundary>
+        )}
+      </QueryErrorResetBoundary>
+    </section>
   );
 }

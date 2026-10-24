@@ -42,22 +42,21 @@ export const getPaginationRange = (currentPage: number, totalPages: number) => {
 
 interface PaginationProps {
   totalPages: number;
+  pageQueryKey: string;
 }
 
-const PAGE_QUERY_KEY = 'page';
-
-export function Pagination({ totalPages }: PaginationProps) {
+export function Pagination({ totalPages, pageQueryKey }: PaginationProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const currentPage = Number(searchParams.get(PAGE_QUERY_KEY)) || 1;
+  const currentPage = Number(searchParams.get(pageQueryKey)) || 1;
 
   const handlePageChange = (page: number) => {
     if (page < 1 || page > totalPages) return;
 
     const currentParams = new URLSearchParams(searchParams.toString());
-    currentParams.set(PAGE_QUERY_KEY, String(page));
+    currentParams.set(pageQueryKey, String(page));
 
     router.push(`${pathname}?${currentParams.toString()}`, { scroll: false });
   };

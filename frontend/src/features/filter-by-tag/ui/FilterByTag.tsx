@@ -1,42 +1,31 @@
 'use client';
 
-import { useMemo } from 'react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 
 import { mockTags } from '../model/mock-tags';
 
 import { ViewAllButton } from './ViewAllButton';
 
+import { filtrationQueryKeys, parsePostsParams } from '@/entities/post';
+
+import { useUpdateSearchParams } from '@/shared/hooks/useUpdateSearchParams';
 import { cn } from '@/shared/lib/classNames';
 import { Tag } from '@/shared/ui';
 
-const TAG_QUERY_KEY = 'tags';
-
 export function FilterByTag() {
-  const router = useRouter();
-  const pathname = usePathname();
   const searchParams = useSearchParams();
+  const { tags: activeTags } = parsePostsParams(searchParams);
+  const setParams = useUpdateSearchParams();
 
-  const activeTags = useMemo(() => {
-    const tagsToken = searchParams.get(TAG_QUERY_KEY);
-    return tagsToken ? tagsToken.split(',') : [];
-  }, [searchParams]);
+  const toggleTag = (name: string) => {
+    const tags = activeTags.includes(name)
+      ? activeTags.filter((tag) => tag !== name)
+      : [...activeTags, name];
 
-  const addTagToQueryUrl = (name: string) => {
-    const currentParams = new URLSearchParams(searchParams.toString());
-    let updatedTags = [...activeTags];
-
-    if (updatedTags.includes(name)) {
-      updatedTags = updatedTags.filter((tag) => tag !== name);
-    } else {
-      updatedTags.push(name);
-    }
-    if (updatedTags.length > 0) {
-      currentParams.set(TAG_QUERY_KEY, updatedTags.join(','));
-    } else {
-      currentParams.delete(TAG_QUERY_KEY);
-    }
-    router.push(`${pathname}?${currentParams.toString()}`, { scroll: false });
+    setParams({
+      [filtrationQueryKeys.tags]: tags,
+      [filtrationQueryKeys.page]: undefined,
+    });
   };
 
   return (
@@ -79,7 +68,7 @@ export function FilterByTag() {
                     'xl:bg-purple-67/10 xl:*:border-purple-67 xl:px-2',
                   'xl:static',
                 )}
-                onClick={() => addTagToQueryUrl(name)}
+                onClick={() => toggleTag(name)}
               >
                 <Tag
                   color='dark'

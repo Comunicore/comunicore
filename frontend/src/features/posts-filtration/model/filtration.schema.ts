@@ -1,7 +1,6 @@
 import z from 'zod';
 
-import { postsPeriodSortEnum } from './period-sort.enum';
-import { postsSortEnum } from './sort.enum';
+import { postsPeriodSortEnum, postsSortEnum } from '@/entities/post';
 
 export const postsFiltrationSchema = z.object({
   sortBy: postsSortEnum,
