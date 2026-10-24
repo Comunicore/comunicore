@@ -1,4 +1,6 @@
-import { PostCard } from '@/entities/post';
+'use client';
+
+import { filtrationQueryKeys, PostCard } from '@/entities/post';
 
 import { PostListResponse } from '@/shared/api/generated';
 import { cn } from '@/shared/lib/classNames';
@@ -32,7 +34,7 @@ export function PostsList({ postsLists, totalPages }: PostsListProps) {
             <span key={label}>{label}</span>
           ))}
         </header>
-        <ul className=''>
+        <ul>
           {postsLists.map((post) => (
             <li
               key={post.id}
@@ -47,7 +49,10 @@ export function PostsList({ postsLists, totalPages }: PostsListProps) {
           ))}
         </ul>
       </div>
-      <Pagination totalPages={totalPages} />
+      <Pagination
+        totalPages={totalPages}
+        pageQueryKey={filtrationQueryKeys.page}
+      />
     </div>
   );
 }

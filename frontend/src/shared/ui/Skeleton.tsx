@@ -21,3 +21,10 @@ export const Skeleton = ({ isLoading, children }: SkeletonProps) => {
     </div>
   );
 };
+
+export const Bone = ({ className }: { className?: string }) => (
+  <div
+    aria-hidden
+    className={cn('animate-pulse rounded-lg bg-white/10', className)}
+  />
+);

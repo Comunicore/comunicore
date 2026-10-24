@@ -1,6 +1,7 @@
 'use client';
 
-import { useSearchParams } from 'next/dist/client/components/navigation';
+import { LuInbox, LuSearchX } from 'react-icons/lu';
+import { useSearchParams } from 'next/navigation';
 
 import { NotFoundResp } from './NotFoundRespl';
 import { PostsList } from './PostsList';
@@ -8,53 +9,60 @@ import { PostsList } from './PostsList';
 import { FilterByTag } from '@/features/filter-by-tag';
 import { PostsFiltration } from '@/features/posts-filtration';
 
-import { usePostList } from '@/entities/post';
+import {
+  filtrationQueryKeys,
+  parsePostsParams,
+  useSuspensePostList,
+} from '@/entities/post';
 
+import { AppRouter } from '@/shared/config/app-router';
+import { useUpdateSearchParams } from '@/shared/hooks/useUpdateSearchParams';
 import { cn } from '@/shared/lib/classNames';
-import { Loader } from '@/shared/ui';
-import { QueryError } from '@/shared/ui/QueryError';
-
-const POSTS_LIMIT = 10;
-const PARAM_PAGE_KEY = 'page';
+import { Button } from '@/shared/ui';
+import { StatePlaceholder } from '@/shared/ui/StatePlaceholder';
 
 export function PostsSection() {
   const searchParams = useSearchParams();
-  const page = parseInt(searchParams.get(PARAM_PAGE_KEY) || '1');
-  const { posts, isLoading, error } = usePostList({
+  const setParam = useUpdateSearchParams();
+  const { limit: POSTS_LIMIT, page } = parsePostsParams(searchParams);
+  const { posts } = useSuspensePostList({
     query: { limit: POSTS_LIMIT, page },
   });
-
-  if (isLoading) {
-    return (
-      <div className='flex h-[40svh] flex-col items-center gap-y-4 pt-[10svh]'>
-        <Loader size='sm' />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <QueryError
-        title='Error'
-        description='An error occurred while fetching posts.'
-        className='h-[20svh]'
-      />
-    );
-  }
-
-  if (!posts?.posts || posts.posts.length === 0) {
-    return (
-      <QueryError
-        title='Oops...'
-        error='no posts found'
-        description='An error occurred while fetching posts.'
-        className='h-[20svh]'
-      />
-    );
-  }
-
   const postsLists = posts.posts;
   const totalPages = Math.ceil((posts.totalCountEstimated || 0) / POSTS_LIMIT);
+
+  const onRetry = () => setParam({ [filtrationQueryKeys.page]: undefined });
+
+  if (postsLists.length === 0) {
+    if (page > 1) {
+      return (
+        <StatePlaceholder
+          tone='info'
+          icon={<LuSearchX size={28} />}
+          title='Страница не найдена'
+          description='Такой страницы нет в списке.'
+          actions={
+            <Button size='sm' color='bordered' onClick={onRetry}>
+              Вернуться на первую страницу
+            </Button>
+          }
+        />
+      );
+    }
+
+    return (
+      <StatePlaceholder
+        icon={<LuInbox size={28} />}
+        title='Пока нет постов'
+        description='Будьте первым, кто начнёт обсуждение.'
+        actions={
+          <Button size='sm' color='purple' href={AppRouter.posts.new}>
+            Создать пост
+          </Button>
+        }
+      />
+    );
+  }
 
   return (
     <>
