@@ -95,6 +95,7 @@ export function RegistrationForm() {
           helperText='Минимум 8 символов, большие буквы и цифры'
           icon={<LuLockKeyhole />}
           actionIcon={showPassword ? <LuEyeOff /> : <LuEye />}
+          actionIconLabel={showPassword ? 'Скрыть пароль' : 'Показать пароль'}
           onActionIconClick={() => setShowPassword((prev) => !prev)}
           {...register('password')}
           error={errors.password}
@@ -106,6 +107,9 @@ export function RegistrationForm() {
           placeholder='Повторите ваш пароль'
           icon={<LuLockKeyhole />}
           actionIcon={showConfirmPassword ? <LuEyeOff /> : <LuEye />}
+          actionIconLabel={
+            showConfirmPassword ? 'Скрыть пароль' : 'Показать пароль'
+          }
           onActionIconClick={() => setShowConfirmPassword((prev) => !prev)}
           {...register('confirmPassword')}
           error={errors.confirmPassword}
@@ -116,6 +120,7 @@ export function RegistrationForm() {
           placeholder='ДД.ММ.ГГГГ'
           type='date'
           actionIcon={<LuCalendar />}
+          actionIconLabel='Открыть календарь'
           ref={(event) => {
             birthDateRef(event);
             dateInputRef.current = event;
