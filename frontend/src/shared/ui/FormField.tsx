@@ -13,6 +13,7 @@ interface FormFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   icon?: ReactNode;
   helperText?: ReactNode;
   actionIcon?: ReactNode;
+  actionIconLabel?: string;
   onActionIconClick?: () => void;
 }
 
@@ -25,28 +26,42 @@ export const FormField = forwardRef<HTMLInputElement, FormFieldProps>(
       icon,
       helperText,
       actionIcon,
+      actionIconLabel,
       onActionIconClick,
       id,
       ...inputProps
     },
     ref,
-  ) => (
-    <div className={cn('flex flex-col gap-y-2', className)}>
-      {label && <Label htmlFor={id}>{label}</Label>}
-      <Input
-        ref={ref}
-        id={id}
-        icon={icon}
-        actionIcon={actionIcon}
-        onActionIconClick={onActionIconClick}
-        {...inputProps}
-      />
-      {helperText && !error && (
-        <p className='text-gray-9e text-sm'>{helperText}</p>
-      )}
-      {error?.message && <ErrorMessage error={error.message} />}
-    </div>
-  ),
+  ) => {
+    const fieldId = id ?? inputProps.name;
+    const hasError = Boolean(error?.message);
+    const showHelper = Boolean(helperText) && !hasError;
+    const errorId = fieldId && hasError ? `${fieldId}-error` : undefined;
+    const helperId = fieldId && showHelper ? `${fieldId}-helper` : undefined;
+
+    return (
+      <div className={cn('flex flex-col gap-y-2', className)}>
+        {label && <Label htmlFor={fieldId}>{label}</Label>}
+        <Input
+          ref={ref}
+          id={fieldId}
+          icon={icon}
+          actionIcon={actionIcon}
+          actionIconLabel={actionIconLabel}
+          onActionIconClick={onActionIconClick}
+          aria-invalid={hasError || undefined}
+          aria-describedby={errorId ?? helperId}
+          {...inputProps}
+        />
+        {showHelper && (
+          <p id={helperId} className='text-gray-9e text-sm'>
+            {helperText}
+          </p>
+        )}
+        {error?.message && <ErrorMessage id={errorId} error={error.message} />}
+      </div>
+    );
+  },
 );
 
 FormField.displayName = 'FormField';
