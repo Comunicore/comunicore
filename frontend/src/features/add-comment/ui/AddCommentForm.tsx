@@ -86,7 +86,8 @@ export function AddCommentForm({
         autoComplete='off'
         inputColor='ghost'
         inputSize='lg'
-        actionIcon={<LuSend title='Отправить комментарий' />}
+        actionIcon={<LuSend />}
+        actionIconLabel='Отправить комментарий'
         onActionIconClick={() => formRef.current?.requestSubmit()}
       />
       {hasError && (
