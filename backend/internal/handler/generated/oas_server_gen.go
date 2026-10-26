@@ -139,6 +139,12 @@ type Handler interface {
 	//
 	// POST /api/user/{userId}
 	UserUpdate(ctx context.Context, req *UserUpdateRequest, params UserUpdateParams) (*UserCreateResponse, error)
+	// VersionGet implements versionGet operation.
+	//
+	// Get application version information.
+	//
+	// GET /api/version
+	VersionGet(ctx context.Context) (VersionGetRes, error)
 }
 
 // Server implements http server based on OpenAPI v3 specification and

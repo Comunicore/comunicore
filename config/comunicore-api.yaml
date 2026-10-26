@@ -445,6 +445,20 @@ paths:
                 $ref: '#/components/schemas/ErrorStringMessage'
         "500":
           $ref: '#/components/responses/ErrorStringDescription'
+  /api/version:
+    get:
+      operationId: versionGet
+      summary: Get application version information
+      security: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VersionResponse'
+        "500":
+          $ref: '#/components/responses/ErrorStringDescription'
 components:
   securitySchemes:
     cookieAuth:
@@ -1227,6 +1241,16 @@ components:
           items:
             $ref: '#/components/schemas/AnalyticsUserCount'
           description: Users with posts but without created posts
+    VersionResponse:
+      type: object
+      properties:
+        commit:
+          description: Application commit hash
+          type: string
+      required:
+        - commit
+      example:
+        commit: "3fca47b38757fe61fbd7cb2f5db7b3f3a26f309e"
     # errors
     ErrorStringMessage:
       description: |

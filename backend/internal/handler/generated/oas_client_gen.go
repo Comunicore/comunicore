@@ -153,6 +153,12 @@ type Invoker interface {
 	//
 	// POST /api/user/{userId}
 	UserUpdate(ctx context.Context, request *UserUpdateRequest, params UserUpdateParams) (*UserCreateResponse, error)
+	// VersionGet invokes versionGet operation.
+	//
+	// Get application version information.
+	//
+	// GET /api/version
+	VersionGet(ctx context.Context) (VersionGetRes, error)
 }
 
 // Client implements OAS client.
@@ -1447,6 +1453,49 @@ func (c *Client) sendUserUpdate(ctx context.Context, request *UserUpdateRequest,
 	}()
 
 	result, err := decodeUserUpdateResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// VersionGet invokes versionGet operation.
+//
+// Get application version information.
+//
+// GET /api/version
+func (c *Client) VersionGet(ctx context.Context) (VersionGetRes, error) {
+	res, err := c.sendVersionGet(ctx)
+	return res, err
+}
+
+func (c *Client) sendVersionGet(ctx context.Context) (res VersionGetRes, err error) {
+
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/api/version"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	body := resp.Body
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
+
+	result, err := decodeVersionGetResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}

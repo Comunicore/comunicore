@@ -74,6 +74,7 @@ func (*AnalyticsMetricsGetInternalServerErrorApplicationJSON) mediaGetRes()     
 func (*AnalyticsMetricsGetInternalServerErrorApplicationJSON) postsListRes()                 {}
 func (*AnalyticsMetricsGetInternalServerErrorApplicationJSON) userCreateRes()                {}
 func (*AnalyticsMetricsGetInternalServerErrorApplicationJSON) userMeRes()                    {}
+func (*AnalyticsMetricsGetInternalServerErrorApplicationJSON) versionGetRes()                {}
 
 // Ref: #/components/schemas/AnalyticsMetricsResponse
 type AnalyticsMetricsResponse struct {
@@ -2347,3 +2348,21 @@ func (s *UserUpdateRequest) SetEmail(val string) {
 func (s *UserUpdateRequest) SetPassword(val string) {
 	s.Password = val
 }
+
+// Ref: #/components/schemas/VersionResponse
+type VersionResponse struct {
+	// Application commit hash.
+	Commit string `json:"commit"`
+}
+
+// GetCommit returns the value of Commit.
+func (s *VersionResponse) GetCommit() string {
+	return s.Commit
+}
+
+// SetCommit sets the value of Commit.
+func (s *VersionResponse) SetCommit(val string) {
+	s.Commit = val
+}
+
+func (*VersionResponse) versionGetRes() {}
