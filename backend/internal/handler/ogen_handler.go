@@ -46,6 +46,7 @@ type OgenHandler struct {
 	mediaHandler      *MediaHandler
 	analyticsHandler  *AnalyticsHandler
 	categoriesHandler *CategoriesHandler
+	versionHandler    *VersionHandler
 	api.UnimplementedHandler
 }
 
@@ -56,6 +57,7 @@ func NewOgenHandler(
 	postsHandler *PostsHandler,
 	mediaHandler *MediaHandler,
 	analyticsHandler *AnalyticsHandler,
+	versionHandler *VersionHandler,
 ) *OgenHandler {
 
 	return &OgenHandler{
@@ -239,8 +241,9 @@ func RegisterOgenRoutes(mux *http.ServeMux, cfg *config.AppConfig) {
 	mediaH := NewMediaHandler(mediaS)
 	categoriesH := NewCategoriesHandler(categoriesS)
 	analyticsH := NewAnalyticsHandler(analyticsS)
+	versionH := NewVersionHandler()
 
-	ogenHandler := NewOgenHandler(authH, userH, categoriesH, postsH, mediaH, analyticsH)
+	ogenHandler := NewOgenHandler(authH, userH, categoriesH, postsH, mediaH, analyticsH, versionH)
 	secHandler := NewSecurityHandler(authR)
 
 	errHandler := &errorHandler{}
@@ -324,4 +327,8 @@ func (h *OgenHandler) AnalyticsVisitBatchSubmit(ctx context.Context, req *api.An
 
 func (h *OgenHandler) AnalyticsMetricsGet(ctx context.Context, params api.AnalyticsMetricsGetParams) (api.AnalyticsMetricsGetRes, error) {
 	return h.analyticsHandler.AnalyticsMetricsGet(ctx, params)
+}
+
+func (h *OgenHandler) VersionGet(ctx context.Context) (api.VersionGetRes, error) {
+	return h.versionHandler.VersionGet(ctx)
 }

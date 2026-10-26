@@ -191,3 +191,12 @@ func (UnimplementedHandler) UserMe(ctx context.Context) (r UserMeRes, _ error) {
 func (UnimplementedHandler) UserUpdate(ctx context.Context, req *UserUpdateRequest, params UserUpdateParams) (r *UserCreateResponse, _ error) {
 	return r, ht.ErrNotImplemented
 }
+
+// VersionGet implements versionGet operation.
+//
+// Get application version information.
+//
+// GET /api/version
+func (UnimplementedHandler) VersionGet(ctx context.Context) (r VersionGetRes, _ error) {
+	return r, ht.ErrNotImplemented
+}

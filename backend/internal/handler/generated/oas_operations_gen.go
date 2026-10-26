@@ -22,4 +22,5 @@ const (
 	UserGetOperation                   OperationName = "UserGet"
 	UserMeOperation                    OperationName = "UserMe"
 	UserUpdateOperation                OperationName = "UserUpdate"
+	VersionGetOperation                OperationName = "VersionGet"
 )

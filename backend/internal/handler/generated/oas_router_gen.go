@@ -482,6 +482,31 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 					}
 
+				case 'v': // Prefix: "version"
+
+					if l := len("version"); len(elem) >= l && elem[0:l] == "version" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					if len(elem) == 0 {
+						// Leaf node.
+						switch r.Method {
+						case "GET":
+							s.handleVersionGetRequest([0]string{}, elemIsEscaped, w, r)
+						default:
+							s.notAllowed(w, r, notAllowedParams{
+								allowedMethods: "GET",
+								allowedHeaders: nil,
+								acceptPost:     "",
+								acceptPatch:    "",
+							})
+						}
+
+						return
+					}
+
 				}
 
 			case 's': // Prefix: "storage/media/"
@@ -1026,6 +1051,31 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							}
 						}
 
+					}
+
+				case 'v': // Prefix: "version"
+
+					if l := len("version"); len(elem) >= l && elem[0:l] == "version" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					if len(elem) == 0 {
+						// Leaf node.
+						switch method {
+						case "GET":
+							r.name = VersionGetOperation
+							r.summary = "Get application version information"
+							r.operationID = "versionGet"
+							r.operationGroup = ""
+							r.pathPattern = "/api/version"
+							r.args = args
+							r.count = 0
+							return r, true
+						default:
+							return
+						}
 					}
 
 				}

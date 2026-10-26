@@ -52,3 +52,7 @@ type UserGetRes interface {
 type UserMeRes interface {
 	userMeRes()
 }
+
+type VersionGetRes interface {
+	versionGetRes()
+}
