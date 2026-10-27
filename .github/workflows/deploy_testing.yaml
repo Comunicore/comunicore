@@ -50,3 +50,9 @@ jobs:
           REPO: ${{ github.repository }}
         run: |
           gh api --method DELETE "repos/$REPO/git/refs/heads/$BRANCH"
+  check_site_is_running:
+    needs: deploy
+    uses: ./.github/workflows/service_check_job.yaml
+    with:
+      site_url: ${{ github.ref_name == 'deploy_test' && 'https://test-comunicore.mooo.com' || github.ref_name == 'deploy_barbaris' && 'https://barbaris-comunicore.mooo.com' || 'https://narzan-comunicore.mooo.com' }}
+
