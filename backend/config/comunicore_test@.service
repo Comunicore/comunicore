@@ -1,0 +1,18 @@
+[Unit]
+Description=Comunicore Backend (test environment "%i")
+After=network.target
+
+[Service]
+Type=exec
+User=comunicore
+Group=comunicore
+WorkingDirectory=/home/comunicore/app_test/%i/backend
+EnvironmentFile=/home/comunicore/.comunicore_%i.env
+ExecStartPre=/home/comunicore/app_test/%i/backend/bin/migrate --config ./conf/server-config.toml
+ExecStart=/home/comunicore/app_test/%i/backend/bin/comunicore --config ./conf/server-config.toml
+ExecStopPost=/home/comunicore/bin/test_instance_clean.sh %i
+RuntimeMaxSec=12hour
+TimeoutStopSec=10s
+Restart=no
+StandardOutput=journal
+StandardError=journal

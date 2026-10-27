@@ -5,10 +5,10 @@ After=network.target
 [Service]
 User=comunicore
 Group=comunicore
-WorkingDirectory=/home/comunicore/app
+WorkingDirectory=/home/comunicore/app/backend
 EnvironmentFile=/home/comunicore/.comunicore.env
-ExecStartPre=/home/comunicore/app/bin/migrate --config ./conf/server-config.toml
-ExecStart=/home/comunicore/app/bin/comunicore --config ./conf/server-config.toml
+ExecStartPre=/home/comunicore/app/backend/bin/migrate --config ./conf/server-config.toml
+ExecStart=/home/comunicore/app/backend/bin/comunicore --config ./conf/server-config.toml
 Restart=always
 RestartSec=5
 StandardOutput=journal
