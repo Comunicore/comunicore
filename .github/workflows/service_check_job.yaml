@@ -1,0 +1,55 @@
+name: Check communicore is running
+permissions:
+  contents: read
+# Reusable workflow to check if comunicore service is running
+# with version built from the current commit.
+#
+# To use this workflow, call it from another workflow as job
+# example:
+# jobs:
+#   check_service_running:
+#     uses: ./.github/workflows/servcice_check_job.yaml
+#     with:
+#       site_url: 'https://comunicore.mooo.com'
+#   use_results:
+#     # this will use the build artifacts from the reusable workflow
+#     needs: check_service_running
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: do steps after service is running check succeeds
+
+on:
+  workflow_call:
+    inputs:
+      site_url:
+        type: string
+        default: 'https://comunicore.mooo.com'
+
+jobs:
+  check_service_running:
+    runs-on: ubuntu-latest
+    steps:
+      - name: compare HEAD commit hash with API commit hash
+        env:
+          CURRENT_COMMIT_HASH: ${{ github.sha }}
+          API_URL: ${{ inputs.site_url }}/api/version
+        run: |
+          echo "API_URL is $API_URL"
+          if ! RESPONSE=$(curl --fail --silent --show-error --connect-timeout 20 --max-time 65 "$API_URL");
+          then
+            echo "error: Remote service is unavailable. Skipping comparison."
+            exit 1
+          fi
+
+          if ! API_COMMIT_HASH=$(jq -er '.commit | strings | select(length > 0)' <<< "$RESPONSE");
+          then
+            echo "Error: Invalid API response. Skipping comparison."
+            exit 1
+          fi
+
+          API_COMMIT_HASH=$(curl -fsSL "$API_URL" | jq -er '.commit')
+          echo "API commit hash is $API_COMMIT_HASH"
+          if [[ "$API_COMMIT_HASH" != "$CURRENT_COMMIT_HASH" ]];
+          then
+            exit 1
+          fi
