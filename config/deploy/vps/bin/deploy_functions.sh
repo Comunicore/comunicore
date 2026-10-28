@@ -57,6 +57,41 @@ function service_comunicore_testing_stop() {
 
   echo "== previous service version stopped ... OK"
 }
+# app_backup BACKUP_DIR APP_WORK_DIR
+function app_backup () {
+  local BACKUP_DIR="$1"
+  if [[ -z "$BACKUP_DIR" ]];
+  then
+      echo "!!! error: app_backup got empty backup dir" >&2
+      exit 1
+  fi
+  local APP_WORK_DIR="$2"
+  if [[ -z "$APP_WORK_DIR" ]];
+  then
+      echo "!!! error: app_backup got empty app work dir" >&2
+      exit 1
+  fi
+  # remove dirs older 8 days except last two
+  find "${BACKUP_DIR}" -maxdepth 1 -type d -mtime +7 -printf '%T@ %p\0' \
+    | sort -nr \
+    | tail -n +3 \
+    | cut -d' ' -f2- \
+    | xargs -r rm -rf --
+  # create backup dir
+  CURRENT_BACKUP_DIR="${BACKUP_DIR}/$(date +%s)"
+  echo "CURRENT_BACKUP_DIR = ${CURRENT_BACKUP_DIR}"
+  mkdir -p "${CURRENT_BACKUP_DIR}"
+  # copy app work dir
+  cp -a "${APP_WORK_DIR}/./" "${CURRENT_BACKUP_DIR}"
+  # hardlink upload dir
+  rm "$CURRENT_BACKUP_DIR/upload"
+  upload_dir_hardlink "${CURRENT_BACKUP_DIR}"
+  # backup database
+  db_dump_production "${CURRENT_BACKUP_DIR}"
+
+  echo "=== Work dir ${APP_WORK_DIR} backuped ==="
+  ls -al "${CURRENT_BACKUP_DIR}"
+}
 function app_dir_clear() {
   local APP_WORK_DIR="$1"
   if [[ -z "$APP_WORK_DIR" ]];
@@ -138,9 +173,8 @@ function upload_dir_hardlink() {
       exit 1
   fi
 
-  (
-    mkdir upload
-    cd upload
+  ( cd "${APP_WORK_DIR}" && rm -rf upload
+    mkdir upload && cd upload
     cp -al /home/comunicore/upload/./ .
   )
   echo "=== upload directory hardlinked to instance ==="
@@ -255,4 +289,18 @@ function db_load_from_production() {
 
   pg_dump --no-owner -U comunicore comunicore | psql -h localhost -p 5432 "${DB_NAME}" "${DB_USER_NAME}"
   echo "=== db copied from production ==="
+}
+# db_dump_production TARGET_DIR
+function db_dump_production() {
+  local TARGET_DIR="$1"
+  if [[ -z "$TARGET_DIR" ]];
+  then
+      echo "!!! error: db_dump_production got empty target dir" >&2
+      exit 1
+  fi
+
+  pg_dump --no-owner -U comunicore comunicore > "${TARGET_DIR}/db.sql"
+  nohup xz -9 "${TARGET_DIR}/db.sql" > "${TARGET_DIR}/db.sql.xz.log" 2>&1 < /dev/null &
+
+  echo "=== db dumped ==="
 }

@@ -12,6 +12,7 @@ SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 
 HOME_DIR="/home/comunicore"
 APP_WORK_DIR="${HOME_DIR}/app"
+BACKUP_DIR="$HOME_DIR/backup"
 
 cd "$HOME_DIR"
 lock_operation "comunicore_deploy_production"
@@ -26,6 +27,7 @@ archive_read "${TMP_DIR}"
 archive_extract "${TMP_DIR}"
 service_file_check "${TMP_DIR}"
 service_comunicore_production_stop
+app_backup "${BACKUP_DIR}" "${APP_WORK_DIR}"
 app_dir_clear "${APP_WORK_DIR}"
 
 mv "${TMP_DIR}" "${APP_WORK_DIR}"
