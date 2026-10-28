@@ -7,7 +7,7 @@ export const postsPeriodSortEnum = z.enum(['newest', 'oldest', 'all']);
 export type PostsPeriodSortTypes = z.infer<typeof postsPeriodSortEnum>;
 
 export const sortPeriodLabels: Record<PostsPeriodSortTypes, string> = {
-  all: 'За все время',
+  all: 'Все',
   newest: 'Сначала новые',
   oldest: 'Сначала старые',
 } as const;

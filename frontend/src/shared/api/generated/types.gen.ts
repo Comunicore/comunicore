@@ -294,6 +294,13 @@ export type AnalyticsMetricsResponse = {
     postOnlyUsers: Array<AnalyticsUserCount>;
 };
 
+export type VersionResponse = {
+    /**
+     * Application commit hash
+     */
+    commit: string;
+};
+
 /**
  * Error with just string message, without code or other data. For simple errors,
  * when we don't need to send any additional data, just a message for log.
@@ -805,3 +812,28 @@ export type MediaGetResponses = {
 };
 
 export type MediaGetResponse = MediaGetResponses[keyof MediaGetResponses];
+
+export type VersionGetData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/version';
+};
+
+export type VersionGetErrors = {
+    /**
+     * Error in request with string description (for log, not for user).
+     */
+    500: string;
+};
+
+export type VersionGetError = VersionGetErrors[keyof VersionGetErrors];
+
+export type VersionGetResponses = {
+    /**
+     * OK
+     */
+    200: VersionResponse;
+};
+
+export type VersionGetResponse = VersionGetResponses[keyof VersionGetResponses];

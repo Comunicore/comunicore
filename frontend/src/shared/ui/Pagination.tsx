@@ -2,7 +2,8 @@
 
 import { useMemo } from 'react';
 import { LuChevronLeft, LuChevronRight } from 'react-icons/lu';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+
+import { useUpdateSearchParams } from '../hooks/useUpdateSearchParams';
 
 import { Button } from './Button';
 
@@ -15,7 +16,7 @@ export const getPaginationRange = (currentPage: number, totalPages: number) => {
 
   const range: (number | string)[] = [];
 
-  if (currentPage < 3) {
+  if (currentPage < 4) {
     range.push(1, 2, 3, SKIP_BUTTON_LABEL, totalPages);
   } else if (currentPage >= totalPages - 2) {
     range.push(
@@ -43,22 +44,19 @@ export const getPaginationRange = (currentPage: number, totalPages: number) => {
 interface PaginationProps {
   totalPages: number;
   pageQueryKey: string;
+  currentPage: number;
 }
 
-export function Pagination({ totalPages, pageQueryKey }: PaginationProps) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-
-  const currentPage = Number(searchParams.get(pageQueryKey)) || 1;
+export function Pagination({
+  totalPages,
+  pageQueryKey,
+  currentPage,
+}: PaginationProps) {
+  const setParams = useUpdateSearchParams();
 
   const handlePageChange = (page: number) => {
     if (page < 1 || page > totalPages) return;
-
-    const currentParams = new URLSearchParams(searchParams.toString());
-    currentParams.set(pageQueryKey, String(page));
-
-    router.push(`${pathname}?${currentParams.toString()}`, { scroll: false });
+    setParams({ [pageQueryKey]: page === 1 ? undefined : page });
   };
 
   const paginationRange = useMemo(

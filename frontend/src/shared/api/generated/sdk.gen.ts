@@ -2,7 +2,7 @@
 
 import { type Client, formDataBodySerializer, type Options as Options2, type TDataShape } from './client';
 import { client } from './client.gen';
-import type { AnalyticsMetricsGetData, AnalyticsMetricsGetErrors, AnalyticsMetricsGetResponses, AnalyticsVisitBatchSubmitData, AnalyticsVisitBatchSubmitErrors, AnalyticsVisitBatchSubmitResponses, AuthLoginData, AuthLoginErrors, AuthLoginResponses, AuthLogoutData, AuthLogoutResponses, CategoriesListData, CategoriesListErrors, CategoriesListResponses, MediaGetData, MediaGetErrors, MediaGetResponses, MediaUploadData, MediaUploadErrors, MediaUploadResponses, PostAddCommentData, PostAddCommentErrors, PostAddCommentResponses, PostCreateData, PostCreateErrors, PostCreateResponses, PostGetData, PostGetErrors, PostGetResponses, PostsListData, PostsListErrors, PostsListResponses, UserCreateData, UserCreateErrors, UserCreateResponses, UserDeleteData, UserDeleteResponses, UserGetData, UserGetErrors, UserGetResponses, UserMeData, UserMeErrors, UserMeResponses, UserUpdateData, UserUpdateResponses } from './types.gen';
+import type { AnalyticsMetricsGetData, AnalyticsMetricsGetErrors, AnalyticsMetricsGetResponses, AnalyticsVisitBatchSubmitData, AnalyticsVisitBatchSubmitErrors, AnalyticsVisitBatchSubmitResponses, AuthLoginData, AuthLoginErrors, AuthLoginResponses, AuthLogoutData, AuthLogoutResponses, CategoriesListData, CategoriesListErrors, CategoriesListResponses, MediaGetData, MediaGetErrors, MediaGetResponses, MediaUploadData, MediaUploadErrors, MediaUploadResponses, PostAddCommentData, PostAddCommentErrors, PostAddCommentResponses, PostCreateData, PostCreateErrors, PostCreateResponses, PostGetData, PostGetErrors, PostGetResponses, PostsListData, PostsListErrors, PostsListResponses, UserCreateData, UserCreateErrors, UserCreateResponses, UserDeleteData, UserDeleteResponses, UserGetData, UserGetErrors, UserGetResponses, UserMeData, UserMeErrors, UserMeResponses, UserUpdateData, UserUpdateResponses, VersionGetData, VersionGetErrors, VersionGetResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -238,3 +238,8 @@ export const mediaUpload = <ThrowOnError extends boolean = false>(options: Optio
  * Get media file by name
  */
 export const mediaGet = <ThrowOnError extends boolean = false>(options: Options<MediaGetData, ThrowOnError>) => (options.client ?? client).get<MediaGetResponses, MediaGetErrors, ThrowOnError>({ url: '/storage/media/{fileName}', ...options });
+
+/**
+ * Get application version information
+ */
+export const versionGet = <ThrowOnError extends boolean = false>(options?: Options<VersionGetData, ThrowOnError>) => (options?.client ?? client).get<VersionGetResponses, VersionGetErrors, ThrowOnError>({ url: '/api/version', ...options });
