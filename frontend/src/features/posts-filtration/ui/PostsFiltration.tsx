@@ -1,27 +1,29 @@
 'use client';
 
-import { FormHTMLAttributes, useRef } from 'react';
+import { FormHTMLAttributes, useEffect, useRef } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { LuChevronDown } from 'react-icons/lu';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import {
   postsFiltrationSchema,
   PostsFiltrationTypes,
 } from '../model/filtration.schema';
+
 import {
+  filtrationQueryKeys,
+  parsePostsParams,
   postsPeriodSortEnum,
   PostsPeriodSortTypes,
-  sortPeriodLabels,
-} from '../model/period-sort.enum';
-import {
   postsSortEnum,
   type PostsSortTypes,
   sortLabels,
-} from '../model/sort.enum';
+  sortPeriodLabels,
+} from '@/entities/post';
 
 import { useModal } from '@/shared/hooks/useModal';
+import { useUpdateSearchParams } from '@/shared/hooks/useUpdateSearchParams';
 import { useWindowResize } from '@/shared/hooks/useWindowResize';
 import { cn } from '@/shared/lib/classNames';
 import {
@@ -37,9 +39,9 @@ import {
 
 export function PostsFiltration(props: FormHTMLAttributes<HTMLFormElement>) {
   const { className, ...restAttrs } = props;
-  const router = useRouter();
-  const pathname = usePathname();
   const searchParams = useSearchParams();
+  const setParams = useUpdateSearchParams();
+  const { sortBy, period, withoutComments } = parsePostsParams(searchParams);
 
   const modalRef = useRef<HTMLFormElement | null>(null);
   const buttonRef = useRef<HTMLButtonElement | HTMLAnchorElement | null>(null);
@@ -48,24 +50,23 @@ export function PostsFiltration(props: FormHTMLAttributes<HTMLFormElement>) {
   const { responsiveIsOpen } = useWindowResize(modalOpen, 1280);
   const isFormInert = !responsiveIsOpen && !modalOpen ? true : undefined;
 
-  const { handleSubmit, register, control } = useForm<PostsFiltrationTypes>({
-    resolver: zodResolver(postsFiltrationSchema),
-    defaultValues: {
-      withoutComments: searchParams.get('withoutComments') === 'true' || false,
-      sortBy:
-        (searchParams.get('sortBy') as PostsFiltrationTypes['sortBy']) ||
-        'last_activity',
-      period:
-        (searchParams.get('period') as PostsFiltrationTypes['period']) || 'all',
-    },
-  });
+  const { handleSubmit, register, control, reset } =
+    useForm<PostsFiltrationTypes>({
+      resolver: zodResolver(postsFiltrationSchema),
+      defaultValues: { sortBy, period, withoutComments },
+    });
+
+  useEffect(() => {
+    reset({ sortBy, period, withoutComments });
+  }, [sortBy, period, withoutComments, reset]);
 
   const onSubmit: SubmitHandler<PostsFiltrationTypes> = (data) => {
-    const currentParams = new URLSearchParams(searchParams.toString());
-    Object.entries(data).forEach(([key, value]) => {
-      currentParams.set(key, String(value));
+    setParams({
+      [filtrationQueryKeys.sortBy]: data.sortBy,
+      [filtrationQueryKeys.period]: data.period,
+      [filtrationQueryKeys.withoutComments]: data.withoutComments,
+      [filtrationQueryKeys.page]: undefined,
     });
-    router.push(`${pathname}?${currentParams.toString()}`, { scroll: false });
   };
 
   const sortOptions = postsSortEnum.options.map((value) => ({
@@ -116,7 +117,7 @@ export function PostsFiltration(props: FormHTMLAttributes<HTMLFormElement>) {
         <h2 className='hidden xl:col-auto xl:inline xl:text-lg xl:font-bold'>
           Фильтры
         </h2>
-        <Label title='Сортировка'>
+        <Label title='Сортировка' className='flex flex-col gap-y-2'>
           <span>Сортировка</span>
           <Controller
             name='sortBy'
@@ -142,7 +143,7 @@ export function PostsFiltration(props: FormHTMLAttributes<HTMLFormElement>) {
             )}
           />
         </Label>
-        <Label title='Период'>
+        <Label title='Период' className='flex flex-col gap-y-2'>
           <span>Период</span>
           <Controller
             name='period'
@@ -169,7 +170,7 @@ export function PostsFiltration(props: FormHTMLAttributes<HTMLFormElement>) {
           />
         </Label>
         <Label
-          className='flex-row items-center gap-x-3 [&:has(input:focus-visible)]:rounded-sm [&:has(input:focus-visible)]:ring-1 [&:has(input:focus-visible)]:ring-white'
+          className='flex gap-x-3 [&:has(input:focus-visible)]:rounded-sm [&:has(input:focus-visible)]:ring-1 [&:has(input:focus-visible)]:ring-white'
           htmlFor='sort-checkbox'
         >
           <Checkbox {...register('withoutComments')} id='sort-checkbox' />

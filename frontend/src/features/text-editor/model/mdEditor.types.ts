@@ -7,14 +7,7 @@ export interface ReturnNewValues {
 export type ToolHandlerConfig = {
   wrapper: string;
   type:
-    | 'wrap'
-    | 'heading'
-    | 'list'
-    | 'o-list'
-    | 'quote'
-    | 'code'
-    | 'url'
-    | 'image';
+    'wrap' | 'heading' | 'list' | 'o-list' | 'quote' | 'code' | 'url' | 'image';
 };
 
 export type HandlerParams = {

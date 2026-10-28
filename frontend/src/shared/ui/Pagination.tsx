@@ -2,9 +2,12 @@
 
 import { useMemo } from 'react';
 import { LuChevronLeft, LuChevronRight } from 'react-icons/lu';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+
+import { useUpdateSearchParams } from '../hooks/useUpdateSearchParams';
 
 import { Button } from './Button';
+
+const SKIP_BUTTON_LABEL = '...';
 
 export const getPaginationRange = (currentPage: number, totalPages: number) => {
   if (totalPages <= 5) {
@@ -13,16 +16,24 @@ export const getPaginationRange = (currentPage: number, totalPages: number) => {
 
   const range: (number | string)[] = [];
 
-  if (currentPage < 3) {
-    range.push(1, 2, 3, '...', totalPages);
+  if (currentPage < 4) {
+    range.push(1, 2, 3, SKIP_BUTTON_LABEL, totalPages);
   } else if (currentPage >= totalPages - 2) {
-    range.push(1, '...', totalPages - 2, totalPages - 1, totalPages);
+    range.push(
+      1,
+      SKIP_BUTTON_LABEL,
+      totalPages - 2,
+      totalPages - 1,
+      totalPages,
+    );
   } else {
     range.push(
+      1,
+      SKIP_BUTTON_LABEL,
       currentPage - 1,
       currentPage,
       currentPage + 1,
-      '...',
+      SKIP_BUTTON_LABEL,
       totalPages,
     );
   }
@@ -32,24 +43,20 @@ export const getPaginationRange = (currentPage: number, totalPages: number) => {
 
 interface PaginationProps {
   totalPages: number;
+  pageQueryKey: string;
+  currentPage: number;
 }
 
-const PAGE_QUERY_KEY = 'page';
-
-export function Pagination({ totalPages }: PaginationProps) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-
-  const currentPage = Number(searchParams.get(PAGE_QUERY_KEY)) || 1;
+export function Pagination({
+  totalPages,
+  pageQueryKey,
+  currentPage,
+}: PaginationProps) {
+  const setParams = useUpdateSearchParams();
 
   const handlePageChange = (page: number) => {
     if (page < 1 || page > totalPages) return;
-
-    const currentParams = new URLSearchParams(searchParams.toString());
-    currentParams.set(PAGE_QUERY_KEY, String(page));
-
-    router.push(`${pathname}?${currentParams.toString()}`, { scroll: false });
+    setParams({ [pageQueryKey]: page === 1 ? undefined : page });
   };
 
   const paginationRange = useMemo(
@@ -67,13 +74,13 @@ export function Pagination({ totalPages }: PaginationProps) {
         aria-label='Prev page'
         size='square'
         color='bordered'
-        title='Previos page'
+        title='Previous page'
         disabled={currentPage <= 1}
       >
         <LuChevronLeft size={20} className='min-w-5' role='img' aria-hidden />
       </Button>
       {paginationRange.map((page, index) => {
-        if (page === '...') {
+        if (page === SKIP_BUTTON_LABEL) {
           return (
             <Button
               key={`dots-${index}`}

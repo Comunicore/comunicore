@@ -1,17 +1,23 @@
+'use client';
+
+import { Suspense } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
+import { LuServerCrash } from 'react-icons/lu';
+import { QueryErrorResetBoundary } from '@tanstack/react-query';
+
 import { NotFoundResp } from './NotFoundRespl';
-import { PostsHeader } from './PostsHeader';
 import { PostsList } from './PostsList';
+import { PostsListSkeleton } from './PostsListSkeleton';
 
 import { FilterByTag } from '@/features/filter-by-tag';
 import { PostsFiltration } from '@/features/posts-filtration';
 
 import { cn } from '@/shared/lib/classNames';
-import { containerClassName } from '@/shared/ui';
+import { Button, StatePlaceholder } from '@/shared/ui';
 
 export function PostsSection() {
   return (
-    <section className={`${containerClassName} grid gap-y-18.5 py-21.25`}>
-      <PostsHeader />
+    <>
       <div
         className={cn(
           'flex min-w-0 flex-col-reverse gap-y-4',
@@ -29,8 +35,37 @@ export function PostsSection() {
           <FilterByTag />
           <NotFoundResp className='hidden xl:flex' />
         </div>
-        <PostsList />
+        <QueryErrorResetBoundary>
+          {({ reset }) => (
+            <ErrorBoundary
+              onReset={reset}
+              fallbackRender={({ resetErrorBoundary }) => (
+                <StatePlaceholder
+                  tone='error'
+                  icon={<LuServerCrash size={28} />}
+                  title='Не удалось загрузить посты'
+                  description='Попробуйте обновить список.'
+                  actions={
+                    <Button
+                      size='sm'
+                      color='purple'
+                      onClick={() => {
+                        resetErrorBoundary();
+                      }}
+                    >
+                      Попробовать снова
+                    </Button>
+                  }
+                />
+              )}
+            >
+              <Suspense fallback={<PostsListSkeleton />}>
+                <PostsList />
+              </Suspense>
+            </ErrorBoundary>
+          )}
+        </QueryErrorResetBoundary>
       </div>
-    </section>
+    </>
   );
 }

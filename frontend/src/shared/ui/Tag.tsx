@@ -3,13 +3,7 @@ import { type HTMLAttributes, PropsWithChildren, useMemo } from 'react';
 import { cn } from '../lib/classNames';
 
 type TagColor =
-  | 'purple'
-  | 'orange'
-  | 'blue'
-  | 'green'
-  | 'dark-purple'
-  | 'cyan'
-  | 'dark';
+  'purple' | 'orange' | 'blue' | 'green' | 'dark-purple' | 'cyan' | 'dark';
 
 type TagSize = 'sm' | 'md' | 'lg' | 'xl';
 
