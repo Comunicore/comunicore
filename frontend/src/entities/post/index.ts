@@ -8,6 +8,6 @@ export {
 } from './model/filtration.enums';
 export { filtrationQueryKeys } from './model/filtrationQuery.keys';
 export { parsePostsParams } from './model/parsePostsParam';
-export { usePostList, useSuspensePostList } from './model/usePostList';
+export { useSuspensePostList } from './model/usePostList';
 export { PostCard } from './ui/PostCard';
 export { PostContent } from './ui/PostContent';

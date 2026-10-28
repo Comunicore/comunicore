@@ -1,69 +1,21 @@
 'use client';
 
-import { LuInbox, LuSearchX } from 'react-icons/lu';
-import { useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
+import { LuServerCrash } from 'react-icons/lu';
+import { QueryErrorResetBoundary } from '@tanstack/react-query';
 
 import { NotFoundResp } from './NotFoundRespl';
 import { PostsList } from './PostsList';
+import { PostsListSkeleton } from './PostsListSkeleton';
 
 import { FilterByTag } from '@/features/filter-by-tag';
 import { PostsFiltration } from '@/features/posts-filtration';
 
-import {
-  filtrationQueryKeys,
-  parsePostsParams,
-  useSuspensePostList,
-} from '@/entities/post';
-
-import { AppRouter } from '@/shared/config/app-router';
-import { useUpdateSearchParams } from '@/shared/hooks/useUpdateSearchParams';
 import { cn } from '@/shared/lib/classNames';
-import { Button } from '@/shared/ui';
-import { StatePlaceholder } from '@/shared/ui/StatePlaceholder';
+import { Button, StatePlaceholder } from '@/shared/ui';
 
 export function PostsSection() {
-  const searchParams = useSearchParams();
-  const setParam = useUpdateSearchParams();
-  const { limit: POSTS_LIMIT, page } = parsePostsParams(searchParams);
-  const { posts } = useSuspensePostList({
-    query: { limit: POSTS_LIMIT, page },
-  });
-  const postsLists = posts.posts;
-  const totalPages = Math.ceil((posts.totalCountEstimated || 0) / POSTS_LIMIT);
-
-  const onRetry = () => setParam({ [filtrationQueryKeys.page]: undefined });
-
-  if (postsLists.length === 0) {
-    if (page > 1) {
-      return (
-        <StatePlaceholder
-          tone='info'
-          icon={<LuSearchX size={28} />}
-          title='Страница не найдена'
-          description='Такой страницы нет в списке.'
-          actions={
-            <Button size='sm' color='bordered' onClick={onRetry}>
-              Вернуться на первую страницу
-            </Button>
-          }
-        />
-      );
-    }
-
-    return (
-      <StatePlaceholder
-        icon={<LuInbox size={28} />}
-        title='Пока нет постов'
-        description='Будьте первым, кто начнёт обсуждение.'
-        actions={
-          <Button size='sm' color='purple' href={AppRouter.posts.new}>
-            Создать пост
-          </Button>
-        }
-      />
-    );
-  }
-
   return (
     <>
       <div
@@ -83,7 +35,36 @@ export function PostsSection() {
           <FilterByTag />
           <NotFoundResp className='hidden xl:flex' />
         </div>
-        <PostsList postsLists={postsLists} totalPages={totalPages} />
+        <QueryErrorResetBoundary>
+          {({ reset }) => (
+            <ErrorBoundary
+              onReset={reset}
+              fallbackRender={({ resetErrorBoundary }) => (
+                <StatePlaceholder
+                  tone='error'
+                  icon={<LuServerCrash size={28} />}
+                  title='Не удалось загрузить посты'
+                  description='Попробуйте обновить список.'
+                  actions={
+                    <Button
+                      size='sm'
+                      color='purple'
+                      onClick={() => {
+                        resetErrorBoundary();
+                      }}
+                    >
+                      Попробовать снова
+                    </Button>
+                  }
+                />
+              )}
+            >
+              <Suspense fallback={<PostsListSkeleton />}>
+                <PostsList />
+              </Suspense>
+            </ErrorBoundary>
+          )}
+        </QueryErrorResetBoundary>
       </div>
     </>
   );

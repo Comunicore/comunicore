@@ -3,8 +3,8 @@
 import { type DefaultError, type InfiniteData, infiniteQueryOptions, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { analyticsMetricsGet, analyticsVisitBatchSubmit, authLogin, authLogout, categoriesList, mediaGet, mediaUpload, type Options, postAddComment, postCreate, postGet, postsList, userCreate, userDelete, userGet, userMe, userUpdate } from '../sdk.gen';
-import type { AnalyticsMetricsGetData, AnalyticsMetricsGetError, AnalyticsMetricsGetResponse, AnalyticsVisitBatchSubmitData, AnalyticsVisitBatchSubmitError, AnalyticsVisitBatchSubmitResponse, AuthLoginData, AuthLoginError, AuthLoginResponse, AuthLogoutData, AuthLogoutResponse, CategoriesListData, CategoriesListError, CategoriesListResponse2, MediaGetData, MediaGetError, MediaGetResponse, MediaUploadData, MediaUploadError, MediaUploadResponse2, PostAddCommentData, PostAddCommentError, PostAddCommentResponse, PostCreateData, PostCreateError, PostCreateResponse, PostGetData, PostGetError, PostGetResponse, PostsListData, PostsListError, PostsListResponse, UserCreateData, UserCreateError, UserCreateResponse2, UserDeleteData, UserDeleteResponse, UserGetData, UserGetError, UserGetResponse2, UserMeData, UserMeError, UserMeResponse, UserUpdateData, UserUpdateResponse } from '../types.gen';
+import { analyticsMetricsGet, analyticsVisitBatchSubmit, authLogin, authLogout, categoriesList, mediaGet, mediaUpload, type Options, postAddComment, postCreate, postGet, postsList, userCreate, userDelete, userGet, userMe, userUpdate, versionGet } from '../sdk.gen';
+import type { AnalyticsMetricsGetData, AnalyticsMetricsGetError, AnalyticsMetricsGetResponse, AnalyticsVisitBatchSubmitData, AnalyticsVisitBatchSubmitError, AnalyticsVisitBatchSubmitResponse, AuthLoginData, AuthLoginError, AuthLoginResponse, AuthLogoutData, AuthLogoutResponse, CategoriesListData, CategoriesListError, CategoriesListResponse2, MediaGetData, MediaGetError, MediaGetResponse, MediaUploadData, MediaUploadError, MediaUploadResponse2, PostAddCommentData, PostAddCommentError, PostAddCommentResponse, PostCreateData, PostCreateError, PostCreateResponse, PostGetData, PostGetError, PostGetResponse, PostsListData, PostsListError, PostsListResponse, UserCreateData, UserCreateError, UserCreateResponse2, UserDeleteData, UserDeleteResponse, UserGetData, UserGetError, UserGetResponse2, UserMeData, UserMeError, UserMeResponse, UserUpdateData, UserUpdateResponse, VersionGetData, VersionGetError, VersionGetResponse } from '../types.gen';
 
 /**
  * Create a new user
@@ -425,4 +425,22 @@ export const mediaGetOptions = (options: Options<MediaGetData>) => queryOptions<
         return data;
     },
     queryKey: mediaGetQueryKey(options)
+});
+
+export const versionGetQueryKey = (options?: Options<VersionGetData>) => createQueryKey('versionGet', options);
+
+/**
+ * Get application version information
+ */
+export const versionGetOptions = (options?: Options<VersionGetData>) => queryOptions<VersionGetResponse, VersionGetError, VersionGetResponse, ReturnType<typeof versionGetQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await versionGet({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: versionGetQueryKey(options)
 });

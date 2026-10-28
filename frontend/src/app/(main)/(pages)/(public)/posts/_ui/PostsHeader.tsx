@@ -45,7 +45,7 @@ export default function PostsHeader() {
         </Button>
       </div>
       <ul className='flex flex-wrap gap-4.25'>
-        {/* make fetching from API */}
+        {/* make fetching categories from API */}
         {filterTags.map(({ icon, label, id }, index) => {
           const Icon = icon;
           const tagActive = currentCategory === id;

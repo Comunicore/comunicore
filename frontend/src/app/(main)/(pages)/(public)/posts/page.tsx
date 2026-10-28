@@ -1,52 +1,38 @@
-'use client';
-
 import { Suspense } from 'react';
-import { ErrorBoundary } from 'react-error-boundary';
-import { LuServerCrash } from 'react-icons/lu';
-import { QueryErrorResetBoundary } from '@tanstack/react-query';
+import { dehydrate, HydrationBoundary } from '@tanstack/react-query';
 
 import PostsHeader from './_ui/PostsHeader';
 import PostsHeaderSkeleton from './_ui/PostsHeaderSkeleton';
-import PostsSectionSkeleton from './_ui/PostsSectionsSkeleton';
 
 import { PostsSection } from '@/widgets/posts-section';
 
-import { Button, StatePlaceholder } from '@/shared/ui';
-import { containerClassName } from '@/shared/ui/Container';
+import { parsePostsParams } from '@/entities/post';
 
-export default function PostsPage() {
+import { postsListOptions } from '@/shared/api/generated/@tanstack/react-query.gen';
+import { getQueryClient } from '@/shared/api/query-client';
+import { parseToSearchParams } from '@/shared/lib/helpers/parseToSearchParams';
+import { Container } from '@/shared/ui/Container';
+
+export default async function PostsPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const sp = await searchParams;
+  const query = parsePostsParams(parseToSearchParams(sp));
+
+  const queryClient = getQueryClient();
+  await queryClient.prefetchQuery(postsListOptions({ query }));
+
   return (
-    <section className={`${containerClassName} grid gap-y-18.5 py-21.25`}>
-      {/* Create header skeleton */}
-      <Suspense fallback={<PostsHeaderSkeleton />}>
-        <PostsHeader />
-      </Suspense>
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <Container className='grid gap-y-18.5 py-21.25'>
+        <Suspense fallback={<PostsHeaderSkeleton />}>
+          <PostsHeader />
+        </Suspense>
 
-      {/* create PsostSection Skeleton */}
-      <QueryErrorResetBoundary>
-        {({ reset }) => (
-          <ErrorBoundary
-            onReset={reset}
-            fallbackRender={({ resetErrorBoundary }) => (
-              <StatePlaceholder
-                tone='error'
-                icon={<LuServerCrash size={28} />}
-                title='Не удалось загрузить посты'
-                description='Попробуйте обновить список.'
-                actions={
-                  <Button size='sm' color='purple' onClick={resetErrorBoundary}>
-                    Попробовать снова
-                  </Button>
-                }
-              />
-            )}
-          >
-            <Suspense fallback={<PostsSectionSkeleton />}>
-              <PostsSection />
-            </Suspense>
-          </ErrorBoundary>
-        )}
-      </QueryErrorResetBoundary>
-    </section>
+        <PostsSection />
+      </Container>
+    </HydrationBoundary>
   );
 }

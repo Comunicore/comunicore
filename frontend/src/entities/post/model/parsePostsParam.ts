@@ -6,7 +6,7 @@ import {
 } from './filtration.enums';
 import { filtrationQueryKeys } from './filtrationQuery.keys';
 
-const POSTS_LIMIT = 20;
+const POSTS_LIMIT = 1;
 
 interface PostFiltrationQueries {
   page: number;
