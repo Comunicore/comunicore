@@ -12,7 +12,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
       style={{ width: size, height: size }}
     >
       <input
-        className='peer border-gray-9e checked:border-purple-67 cursor-pointer appearance-none rounded-sm border-2 duration-200 focus:ring-0 focus:outline-none'
+        className='peer border-gray-9e checked:border-purple-67 focus-visible:outline-purple-86 cursor-pointer appearance-none rounded-sm border-2 duration-200 focus-visible:outline-2 focus-visible:outline-offset-2'
         id={id}
         type='checkbox'
         ref={ref}

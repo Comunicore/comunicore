@@ -18,6 +18,7 @@ interface BaseProps {
   inputSize?: InputSize;
   inputColor?: InputColor;
   actionIcon?: ReactNode;
+  actionIconLabel?: string;
   onActionIconClick?: () => void;
 }
 
@@ -61,6 +62,7 @@ export function Input(props: InputFieldProps | TextareaFieldProps) {
     className,
     icon,
     actionIcon,
+    actionIconLabel,
     onActionIconClick,
     inputSize = 'md',
     inputColor = 'bordered',
@@ -107,7 +109,7 @@ export function Input(props: InputFieldProps | TextareaFieldProps) {
   return (
     <div className={commonClassName}>
       {icon && (
-        <div className={cn('text-gray-9e shrink-0', iconAlignment)}>
+        <div className={cn('text-gray-9e shrink-0', iconAlignment)} aria-hidden>
           {renderIcon(icon)}
         </div>
       )}
@@ -124,8 +126,9 @@ export function Input(props: InputFieldProps | TextareaFieldProps) {
         <button
           type='button'
           onClick={onActionIconClick}
+          aria-label={actionIconLabel}
           className={cn(
-            'text-gray-9e hover:text-light ml-2.5 shrink-0 cursor-pointer transition-colors focus:outline-none',
+            'text-gray-9e hover:text-light focus-visible:outline-purple-86 ml-2.5 shrink-0 cursor-pointer rounded-sm transition-colors focus-visible:outline-2 focus-visible:outline-offset-2',
             iconAlignment,
           )}
         >
