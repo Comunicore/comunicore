@@ -72,11 +72,11 @@ function app_backup () {
       exit 1
   fi
   # remove dirs older 8 days except last two
-  find "${BACKUP_DIR}" -maxdepth 1 -type d -mtime +7 -printf '%T@ %p\0' \
-    | sort -nr \
-    | tail -n +3 \
-    | cut -d' ' -f2- \
-    | xargs -r rm -rf --
+  find "${BACKUP_DIR}" -maxdepth 1 -mindepth 1 -type d -mtime +7 -printf '%T@ %p\0' \
+    | sort -znr \
+    | tail -zn +3 \
+    | cut -zd' ' -f2- \
+    | xargs -0r rm -rf --
   # create backup dir
   CURRENT_BACKUP_DIR="${BACKUP_DIR}/$(date +%s)"
   echo "CURRENT_BACKUP_DIR = ${CURRENT_BACKUP_DIR}"
