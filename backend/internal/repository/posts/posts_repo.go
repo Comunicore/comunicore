@@ -11,12 +11,14 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+	"uuid"
 
 	"github.com/comunicore/comunicore/backend/internal/apperror"
 	"github.com/comunicore/comunicore/backend/internal/repository"
 	postdDb "github.com/comunicore/comunicore/backend/internal/repository/sqlc/db"
 	"github.com/comunicore/comunicore/backend/internal/service/model"
-	"github.com/google/uuid"
+
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/samber/mo"
 )
@@ -48,6 +50,7 @@ func optionUrlsToJsonbArray(optUrls mo.Option[[]url.URL]) ([]byte, error) {
 // create post
 func (r *PostsRepo) Create(ctx context.Context, post model.PostCreateRepo) (model.PostRepoInfo, error) {
 	params := postdDb.PostCreateParams{
+		Uuid:       pgtype.UUID{Bytes: [16]byte(post.UUID), Valid: true},
 		CategoryID: int32(post.CategoryID),
 		Type:       post.Type,
 		Title:      post.Title,
@@ -60,7 +63,7 @@ func (r *PostsRepo) Create(ctx context.Context, post model.PostCreateRepo) (mode
 	}
 	row, err := r.queries.PostCreate(ctx, params)
 	if err != nil {
-		return model.PostRepoInfo{}, err
+		return model.PostRepoInfo{}, apperror.PgErrorToAppError(err)
 	}
 	postRepo := model.PostRepoInfo{
 		ID:         int(row.ID),
@@ -81,6 +84,13 @@ func (r *PostsRepo) Create(ctx context.Context, post model.PostCreateRepo) (mode
 	}
 	// post stats is empty - post just creted, so all values are zero (by default)
 	return postRepo, err
+}
+func (r *PostsRepo) Delete(ctx context.Context, postId int) error {
+	err := r.queries.PostDeleteById(ctx, int32(postId))
+	if err != nil {
+		return apperror.PgErrorToAppError(err)
+	}
+	return nil
 }
 
 func (r *PostsRepo) InsertPostTags(ctx context.Context, postID int, tags []string) error {

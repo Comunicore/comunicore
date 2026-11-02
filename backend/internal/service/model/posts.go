@@ -6,8 +6,8 @@ package model
 import (
 	"net/url"
 	"time"
+	"uuid"
 
-	"github.com/google/uuid"
 	"github.com/samber/mo"
 )
 
@@ -37,6 +37,7 @@ type PostCreateService struct {
 	Tags     []string
 }
 type PostCreateRepo struct {
+	UUID       uuid.UUID
 	CategoryID int
 	Type       string
 	Title      string

@@ -16,6 +16,7 @@ import "errors"
 
 var NotFoundError = errors.New("NotFoundError")
 var NotUniqueError = errors.New("NotUniqueError")
+var IncorrectParametersError = errors.New("IncorrectParametersError")
 
 // deprecated error, user fmt.Errorf with %w and New...Error() instead
 type UnspecifiedError struct {

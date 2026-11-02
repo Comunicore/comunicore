@@ -7,6 +7,7 @@ import (
 	"context"
 
 	"github.com/comunicore/comunicore/backend/internal/lib/utils"
+	"github.com/comunicore/comunicore/backend/internal/saga"
 	"github.com/comunicore/comunicore/backend/internal/service/model"
 )
 
@@ -32,6 +33,7 @@ type UserRepo interface {
 }
 
 type PostsService struct {
+	saga         *saga.PostsSaga
 	categoryRepo CategoryRepo
 	postsRepo    PostsRepo
 	commentsRepo CommentsRepo
@@ -39,12 +41,14 @@ type PostsService struct {
 }
 
 func NewPostsService(
+	saga *saga.PostsSaga,
 	categoryRepo CategoryRepo,
 	postsRepo PostsRepo,
 	commentsRepo CommentsRepo,
 	userRepo UserRepo,
 ) *PostsService {
 	return &PostsService{
+		saga:         saga,
 		categoryRepo: categoryRepo,
 		postsRepo:    postsRepo,
 		commentsRepo: commentsRepo,
@@ -79,26 +83,9 @@ func (s *PostsService) AddComment(ctx context.Context, comment model.CommentCrea
 	return commentInfo, nil
 }
 func (s *PostsService) Create(ctx context.Context, post model.PostCreateService) (model.PostInfo, error) {
-	category, err := s.categoryRepo.GetCategoryByName(ctx, post.Category)
+	createdPost, category, err := s.saga.PostCreate(ctx, post)
 	if err != nil {
 		return model.PostInfo{}, err
-	}
-	createdPost, err := s.postsRepo.Create(ctx, model.PostCreateRepo{
-		CategoryID: category.ID,
-		Type:       post.Type,
-		Title:      post.Title,
-		Content:    post.Content,
-		Files:      post.Files,
-		UserID:     post.UserID,
-		Tags:       post.Tags,
-	})
-	if err != nil {
-		return model.PostInfo{}, err
-	}
-	if len(post.Tags) > 0 {
-		if err := s.postsRepo.InsertPostTags(ctx, createdPost.ID, post.Tags); err != nil {
-			return model.PostInfo{}, err
-		}
 	}
 
 	userInfo, err := s.userRepo.Get(ctx, createdPost.UserID)
