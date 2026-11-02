@@ -651,11 +651,12 @@ func (q *Queries) GetCategoryByName(ctx context.Context, name string) (Category,
 }
 
 const postCreate = `-- name: PostCreate :one
-INSERT INTO posts (category_id, type, title, content, user_id, files) VALUES ($1, $2, $3, $4, $5, $6)
+INSERT INTO posts (uuid, category_id, type, title, content, user_id, files) VALUES ($1, $2, $3, $4, $5, $6, $7)
 RETURNING id, uuid, category_id, type, title, content, user_id, seo_meta, files, created_at, updated_at
 `
 
 type PostCreateParams struct {
+	Uuid       pgtype.UUID
 	CategoryID int32
 	Type       string
 	Title      string
@@ -666,6 +667,7 @@ type PostCreateParams struct {
 
 func (q *Queries) PostCreate(ctx context.Context, arg PostCreateParams) (Post, error) {
 	row := q.db.QueryRow(ctx, postCreate,
+		arg.Uuid,
 		arg.CategoryID,
 		arg.Type,
 		arg.Title,
@@ -688,6 +690,15 @@ func (q *Queries) PostCreate(ctx context.Context, arg PostCreateParams) (Post, e
 		&i.UpdatedAt,
 	)
 	return i, err
+}
+
+const postDeleteById = `-- name: PostDeleteById :exec
+DELETE FROM posts WHERE id = $1
+`
+
+func (q *Queries) PostDeleteById(ctx context.Context, id int32) error {
+	_, err := q.db.Exec(ctx, postDeleteById, id)
+	return err
 }
 
 const postGetById = `-- name: PostGetById :one
@@ -847,6 +858,7 @@ func (q *Queries) PostPagesBeforePostID(ctx context.Context, arg PostPagesBefore
 }
 
 const postStats = `-- name: PostStats :one
+
 SELECT comments_count, likes_count, views_count FROM posts_extras WHERE post_id = $1
 `
 
@@ -856,6 +868,7 @@ type PostStatsRow struct {
 	ViewsCount    int32
 }
 
+// TODO: delete post tags and comments when deleting a post
 func (q *Queries) PostStats(ctx context.Context, postID int32) (PostStatsRow, error) {
 	row := q.db.QueryRow(ctx, postStats, postID)
 	var i PostStatsRow

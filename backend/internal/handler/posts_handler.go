@@ -96,7 +96,7 @@ func (h *PostsHandler) PostCreate(
 	}
 	apiPost := &api.PostItem{
 		ID:        post.ID,
-		UUID:      post.UUID,
+		UUID:      [16]byte(post.UUID),
 		Category:  post.Category,
 		Type:      post.Type,
 		Title:     post.Title,
@@ -179,7 +179,7 @@ func (h *PostsHandler) PostGet(ctx context.Context, params api.PostGetParams) (a
 	})
 	apiPost := &api.PostWithCommentsListResponse{
 		ID:       postWithComments.ID,
-		UUID:     postWithComments.UUID,
+		UUID:     [16]byte(postWithComments.UUID),
 		Category: postWithComments.Category,
 		Type:     postWithComments.Type,
 		Author: api.MessageAuthor{
@@ -256,7 +256,7 @@ GOT_POST_ID:
 	for i, post := range postsList.Posts {
 		resPosts[i] = api.PostListItem{
 			ID:       post.ID,
-			UUID:     post.UUID,
+			UUID:     [16]byte(post.UUID),
 			Category: post.Category,
 			Type:     post.Type,
 			Title:    post.Title,

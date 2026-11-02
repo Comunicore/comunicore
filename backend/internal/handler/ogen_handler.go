@@ -30,6 +30,8 @@ import (
 	postsRepo "github.com/comunicore/comunicore/backend/internal/repository/posts"
 	userRepo "github.com/comunicore/comunicore/backend/internal/repository/user"
 
+	"github.com/comunicore/comunicore/backend/internal/saga"
+
 	analyticsService "github.com/comunicore/comunicore/backend/internal/service/analytics"
 	authService "github.com/comunicore/comunicore/backend/internal/service/auth"
 	categoriesService "github.com/comunicore/comunicore/backend/internal/service/categories"
@@ -226,12 +228,14 @@ func RegisterOgenRoutes(mux *http.ServeMux, cfg *config.AppConfig) {
 		panic(err)
 	}
 
+	postsSagaInstance := saga.NewPostsSaga(categoryR, postsR)
+
 	authS := authService.NewAuthService(authR, userR)
 	userS := userService.NewUserService(userR, authR)
 	mediaS := mediaService.NewMediaService(cfg.Server.BaseURL, mediaR)
 
 	categoriesS := categoriesService.NewCategoriesService(categoryR)
-	postsS := postsService.NewPostsService(categoryR, postsR, commentR, userR)
+	postsS := postsService.NewPostsService(postsSagaInstance, categoryR, postsR, commentR, userR)
 	analyticsS := analyticsService.NewAnalyticsService(analyticsR)
 
 	secure, sameSite := config.SessionCookieOpts(cfg.Server.BaseURL)
