@@ -8,9 +8,7 @@ import { usePathname } from 'next/navigation';
 import { isNavLinkActive } from '../model/isNavLinkActive';
 import { navLinks } from '../model/navLinks';
 
-import { AuthButtons } from './AuthButtons';
-
-import { ProfileActions } from '@/features/profile-actions';
+import { AuthSlot } from './AuthSlot';
 
 import {
   selectIsAuthenticated,
@@ -165,7 +163,7 @@ export function BurgerMenu({ menuRef }: BurgerMenuProps) {
           );
         })}
       </nav>
-      {isAuthenticated ? <ProfileActions /> : <AuthButtons />}
+      <AuthSlot skeletonClassName='h-13 w-full rounded-[10px]' />
       {isAuthenticated && (
         <Button
           color='red'
