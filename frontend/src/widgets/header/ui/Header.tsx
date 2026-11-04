@@ -9,12 +9,8 @@ import { usePathname } from 'next/navigation';
 import { isNavLinkActive } from '../model/isNavLinkActive';
 import { navLinks } from '../model/navLinks';
 
-import { AuthButtons } from './AuthButtons';
+import { AuthSlot } from './AuthSlot';
 import { Burger } from './Burger';
-
-import { ProfileActions } from '@/features/profile-actions';
-
-import { selectIsAuthenticated, useAuthStore } from '@/entities/session';
 
 import logo from '@/shared/assets/images/logo.svg';
 import { AppRouter } from '@/shared/config/app-router';
@@ -34,8 +30,6 @@ interface HeaderProps {
 export function Header(props: HeaderProps) {
   const { menuRef, burgerRef } = props;
   const pathname = usePathname();
-
-  const isAuthenticated = useAuthStore(selectIsAuthenticated);
 
   const isOpen = useMenuIsOpen();
   const setIsOpen = useMenuActions().setIsOpen;
@@ -106,11 +100,7 @@ export function Header(props: HeaderProps) {
           <button title='Search' aria-label='Search button'>
             <LuSearch size={30} />
           </button>
-          {isAuthenticated ? (
-            <ProfileActions className='hidden xl:flex' />
-          ) : (
-            <AuthButtons className='hidden xl:flex' />
-          )}
+          <AuthSlot className='hidden xl:flex' skeletonClassName='h-10 w-56' />
           <Burger
             isOpen={isOpen}
             setIsOpen={setMenuOpen}
