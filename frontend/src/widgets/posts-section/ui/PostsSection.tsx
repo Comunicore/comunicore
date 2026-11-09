@@ -17,7 +17,7 @@ import { Button, StatePlaceholder } from '@/shared/ui';
 
 export function PostsSection() {
   return (
-    <>
+    <Suspense fallback={<PostsListSkeleton />}>
       <div
         className={cn(
           'flex min-w-0 flex-col-reverse gap-y-4',
@@ -45,6 +45,7 @@ export function PostsSection() {
                   icon={<LuServerCrash size={28} />}
                   title='Не удалось загрузить посты'
                   description='Попробуйте обновить список.'
+                  className='max-h-200'
                   actions={
                     <Button
                       size='sm'
@@ -59,13 +60,11 @@ export function PostsSection() {
                 />
               )}
             >
-              <Suspense fallback={<PostsListSkeleton />}>
-                <PostsList />
-              </Suspense>
+              <PostsList />
             </ErrorBoundary>
           )}
         </QueryErrorResetBoundary>
       </div>
-    </>
+    </Suspense>
   );
 }

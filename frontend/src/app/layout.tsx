@@ -33,7 +33,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang='en'>
+    <html lang='ru'>
       <body className={`${montserrat.variable} ${inter.variable}`}>
         <Providers>{children}</Providers>
       </body>

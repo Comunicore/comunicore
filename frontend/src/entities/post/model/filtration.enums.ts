@@ -25,6 +25,6 @@ export type PostsSortTypes = z.infer<typeof postsSortEnum>;
 export const sortLabels: Record<PostsSortTypes, string> = {
   last_activity: 'Последняя активность',
   likes: 'По лайкам',
-  views: 'По прoсмотрам',
+  views: 'По просмотрам',
   popular: 'Популярные',
 } as const;

@@ -85,7 +85,11 @@ export function Pagination({
             <Button
               key={`dots-${index}`}
               type='button'
-              color='bordered'
+              color='transparent'
+              className='hover:border-gray-9e/10 cursor-default hover:bg-transparent'
+              disabled
+              aria-label='Skip pages'
+              title='Skip pages'
               size='square'
             >
               ...
