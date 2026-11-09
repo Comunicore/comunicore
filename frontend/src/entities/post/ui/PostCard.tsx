@@ -1,8 +1,7 @@
 import { HTMLAttributes } from 'react';
 import Link from 'next/link';
 
-import { Post } from '../model/post.types';
-
+import { PostListItem } from '@/shared/api/generated';
 import { AppRouter } from '@/shared/config/app-router';
 import { cn } from '@/shared/lib/classNames';
 import { formatInt } from '@/shared/lib/helpers/formatInt';
@@ -10,19 +9,17 @@ import { formatTimeAgo } from '@/shared/lib/helpers/formatTimeAgo';
 import { ProfileAvatar, Tag } from '@/shared/ui';
 
 interface PostCardProps extends HTMLAttributes<HTMLElement> {
-  post: Post;
+  post: PostListItem;
 }
 
 export const PostCard = ({
   className,
   post: {
-    avatarUrl,
     id,
-    authorName,
-    commentsCount,
+    author: { displayName: authorName, avatarUrl },
     category,
     title,
-    views,
+    postStats: { commentsCount, viewsCount },
     createdAt,
   },
   ...restAttrs
@@ -57,7 +54,7 @@ export const PostCard = ({
         </div>
         <div className='text-gray-9e flex flex-wrap gap-x-5 gap-y-1 whitespace-nowrap lg:hidden'>
           <span>{commentsCount} комментариев</span>
-          <span>{formatInt(views)} просмотров</span>
+          <span>{formatInt(viewsCount)} просмотров</span>
         </div>
       </div>
     </header>
@@ -69,7 +66,7 @@ export const PostCard = ({
     </Tag>
     <span className='hidden text-lg lg:inline'>{commentsCount}</span>
     <span className='hidden whitespace-nowrap lg:inline'>
-      {formatInt(views)}
+      {formatInt(viewsCount)}
     </span>
   </article>
 );

@@ -1,13 +1,19 @@
 'use client';
 
+import { LuInbox, LuSearchX } from 'react-icons/lu';
 import { useSearchParams } from 'next/navigation';
 
-import { usePostsList } from '../model/usePostsList';
+import {
+  filtrationQueryKeys,
+  parsePostsParams,
+  PostCard,
+  useSuspensePostList,
+} from '@/entities/post';
 
-import { PostCard } from '@/entities/post';
-
+import { AppRouter } from '@/shared/config/app-router';
+import { useUpdateSearchParams } from '@/shared/hooks/useUpdateSearchParams';
 import { cn } from '@/shared/lib/classNames';
-import { Loader, Pagination } from '@/shared/ui';
+import { Button, Pagination, StatePlaceholder } from '@/shared/ui';
 
 const tableGridClassName = cn(
   'flex flex-col *:not-first:text-center',
@@ -16,54 +22,52 @@ const tableGridClassName = cn(
   '2xl:grid-cols-[52.5%_11.5rem_auto_auto]',
 );
 
+const tableLabels = ['Пост', 'Категория', 'Комментарии', 'Просмотры'] as const;
+
 export function PostsList() {
   const searchParams = useSearchParams();
-  const page = Number(searchParams.get('page')) || 1;
-  const { data, isPending, isError } = usePostsList(page);
+  const { limit: POSTS_LIMIT, page } = parsePostsParams(searchParams);
+  const { posts } = useSuspensePostList({
+    query: { limit: POSTS_LIMIT, page },
+  });
+  const postsLists = posts.posts;
+  const totalPages = Math.ceil((posts.totalCountEstimated || 0) / POSTS_LIMIT);
+  const setParam = useUpdateSearchParams();
 
-  const renderBody = () => {
-    if (isPending) {
-      return (
-        <div className='flex justify-center py-10'>
-          <Loader size='sm' />
-        </div>
-      );
-    }
+  const onRetry = () => setParam({ [filtrationQueryKeys.page]: undefined });
 
-    if (isError) {
+  if (postsLists.length === 0) {
+    if (page > 1) {
       return (
-        <p className='text-gray-9e px-2.5 py-10 text-center'>
-          Не удалось загрузить посты. Попробуйте обновить страницу.
-        </p>
-      );
-    }
-
-    if (!data.posts.length) {
-      return (
-        <p className='text-gray-9e px-2.5 py-10 text-center'>
-          Постов пока нет.
-        </p>
+        <StatePlaceholder
+          tone='info'
+          icon={<LuSearchX size={28} />}
+          title='Страница не найдена'
+          description='Такой страницы нет в списке.'
+          className='max-h-150'
+          actions={
+            <Button size='sm' color='bordered' onClick={onRetry}>
+              Вернуться на первую страницу
+            </Button>
+          }
+        />
       );
     }
 
     return (
-      <ul>
-        {data.posts.map((post) => (
-          <li
-            key={post.id}
-            className={cn(
-              'group relative px-2.5 py-5 transition',
-              'not-last:border-b-gray-9e/10 not-last:border-b',
-              'focus-within:ring-offset focus-within:ring focus-within:ring-white',
-            )}
-          >
-            <PostCard className={tableGridClassName} post={post} />
-          </li>
-        ))}
-      </ul>
+      <StatePlaceholder
+        icon={<LuInbox size={28} />}
+        title='Пока нет постов'
+        description='Будьте первым, кто начнёт обсуждение.'
+        className='max-h-150'
+        actions={
+          <Button size='sm' color='purple' href={AppRouter.posts.new}>
+            Создать пост
+          </Button>
+        }
+      />
     );
-  };
-
+  }
   return (
     <div>
       <div className='border-gray-9e/10 bg-dark-1b/50 h-fit rounded-[0.625rem] border py-1.25'>
@@ -73,14 +77,30 @@ export function PostsList() {
             tableGridClassName,
           )}
         >
-          <span>Пост</span>
-          <span>Категория</span>
-          <span>Комментарии</span>
-          <span>Просмотры</span>
+          {tableLabels.map((label) => (
+            <span key={label}>{label}</span>
+          ))}
         </header>
-        {renderBody()}
+        <ul>
+          {postsLists.map((post) => (
+            <li
+              key={post.id}
+              className={cn(
+                'group relative px-2.5 py-5 transition',
+                'not-last:border-b-gray-9e/10 not-last:border-b',
+                'focus-within:ring-offset focus-within:ring focus-within:ring-white',
+              )}
+            >
+              <PostCard className={tableGridClassName} post={post} />
+            </li>
+          ))}
+        </ul>
       </div>
-      {data && <Pagination totalPages={data.totalPages} />}
+      <Pagination
+        totalPages={totalPages}
+        pageQueryKey={filtrationQueryKeys.page}
+        currentPage={page}
+      />
     </div>
   );
 }

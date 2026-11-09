@@ -1,7 +1,7 @@
 import { BsGrid3X2GapFill } from 'react-icons/bs';
 import { LuCodeXml, LuCpu, LuPalette, LuRocket } from 'react-icons/lu';
 
-export const filterTags = [
+const filterTags = [
   {
     id: 'all',
     icon: BsGrid3X2GapFill,
@@ -28,3 +28,5 @@ export const filterTags = [
     label: 'Продуктивность',
   },
 ] as const;
+
+export default filterTags;
