@@ -24,7 +24,7 @@ permissions:
 #     runs-on: ubuntu-latest
 #     steps:
 #       - name: Download build
-#         uses: actions/download-artifact@v4
+#         uses: actions/download-artifact@v8
 #         with:
 #           name: comunicore_bin
 #       - name: extract build
@@ -185,13 +185,13 @@ jobs:
     steps:
       - name: Download frontend build artifacts
         if: inputs.run_build && inputs.upload_build_artifacts
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v8
         with:
           name: comunicore_bin_frontend
 
       - name: Download backend build artifacts
         if: inputs.run_build && inputs.upload_build_artifacts
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v8
         with:
           name: comunicore_bin_backend
 
