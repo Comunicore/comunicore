@@ -139,7 +139,7 @@ jobs:
 
       - name: Setup just
         if: inputs.run_build || inputs.run_tests
-        uses: extractions/setup-just@v3
+        uses: extractions/setup-just@v4
 
       - name: Build backend
         if: inputs.run_build
